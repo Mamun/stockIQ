@@ -61,58 +61,129 @@ def get_company_name(ticker: str) -> str:
 @st.cache_data(ttl=3600)
 def fetch_spx_recommendations() -> pd.DataFrame:
     """
-    Fetch last 6 months of data for all SPX_TOP_30 tickers.
-    Resample to weekly and monthly, count green candles, produce BUY/SELL signal.
-    Cached for 1 hour.
+    Full-featured weekly/monthly candle screener for SPX_TICKERS.
+
+    Computes per ticker:
+      • 4-week & 4-month green candle counts
+      • 5-tier signal (Strong Buy → Sell)
+      • 1W / 1M / 3M price returns
+      • Performance vs S&P 500 (1M relative strength)
+      • Volume trend (5-day avg vs 20-day avg)
+      • RSI-14
+      • Sector (from yfinance info)
     """
     recommendations = []
     progress = st.empty()
 
+    end_date   = datetime.today()
+    start_date = end_date - timedelta(days=270)   # 9 months → enough for 3M return + warmup
+    start_str  = start_date.strftime("%Y-%m-%d")
+    end_str    = end_date.strftime("%Y-%m-%d")
+
+    # ── SPX benchmark (fetch once for relative-strength calc) ─────────────────
+    spx_ret_1m = 0.0
+    try:
+        spx = yf.download("^GSPC", start=start_str, end=end_str,
+                          progress=False, auto_adjust=True)
+        if isinstance(spx.columns, pd.MultiIndex):
+            spx.columns = spx.columns.get_level_values(0)
+        spx = spx.dropna(subset=["Close"])
+        if len(spx) >= 22:
+            spx_ret_1m = (
+                (float(spx["Close"].iloc[-1]) - float(spx["Close"].iloc[-22]))
+                / float(spx["Close"].iloc[-22]) * 100
+            )
+    except Exception:
+        pass
+
+    # ── Per-ticker scan ───────────────────────────────────────────────────────
     for idx, ticker in enumerate(SPX_TICKERS):
         progress.info(f"Fetching {ticker}… ({idx + 1}/{len(SPX_TICKERS)})")
         try:
-            end_date   = datetime.today()
-            start_date = end_date - timedelta(days=180)
-            df = yf.download(
-                ticker,
-                start=start_date.strftime("%Y-%m-%d"),
-                end=end_date.strftime("%Y-%m-%d"),
-                progress=False,
-                auto_adjust=True,
-            )
-            if df.empty or len(df) < 10:
+            df = yf.download(ticker, start=start_str, end=end_str,
+                             progress=False, auto_adjust=True)
+            if df.empty or len(df) < 20:
                 continue
             if isinstance(df.columns, pd.MultiIndex):
                 df.columns = df.columns.get_level_values(0)
             df = df.dropna(subset=["Close"])
-            if len(df) < 10:
+            if len(df) < 20:
                 continue
 
-            company_name = yf.Ticker(ticker).info.get("longName", ticker)
+            info         = yf.Ticker(ticker).info
+            company_name = info.get("longName", ticker)
+            sector       = info.get("sector", "—")
+            last_price   = float(df["Close"].iloc[-1])
 
-            weekly_df     = df[["Open", "Close"]].resample("W").agg({"Open": "first", "Close": "last"})
-            weekly_last_4 = weekly_df.tail(4)
-            weekly_green  = sum(1 for _, row in weekly_last_4.iterrows() if row["Close"] > row["Open"])
-            weekly_status = ["🟢" if row["Close"] > row["Open"] else "🔴" for _, row in weekly_last_4.iterrows()]
+            # ── Price returns ────────────────────────────────────────────────
+            def _ret(n: int):
+                if len(df) > n:
+                    prev = float(df["Close"].iloc[-(n + 1)])
+                    return (last_price - prev) / prev * 100
+                return None
 
-            monthly_df     = df[["Open", "Close"]].resample("ME").agg({"Open": "first", "Close": "last"})
-            monthly_last_4 = monthly_df.tail(4)
-            monthly_green  = sum(1 for _, row in monthly_last_4.iterrows() if row["Close"] > row["Open"])
-            monthly_status = ["🟢" if row["Close"] > row["Open"] else "🔴" for _, row in monthly_last_4.iterrows()]
+            ret_1w = _ret(5)
+            ret_1m = _ret(21)
+            ret_3m = _ret(63)
+            vs_spx = round(ret_1m - spx_ret_1m, 1) if ret_1m is not None else None
 
-            signal   = "🟢 BUY" if (weekly_green == 4 and monthly_green >= 3) else "🔴 SELL"
-            strength = weekly_green + monthly_green
+            # ── Volume trend ─────────────────────────────────────────────────
+            avg_vol_5  = float(df["Volume"].tail(5).mean())
+            avg_vol_20 = float(df["Volume"].tail(20).mean())
+            if avg_vol_20 > 0:
+                ratio = avg_vol_5 / avg_vol_20
+                vol_trend = "🔼" if ratio > 1.1 else "🔽" if ratio < 0.9 else "➡️"
+            else:
+                vol_trend = "—"
+
+            # ── RSI-14 ───────────────────────────────────────────────────────
+            delta    = df["Close"].diff()
+            avg_gain = delta.clip(lower=0).ewm(com=13, min_periods=14).mean()
+            avg_loss = (-delta.clip(upper=0)).ewm(com=13, min_periods=14).mean()
+            rs       = avg_gain / avg_loss.replace(0, np.nan)
+            rsi      = float((100 - 100 / (1 + rs)).iloc[-1])
+
+            # ── Candle counts ────────────────────────────────────────────────
+            weekly_df    = df[["Open", "Close"]].resample("W").agg({"Open": "first", "Close": "last"})
+            w4           = weekly_df.tail(4)
+            weekly_green = sum(1 for _, r in w4.iterrows() if r["Close"] > r["Open"])
+            weekly_dots  = ["🟢" if r["Close"] > r["Open"] else "🔴" for _, r in w4.iterrows()]
+
+            monthly_df    = df[["Open", "Close"]].resample("ME").agg({"Open": "first", "Close": "last"})
+            m4            = monthly_df.tail(4)
+            monthly_green = sum(1 for _, r in m4.iterrows() if r["Close"] > r["Open"])
+            monthly_dots  = ["🟢" if r["Close"] > r["Open"] else "🔴" for _, r in m4.iterrows()]
+
+            # ── 5-tier signal ────────────────────────────────────────────────
+            if weekly_green == 4 and monthly_green == 4:
+                signal, sig_order = "🟢 Strong Buy", 1
+            elif weekly_green == 4 and monthly_green >= 3:
+                signal, sig_order = "🟢 Buy", 2
+            elif weekly_green >= 3 and monthly_green >= 3:
+                signal, sig_order = "🟡 Accumulate", 3
+            elif weekly_green >= 2:
+                signal, sig_order = "🟠 Caution", 4
+            else:
+                signal, sig_order = "🔴 Sell", 5
 
             recommendations.append({
-                "Ticker":       ticker,
-                "Company":      company_name,
-                "Last Price":   f"${df['Close'].iloc[-1]:.2f}",
-                "🔷 Weeks":     " ".join(weekly_status),
-                "Green Weeks":  f"{weekly_green}/4",
-                "🔶 Months":    " ".join(monthly_status),
-                "Green Months": f"{monthly_green}/4",
-                "Signal":       signal,
-                "Strength":     strength,
+                "Ticker":    ticker,
+                "Company":   company_name,
+                "Sector":    sector,
+                "Price":     round(last_price, 2),
+                "1W %":      round(ret_1w, 1) if ret_1w is not None else None,
+                "1M %":      round(ret_1m, 1) if ret_1m is not None else None,
+                "3M %":      round(ret_3m, 1) if ret_3m is not None else None,
+                "vs SPX":    vs_spx,
+                "Vol":       vol_trend,
+                "RSI":       round(rsi, 1),
+                "🔷 Weeks":  " ".join(weekly_dots),
+                "W Score":   f"{weekly_green}/4",
+                "🔶 Months": " ".join(monthly_dots),
+                "M Score":   f"{monthly_green}/4",
+                "Signal":    signal,
+                "_order":    sig_order,
+                "Strength":  weekly_green + monthly_green,
             })
         except Exception:
             continue
@@ -120,7 +191,12 @@ def fetch_spx_recommendations() -> pd.DataFrame:
     progress.empty()
     if not recommendations:
         return pd.DataFrame()
-    return pd.DataFrame(recommendations).sort_values("Strength", ascending=False)
+
+    return (
+        pd.DataFrame(recommendations)
+        .sort_values(["_order", "Strength"], ascending=[True, False])
+        .reset_index(drop=True)
+    )
 
 
 @st.cache_data(ttl=1800)  # 30-min cache — scan is expensive
