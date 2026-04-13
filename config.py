@@ -43,6 +43,16 @@ _SPX_UNIVERSE = [
     "PFE", "ABT", "TXN", "CSCO", "PM", "LIN", "ACN", "NKE", "DIS", "AXP",
     # 41-50
     "HON", "INTC", "IBM", "AMGN", "GE", "LOW", "SBUX", "BA", "RTX", "CAT",
+    # 51-60
+    "NOW", "INTU", "ISRG", "GS", "SPGI", "MS", "BLK", "SYK", "PEP", "TMO",
+    # 61-70
+    "PLD", "VRTX", "REGN", "MMC", "CB", "ETN", "DE", "BKNG", "MDT", "NEE",
+    # 71-80
+    "MO", "T", "VZ", "CL", "BMY", "GILD", "CI", "ELV", "HCA", "MCO",
+    # 81-90
+    "ICE", "TJX", "USB", "PNC", "AON", "ZTS", "COF", "APD", "ECL", "CME",
+    # 91-100
+    "LRCX", "KLAC", "AMAT", "PANW", "MU", "SNPS", "CDNS", "ADI", "MRVL", "QCOM",
 ]
 
 SCREENER_TICKER_COUNT: int = int(os.environ.get("SCREENER_TICKER_COUNT", 50))
