@@ -4,6 +4,7 @@ import streamlit as st
 from plotly.subplots import make_subplots
 
 from data import fetch_index_snapshot, fetch_spx_intraday, fetch_spx_quote
+from indicators import compute_daily_gaps
 
 
 # ── Sidebar ticker (auto-refreshes every 60 s without rerunning the full app) ──
@@ -125,8 +126,41 @@ def render_spx_dashboard_tab() -> None:
         st.markdown("#### Technical Summary")
         _render_technical_summary(daily_df, price)
 
+        st.markdown("---")
+        _render_spy_gap_table(daily_df)
+
 
 # ── Private helpers ────────────────────────────────────────────────────────────
+
+def _render_spy_gap_table(daily_df) -> None:
+    st.markdown("#### Daily Gaps (Last 30 Days)")
+    gaps_df   = compute_daily_gaps(daily_df)
+    gaps_data = gaps_df.tail(30)[["Open", "Prev Close", "Gap", "Gap %", "Gap Filled"]].reset_index()
+    gaps_data.columns = ["Date", "Open", "Prev Close", "Gap $", "Gap %", "Filled"]
+    gaps_data["Date"] = gaps_data["Date"].dt.strftime("%m-%d")
+    gaps_data = gaps_data.sort_values("Date", ascending=False).reset_index(drop=True)
+    gaps_data["Status"] = gaps_data.apply(
+        lambda r: "—" if r["Gap $"] == 0 else ("✅ Filled" if r["Filled"] else "❌ Open"),
+        axis=1,
+    )
+    display = gaps_data[["Date", "Open", "Prev Close", "Gap $", "Gap %", "Status"]]
+
+    def _highlight(row):
+        gap    = gaps_data.loc[row.name, "Gap $"]
+        filled = gaps_data.loc[row.name, "Filled"]
+        if gap == 0 or bool(filled):
+            return [""] * len(row)
+        style = "background-color: rgba(239,68,68,0.25); color:#EF4444; font-weight:600"
+        return [style] * len(row)
+
+    st.dataframe(
+        display.style.apply(_highlight, axis=1).format(
+            {"Open": "${:.2f}", "Prev Close": "${:.2f}", "Gap $": "${:.2f}", "Gap %": "{:+.2f}%"},
+            na_rep="—",
+        ),
+        width="stretch", hide_index=True, height=600,
+    )
+
 
 def _render_index_strip(df) -> None:
     if df.empty:
