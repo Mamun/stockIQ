@@ -724,6 +724,27 @@ def fetch_spx_intraday(period: str = "1d", interval: str = "5m") -> pd.DataFrame
 
 
 @st.cache_data(ttl=3600)
+def fetch_vix_ohlc(period: str = "1y") -> pd.DataFrame:
+    """
+    Daily VIX OHLC history (Open, High, Low, Close) for gap analysis.
+    Cached for 1 hour.
+    """
+    try:
+        df = yf.download(
+            "^VIX",
+            period=period,
+            interval="1d",
+            progress=False,
+            auto_adjust=True,
+        )
+        if isinstance(df.columns, pd.MultiIndex):
+            df.columns = df.columns.get_level_values(0)
+        return df[["Open", "High", "Low", "Close"]].dropna()
+    except Exception:
+        return pd.DataFrame()
+
+
+@st.cache_data(ttl=3600)
 def fetch_vix_history(period: str = "1y") -> pd.DataFrame:
     """
     Daily VIX close history alongside SPY close for dual-axis comparison.

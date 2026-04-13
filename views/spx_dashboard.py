@@ -3,7 +3,7 @@ import plotly.graph_objects as go
 import streamlit as st
 from plotly.subplots import make_subplots
 
-from data import fetch_index_snapshot, fetch_spx_intraday, fetch_spx_quote, fetch_vix_history
+from data import fetch_index_snapshot, fetch_spx_intraday, fetch_spx_quote, fetch_vix_history, fetch_vix_ohlc
 from indicators import compute_daily_gaps
 
 
@@ -200,6 +200,9 @@ def _render_vix_section() -> None:
 
     st.plotly_chart(_spy_vix_chart(vix_df), width="stretch")
 
+    st.markdown("---")
+    _render_vix_gap_table()
+
 
 def _spy_vix_chart(df) -> go.Figure:
     """Dual-axis chart: SPY price (left axis) + VIX (right axis, shaded zones)."""
@@ -250,6 +253,39 @@ def _spy_vix_chart(df) -> go.Figure:
     fig.update_yaxes(title_text="SPY Price", secondary_y=False, gridcolor="#1E293B")
     fig.update_yaxes(title_text="VIX", secondary_y=True, gridcolor="rgba(0,0,0,0)", showgrid=False)
     return fig
+
+
+def _render_vix_gap_table() -> None:
+    st.markdown("#### VIX Daily Gaps (Last 30 Days)")
+    vix_ohlc = fetch_vix_ohlc(period="1y")
+    if vix_ohlc.empty:
+        st.info("VIX OHLC data unavailable.")
+        return
+    gaps_df   = compute_daily_gaps(vix_ohlc)
+    gaps_data = gaps_df.tail(30)[["Open", "Prev Close", "Gap", "Gap %", "Gap Filled"]].reset_index()
+    gaps_data.columns = ["Date", "Open", "Prev Close", "Gap $", "Gap %", "Filled"]
+    gaps_data["Date"] = gaps_data["Date"].dt.strftime("%m-%d")
+    gaps_data = gaps_data.sort_values("Date", ascending=False).reset_index(drop=True)
+    gaps_data["Status"] = gaps_data.apply(
+        lambda r: "—" if r["Gap $"] == 0 else ("✅ Filled" if r["Filled"] else "❌ Open"),
+        axis=1,
+    )
+    display = gaps_data[["Date", "Open", "Prev Close", "Gap $", "Gap %", "Status"]]
+
+    def _highlight(row):
+        gap    = gaps_data.loc[row.name, "Gap $"]
+        filled = gaps_data.loc[row.name, "Filled"]
+        if gap == 0 or bool(filled):
+            return [""] * len(row)
+        return ["background-color: rgba(239,68,68,0.25); color:#EF4444; font-weight:600"] * len(row)
+
+    st.dataframe(
+        display.style.apply(_highlight, axis=1).format(
+            {"Open": "{:.2f}", "Prev Close": "{:.2f}", "Gap $": "{:.2f}", "Gap %": "{:+.2f}%"},
+            na_rep="—",
+        ),
+        width="stretch", hide_index=True, height=600,
+    )
 
 
 def _render_spy_gap_table(daily_df) -> None:
