@@ -390,25 +390,36 @@ def compute_daily_gaps(df: pd.DataFrame) -> pd.DataFrame:
     df_gap["Gap %"] = (df_gap["Gap"] / df_gap["Prev Close"] * 100).round(2)
     
     # Check if gap is filled within 3 trading days
-    df_gap["Gap Filled"] = False
+    gap_filled_list = []
     for i in range(len(df_gap)):
-        if pd.isna(df_gap.iloc[i]["Gap"]) or df_gap.iloc[i]["Gap"] == 0:
-            continue
+        gap = df_gap.iloc[i]["Gap"]
         prev_close = df_gap.iloc[i]["Prev Close"]
-        gap_direction = 1 if df_gap.iloc[i]["Gap"] > 0 else -1  # 1 for up gap, -1 for down gap
+        
+        # Skip if no gap or NaN
+        if pd.isna(gap) or pd.isna(prev_close) or gap == 0:
+            gap_filled_list.append(False)
+            continue
+        
+        is_filled = False
+        gap_direction = 1 if gap > 0 else -1  # 1 for up gap, -1 for down gap
         
         # Check next 3 trading days
         for j in range(i + 1, min(i + 4, len(df_gap))):
             high = df_gap.iloc[j]["High"]
             low = df_gap.iloc[j]["Low"]
-            # Gap is filled if price touches previous close within 3 days
-            if gap_direction > 0 and low <= prev_close:  # Up gap filled
-                df_gap.iloc[i, df_gap.columns.get_loc("Gap Filled")] = True
-                break
-            elif gap_direction < 0 and high >= prev_close:  # Down gap filled
-                df_gap.iloc[i, df_gap.columns.get_loc("Gap Filled")] = True
-                break
+            
+            if gap_direction > 0:  # Up gap: check if low touches prev close
+                if low <= prev_close:
+                    is_filled = True
+                    break
+            else:  # Down gap: check if high touches prev close
+                if high >= prev_close:
+                    is_filled = True
+                    break
+        
+        gap_filled_list.append(is_filled)
     
+    df_gap["Gap Filled"] = gap_filled_list
     df_gap["Open"] = df_gap["Open"].round(2)
     df_gap["Close"] = df_gap["Close"].round(2)
     df_gap["Prev Close"] = df_gap["Prev Close"].round(2)
@@ -658,25 +669,20 @@ if analyze_btn or ticker:
         
         # Extract display columns and track unfilled status
         gaps_display_data = gaps_last_30[["Open", "Prev Close", "Gap", "Gap %", "Gap Filled"]].reset_index()
-        gaps_display_data.columns = ["Date", "Open", "Prev Close", "Gap $", "Gap %", "Unfilled"]
+        gaps_display_data.columns = ["Date", "Open", "Prev Close", "Gap $", "Gap %", "Filled"]
         gaps_display_data["Date"] = gaps_display_data["Date"].dt.strftime("%m-%d")
-        gaps_display_data = gaps_display_data.sort_values("Date", ascending=False)
+        gaps_display_data = gaps_display_data.sort_values("Date", ascending=False).reset_index(drop=True)
         
-        # Style with conditional formatting
-        def style_gap_row(row):
-            if row["Unfilled"] is False:  # Gap filled (normal color)
-                return [""] * len(row)
-            else:  # Gap not filled (highlight in red)
-                return ["background-color: rgba(239, 68, 68, 0.2); color: #EF4444; font-weight: bold"] * len(row)
+        # Create colored display: highlight unfilled gaps in red
+        gaps_for_display = gaps_display_data.drop("Filled", axis=1)
         
-        # Display without the Unfilled column but with styling
-        gaps_for_display = gaps_display_data.drop("Unfilled", axis=1)
-        styled_df = gaps_for_display.style.apply(
-            lambda row: ["background-color: rgba(239, 68, 68, 0.2); color: #EF4444; font-weight: bold"] * len(row) 
-                        if gaps_display_data.loc[row.name, "Unfilled"] is False else [""] * len(row),
-            axis=1
-        )
-        st.dataframe(gaps_for_display, use_container_width=True, hide_index=True, height=600)
+        # Apply styling: red background for unfilled gaps
+        def highlight_unfilled(row):
+            is_unfilled = gaps_display_data.loc[row.name, "Filled"] is False
+            return ["background-color: rgba(239, 68, 68, 0.3); color: #EF4444; font-weight: bold"] * len(row) if is_unfilled else [""] * len(row)
+        
+        styled_df = gaps_for_display.style.apply(highlight_unfilled, axis=1)
+        st.dataframe(styled_df, use_container_width=True, hide_index=True, height=600)
 
     if show_patterns:
         pattern_rows = []
