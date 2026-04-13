@@ -44,6 +44,9 @@ st.markdown("""
 st.title("📈 Stock Market Analyzer")
 st.markdown("Moving Averages · Fibonacci Levels · Buy / Sell Signals · Reversal Patterns")
 
+# ── Navigation Tabs (Main Menu) ────────────────────────────────────────────────
+tab_search, tab_screener = st.tabs(["🔍 Search by Company Name", "📊 Weekly/Monthly Screener"])
+
 # ── Session state ─────────────────────────────────────────────────────────────
 if "search_results" not in st.session_state:
     st.session_state.search_results = []
@@ -155,12 +158,11 @@ def fetch_spx_recommendations() -> pd.DataFrame:
     return pd.DataFrame(recommendations).sort_values("Strength", ascending=False)
 
 
-# ── Navigation tabs ───────────────────────────────────────────────────────────
-tab_analyzer, tab_screener = st.tabs(["📈 Stock Analyzer", "📊 Weekly/Monthly Screener"])
+# ── Navigation tabs (removed - using top-level tabs instead)
 
-# ── Tab 1: Stock Analyzer ─────────────────────────────────────────────────────
-with tab_analyzer:
-    # ── Feature Overview (SEO Content) ────────────────────────────────────────────
+# ── Tab 1: Search by Company Name ─────────────────────────────────────────────
+with tab_search:
+    # ── Feature Overview (SEO Content) ────────────────────────────────────────────────
     with st.expander("📊 About This Stock Analyzer", expanded=False):
         st.markdown("""
         **Stock Market Analyzer** is a free technical analysis tool designed to help traders and investors make informed decisions with real-time data.
