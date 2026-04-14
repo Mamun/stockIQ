@@ -10,3 +10,5 @@ venv/
 
 # Streamlit secrets only (keep config)
 .streamlit/secrets.toml
+.env
+.streamlit/secrets.toml

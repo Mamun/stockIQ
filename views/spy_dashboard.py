@@ -5,6 +5,7 @@ from plotly.subplots import make_subplots
 
 from data import fetch_index_snapshot, fetch_spx_intraday, fetch_spx_quote, fetch_vix_history, fetch_vix_ohlc
 from indicators import compute_daily_gaps, compute_rsi
+from views.ai_forecast import render_ai_forecast
 
 
 # ── Main dashboard tab ─────────────────────────────────────────────────────────
@@ -61,15 +62,31 @@ def render_spy_dashboard_tab() -> None:
 
     st.markdown("---")
 
-    # ── 4. Gap table (always 1Y daily) ────────────────────────────────────────
+    # ── 4. AI Forecast slot ───────────────────────────────────────────────────
+    ai_slot = st.empty()
+
+    st.markdown("---")
+
+    # ── 5. Gap table ──────────────────────────────────────────────────────────
     if not daily_df.empty:
         _render_spy_gap_table(daily_df)
 
     st.markdown("---")
 
-    # ── 4. VIX panel ──────────────────────────────────────────────────────────
+    # ── 6. VIX panel ──────────────────────────────────────────────────────────
     st.markdown("#### VIX — Fear & Greed Gauge")
     _render_vix_section()
+
+    # ── Fill AI Forecast slot last (gap table + VIX already visible) ──────────
+    if not daily_df.empty:
+        try:
+            gaps_df_for_ai = compute_daily_gaps(daily_df).copy()
+            rsi_dedup = compute_rsi(daily_df)[~daily_df.index.duplicated(keep="last")]
+            gaps_df_for_ai["RSI"] = rsi_dedup.reindex(gaps_df_for_ai.index)
+            with ai_slot.container():
+                render_ai_forecast(gaps_df_for_ai)
+        except Exception:
+            pass
 
 
 # ── Private helpers ────────────────────────────────────────────────────────────
@@ -235,8 +252,7 @@ def _render_spy_gap_table(daily_df) -> None:
     head_col, btn_col = st.columns([8, 1])
     head_col.markdown("#### Daily Gaps (Last 30 Days)")
     with btn_col:
-        import streamlit.components.v1 as components
-        components.html("""
+        st.html("""
         <button onclick="
           var url = (window.parent.location.origin || window.location.ancestorOrigins?.[0] || window.location.origin) + '/spy-gaps';
           navigator.clipboard.writeText(url)
@@ -260,7 +276,7 @@ def _render_spy_gap_table(daily_df) -> None:
           border-radius:6px;padding:5px 10px;cursor:pointer;
           font-size:13px;white-space:nowrap;width:100%;
         ">🔗 Share</button>
-        """, height=38)
+        """)
     gaps_df = compute_daily_gaps(daily_df)
 
     # Next-day price direction: shift Close up by 1 so each row shows tomorrow's close

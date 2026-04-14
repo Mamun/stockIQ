@@ -3,3 +3,5 @@ yfinance>=0.2.30
 plotly>=5.0
 pandas>=2.0
 numpy>=1.20
+anthropic>=0.40.0
+python-dotenv>=1.0.0

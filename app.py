@@ -1,4 +1,13 @@
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
 import streamlit as st
+
+# Inject Streamlit secrets into os.environ so all modules can use os.environ.get()
+for _key, _val in st.secrets.items():
+    if isinstance(_val, str):
+        os.environ.setdefault(_key, _val)
 
 from seo import inject_seo
 
@@ -20,7 +29,8 @@ inject_seo()
 # ── Navigation ────────────────────────────────────────────────────────────────
 pages = [
     st.Page("views/spy_dashboard.py",   title="SPY Live",               icon="📈", url_path="spy",          default=True),
-    st.Page("views/spy_gap_table.py",   title="SPY Gap Table",          icon="📋", url_path="spy-gaps"),
+    st.Page("views/spy_gap_table.py",    title="SPY Gap Table",          icon="📋", url_path="spy-gaps"),
+    st.Page("views/ai_forecast_page.py", title="SPY AI Forecast",        icon="🤖", url_path="spy-ai-forecast"),
     st.Page("views/analyzer.py",        title="Stock Analyzer",         icon="🔬", url_path="analyzer"),
     st.Page("views/screener.py",        title="Weekly/Monthly Screener",icon="📊", url_path="screener"),
     st.Page("views/bounce_radar.py",    title="Bounce Radar",           icon="📡", url_path="bounce-radar"),
@@ -57,7 +67,9 @@ st.markdown("""
 st.markdown("""
 <style>
 [data-testid="stSidebarNav"] a[href$="/spy-gaps"],
-[data-testid="stSidebarNavLink"] a[href$="/spy-gaps"] { display: none !important; }
+[data-testid="stSidebarNavLink"] a[href$="/spy-gaps"],
+[data-testid="stSidebarNav"] a[href$="/spy-ai-forecast"],
+[data-testid="stSidebarNavLink"] a[href$="/spy-ai-forecast"] { display: none !important; }
 </style>
 """, unsafe_allow_html=True)
 

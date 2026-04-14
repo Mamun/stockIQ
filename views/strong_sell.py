@@ -53,7 +53,7 @@ def render_strong_sell_tab() -> None:
         "Max results",
         min_value=5, max_value=30, value=_url_top, step=5,
     )
-    scan_btn = c5.button("🔍 Scan", use_container_width=True, type="primary")
+    scan_btn = c5.button("🔍 Scan", width="stretch", type="primary")
 
     st.markdown("---")
 
