@@ -1,6 +1,6 @@
 # IndexIQ — Free S&P 500 Technical Analysis & Screener
 
-[![CI](https://github.com/Mamun/picker/actions/workflows/ci.yml/badge.svg)](https://github.com/Mamun/picker/actions/workflows/ci.yml)
+[![CI](https://github.com/Mamun/indexiq/actions/workflows/ci.yml/badge.svg)](https://github.com/Mamun/indexiq/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue)](https://www.python.org)
 [![Streamlit](https://img.shields.io/badge/built%20with-Streamlit-FF4B4B)](https://streamlit.io)
@@ -43,7 +43,7 @@
 ### Installation
 
 ```bash
-git clone https://github.com/Mamun/picker.git
+git clone https://github.com/Mamun/indexiq.git
 cd picker
 
 python -m venv .venv
@@ -141,7 +141,7 @@ Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) before
 4. Run `pytest` and `ruff check .`
 5. Open a Pull Request
 
-See [good first issues](https://github.com/Mamun/picker/labels/good%20first%20issue) for a place to start.
+See [good first issues](https://github.com/Mamun/indexiq/labels/good%20first%20issue) for a place to start.
 
 ---
 
