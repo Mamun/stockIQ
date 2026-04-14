@@ -82,42 +82,34 @@ def compute_daily_gaps(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def patch_today_gap(gaps_df: pd.DataFrame, quote: dict) -> pd.DataFrame:
-    """Patch the most recent gap row using live quote data.
+    """Patch today's gap row with live intraday fill status.
 
-    Fixes two issues:
-    1. Prev Close mismatch — yfinance historical OHLC and fast_info.previous_close
-       are different data endpoints and can diverge. Override with fast_info value.
-    2. Gap fill status — historical data has no future bars for today, so gap fill
-       is always Unknown. Use intraday day_high/day_low to resolve it in real-time.
+    Historical OHLC data has no future bars for the current session, so gap fill
+    is always shown as Pending/Unknown. This uses fast_info day_high/day_low to
+    determine in real-time whether today's gap has been touched.
+
+    Note: Open and Prev Close are intentionally left as-is from the historical
+    OHLC data so all rows use a single consistent data source for gap amounts.
+    fast_info.previous_close can diverge from the historical regular-session close
+    (e.g. due to extended-hours trades), which would make today's gap inconsistent
+    with every other row in the table.
     """
     if gaps_df.empty:
         return gaps_df
 
-    prev_close = quote.get("prev_close") or 0
-    day_open   = quote.get("day_open")   or 0
-    day_high   = quote.get("day_high")   or 0
-    day_low    = quote.get("day_low")    or 0
-
-    if not prev_close:
+    day_high = quote.get("day_high") or 0
+    day_low  = quote.get("day_low")  or 0
+    if not day_high or not day_low:
         return gaps_df
 
     gaps_df  = gaps_df.copy()
     last_idx = gaps_df.index[-1]
+    gap        = float(gaps_df.at[last_idx, "Gap"])
+    prev_close = float(gaps_df.at[last_idx, "Prev Close"])
 
-    # Use fast_info values for Open and Prev Close — historical OHLC endpoint
-    # can disagree with fast_info due to different data sources and UTC date offsets.
-    today_open = day_open if day_open else float(gaps_df.at[last_idx, "Open"])
-    gaps_df.at[last_idx, "Open"]      = round(today_open, 2)
-    gaps_df.at[last_idx, "Prev Close"] = round(prev_close, 2)
-    gap     = round(today_open - prev_close, 2)
-    gap_pct = round(gap / prev_close * 100, 2)
-    gaps_df.at[last_idx, "Gap"]   = gap
-    gaps_df.at[last_idx, "Gap %"] = gap_pct
-
-    if not day_high or not day_low or gap == 0:
+    if pd.isna(gap) or gap == 0 or pd.isna(prev_close):
         return gaps_df
 
-    # Determine fill using live intraday range
     is_filled = (day_low <= prev_close) if gap > 0 else (day_high >= prev_close)
     gaps_df.at[last_idx, "Gap Filled"]    = is_filled
     gaps_df.at[last_idx, "Gap Confirmed"] = True
