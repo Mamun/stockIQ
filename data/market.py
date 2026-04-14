@@ -31,6 +31,7 @@ def fetch_spx_quote() -> dict:
             "prev_close": prev,
             "change":     price - prev,
             "change_pct": (price - prev) / prev * 100,
+            "day_open":   float(getattr(fi, "open",               0) or 0),
             "day_high":   float(getattr(fi, "day_high",            0) or 0),
             "day_low":    float(getattr(fi, "day_low",             0) or 0),
             "volume":     vol,

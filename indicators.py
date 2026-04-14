@@ -94,6 +94,7 @@ def patch_today_gap(gaps_df: pd.DataFrame, quote: dict) -> pd.DataFrame:
         return gaps_df
 
     prev_close = quote.get("prev_close") or 0
+    day_open   = quote.get("day_open")   or 0
     day_high   = quote.get("day_high")   or 0
     day_low    = quote.get("day_low")    or 0
 
@@ -102,9 +103,11 @@ def patch_today_gap(gaps_df: pd.DataFrame, quote: dict) -> pd.DataFrame:
 
     gaps_df  = gaps_df.copy()
     last_idx = gaps_df.index[-1]
-    today_open = float(gaps_df.at[last_idx, "Open"])
 
-    # Override Prev Close with the authoritative fast_info value
+    # Use fast_info values for Open and Prev Close — historical OHLC endpoint
+    # can disagree with fast_info due to different data sources and UTC date offsets.
+    today_open = day_open if day_open else float(gaps_df.at[last_idx, "Open"])
+    gaps_df.at[last_idx, "Open"]      = round(today_open, 2)
     gaps_df.at[last_idx, "Prev Close"] = round(prev_close, 2)
     gap     = round(today_open - prev_close, 2)
     gap_pct = round(gap / prev_close * 100, 2)

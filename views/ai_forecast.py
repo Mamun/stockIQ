@@ -46,8 +46,13 @@ def _next_market_open_str() -> str:
 
 
 def _build_context(gaps_df: pd.DataFrame, quote: dict) -> str:
+    # Exclude the last row (today's partial/in-progress bar) from gap history.
+    # yfinance's daily endpoint includes an incomplete bar for the current session
+    # with a UTC date offset, making its values unreliable. The live quote fields
+    # below already capture today's context (prev_close, day_high, day_low).
+    completed_gaps = gaps_df.iloc[:-1]
     rows = []
-    for dt, row in gaps_df.tail(15).iterrows():
+    for dt, row in completed_gaps.tail(15).iterrows():
         rows.append({
             "date":         dt.strftime("%Y-%m-%d"),
             "open":         round(float(row.get("Open", 0)), 2),
@@ -60,14 +65,21 @@ def _build_context(gaps_df: pd.DataFrame, quote: dict) -> str:
         })
     et      = timezone(timedelta(hours=-4))
     now_et  = datetime.now(et)
+    prev_c  = round(quote.get("prev_close", 0), 2)
+    day_o   = round(quote.get("day_open",   0), 2)
+    today_gap     = round(day_o - prev_c, 2) if day_o and prev_c else 0
+    today_gap_pct = round(today_gap / prev_c * 100, 2) if prev_c else 0
     context = {
-        "today":          now_et.strftime("%Y-%m-%d"),
-        "as_of":          now_et.strftime("%Y-%m-%d %H:%M ET"),
-        "spy_live_price": round(quote.get("price", 0), 2),
-        "spy_prev_close": round(quote.get("prev_close", 0), 2),
-        "spy_day_high":   round(quote.get("day_high", 0), 2),
-        "spy_day_low":    round(quote.get("day_low", 0), 2),
-        "gap_history":    rows,
+        "today":              now_et.strftime("%Y-%m-%d"),
+        "as_of":              now_et.strftime("%Y-%m-%d %H:%M ET"),
+        "spy_live_price":     round(quote.get("price", 0), 2),
+        "spy_prev_close":     prev_c,
+        "spy_day_open":       day_o,
+        "spy_today_gap_usd":  today_gap,
+        "spy_today_gap_pct":  today_gap_pct,
+        "spy_day_high":       round(quote.get("day_high", 0), 2),
+        "spy_day_low":        round(quote.get("day_low",  0), 2),
+        "gap_history":        rows,
     }
     return json.dumps(context)
 
