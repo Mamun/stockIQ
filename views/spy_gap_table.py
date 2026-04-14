@@ -3,7 +3,6 @@ import streamlit as st
 
 from data import fetch_spx_intraday
 from indicators import compute_daily_gaps, compute_rsi
-from views.ai_forecast import render_ai_forecast
 
 
 def render_spy_gap_table_page() -> None:
@@ -32,9 +31,6 @@ def render_spy_gap_table_page() -> None:
     # RSI — deduplicate index before aligning to prevent row expansion
     rsi_dedup = compute_rsi(daily_df)[~daily_df.index.duplicated(keep="last")]
     gaps_df["RSI"] = rsi_dedup.reindex(gaps_df.index)
-
-    # ── Reserve slot for AI Forecast — renders after gap table loads ──────────
-    ai_slot = st.empty()
 
     st.divider()
 
@@ -122,10 +118,5 @@ def render_spy_gap_table_page() -> None:
             .format(fmt, na_rep="—"),
         width="stretch", hide_index=True, height=900,
     )
-
-    # ── Fill AI Forecast slot now that gap table is visible ───────────────────
-    with ai_slot.container():
-        render_ai_forecast(gaps_df)
-
 
 render_spy_gap_table_page()
