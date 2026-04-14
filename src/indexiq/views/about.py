@@ -1,6 +1,8 @@
 import pandas as pd
 import streamlit as st
 
+from indexiq.affiliate import render_broker_cards
+
 
 def render_about_tab() -> None:
     st.title("ℹ️ About This Stock Analyzer")
@@ -31,6 +33,9 @@ def render_about_tab() -> None:
 
     All data is sourced from Yahoo Finance and updated in real-time.
     """)
+
+    st.markdown("---")
+    render_broker_cards()
 
     st.markdown("---")
     st.markdown("**Supported Reversal Patterns:**")

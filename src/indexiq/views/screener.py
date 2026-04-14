@@ -1,7 +1,8 @@
 import plotly.graph_objects as go
 import streamlit as st
 
-from indexiq.config import SCREENER_TICKER_COUNT
+from indexiq.config import SCREENER_TICKER_COUNT, _SPX_UNIVERSE
+from indexiq.premium import is_premium, render_upgrade_prompt, FREE_TICKER_COUNT, PREMIUM_TICKER_COUNT
 from indexiq.data import fetch_spx_recommendations
 
 _SIGNAL_TIERS = [
@@ -28,17 +29,17 @@ def render_screener_tab() -> None:
         "Adds RSI, price returns, volume trend, and relative strength vs the index "
         "so you can spot real momentum — not just green dots."
     )
-    st.caption(
-        f"Universe: top {SCREENER_TICKER_COUNT} S&P 500 stocks · "
-        "Set `SCREENER_TICKER_COUNT` env var to change · Cached 1 hour"
-    )
+
+    ticker_count = PREMIUM_TICKER_COUNT if is_premium() else FREE_TICKER_COUNT
+    tier_label   = "✨ Premium" if is_premium() else f"Free · [upgrade for {PREMIUM_TICKER_COUNT} tickers](/premium)"
+    st.caption(f"Universe: top **{ticker_count}** S&P 500 stocks · {tier_label} · Cached 1 hour")
     st.markdown("---")
 
     if not st.button("🔄 Run Screener", width="stretch", type="primary"):
         _render_legend()
         return
 
-    with st.spinner(f"📊 Analyzing {SCREENER_TICKER_COUNT} stocks…"):
+    with st.spinner(f"📊 Analyzing {ticker_count} stocks…"):
         df = fetch_spx_recommendations()
 
     if df.empty:

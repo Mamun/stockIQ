@@ -10,6 +10,8 @@ for _key, _val in st.secrets.items():
         os.environ.setdefault(_key, _val)
 
 from indexiq.seo import inject_seo
+from indexiq.premium import render_premium_sidebar
+from indexiq.affiliate import render_sidebar_banner
 
 # ── Page config ───────────────────────────────────────────────────────────────
 st.set_page_config(
@@ -38,6 +40,7 @@ pages = [
     st.Page("src/indexiq/views/strong_buy.py",       title="Strong Buy",              icon="💎", url_path="strong-buy"),
     st.Page("src/indexiq/views/strong_sell.py",      title="Strong Sell",             icon="🔻", url_path="strong-sell"),
     st.Page("src/indexiq/views/munger_strategy.py",  title="Munger Watchlist",        icon="🎩", url_path="munger"),
+    st.Page("src/indexiq/views/pricing.py",          title="✨ Premium",              icon="✨",  url_path="premium"),
     st.Page("src/indexiq/views/about.py",            title="About",                   icon="ℹ️",  url_path="about"),
 ]
 
@@ -75,5 +78,7 @@ st.markdown("""
 
 with st.sidebar:
     st.caption("Data sourced from Yahoo Finance · Real-time")
+    render_premium_sidebar()
+    render_sidebar_banner()
 
 pg.run()
