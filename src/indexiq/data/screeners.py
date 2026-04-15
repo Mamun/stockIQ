@@ -7,7 +7,7 @@ import streamlit as st
 import yfinance as yf
 
 from indexiq.cache_ttl import CACHE_TTL
-from indexiq.config import SPX_TICKERS
+from indexiq.config import NASDAQ_100_TICKERS, SPX_TICKERS
 from indexiq.models.indicators import compute_rsi
 
 logging.getLogger("yfinance").setLevel(logging.CRITICAL)
@@ -18,7 +18,7 @@ def _rsi_last(df: pd.DataFrame) -> float:
     return float(compute_rsi(df).iloc[-1])
 
 
-@st.cache_data(ttl=CACHE_TTL["fetch_spx_recommendations"])
+@st.cache_data(ttl=CACHE_TTL["fetch_spx_recommendations"], show_spinner=False)
 def fetch_spx_recommendations() -> pd.DataFrame:
     """
     Weekly/monthly candle screener for SPX_TICKERS.
@@ -145,7 +145,7 @@ def fetch_spx_recommendations() -> pd.DataFrame:
     )
 
 
-@st.cache_data(ttl=CACHE_TTL["fetch_bounce_candidates"])  # scan is expensive
+@st.cache_data(ttl=CACHE_TTL["fetch_bounce_candidates"], show_spinner=False)  # scan is expensive
 def fetch_bounce_candidates(threshold_pct: float = 5.0, top_n: int = 30) -> pd.DataFrame:
     """
     Scan SPX_TICKERS for stocks within ±threshold_pct of their 200-day MA.
@@ -237,7 +237,7 @@ def fetch_bounce_candidates(threshold_pct: float = 5.0, top_n: int = 30) -> pd.D
     )
 
 
-@st.cache_data(ttl=CACHE_TTL["fetch_squeeze_candidates"])  # short interest is reported infrequently
+@st.cache_data(ttl=CACHE_TTL["fetch_squeeze_candidates"], show_spinner=False)  # short interest is reported infrequently
 def fetch_squeeze_candidates(
     rsi_min: float = 55.0,
     min_short_float: float = 0.5,
@@ -424,7 +424,7 @@ def _proximity_score(dist_pct: float) -> int:
     return 0
 
 
-@st.cache_data(ttl=CACHE_TTL["fetch_munger_candidates"])
+@st.cache_data(ttl=CACHE_TTL["fetch_munger_candidates"], show_spinner=False)
 def fetch_munger_candidates(
     threshold_pct: float = 15.0,
     min_quality: float = 30.0,
@@ -508,7 +508,7 @@ def fetch_munger_candidates(
     )
 
 
-@st.cache_data(ttl=CACHE_TTL["fetch_strong_buy_candidates"])
+@st.cache_data(ttl=CACHE_TTL["fetch_strong_buy_candidates"], show_spinner=False)
 def fetch_strong_buy_candidates(
     min_upside: float = 5.0,
     min_analysts: int = 5,
@@ -612,12 +612,12 @@ def fetch_strong_buy_candidates(
     )
 
 
-@st.cache_data(ttl=CACHE_TTL["fetch_strong_sell_candidates"])
+@st.cache_data(ttl=CACHE_TTL["fetch_strong_sell_candidates"], show_spinner=False)
 def fetch_strong_sell_candidates(
-    min_downside: float = 5.0,
-    min_analysts: int = 5,
-    min_rating: float = 3.5,
-    top_n: int = 20,
+    min_downside: float = 0.0,
+    min_analysts: int = 1,
+    min_rating: float = 2.5,
+    top_n: int = 30,
 ) -> pd.DataFrame:
     """
     Scan SPX_TICKERS for analyst sell / strong-sell consensus setups.
@@ -681,8 +681,12 @@ def fetch_strong_sell_candidates(
                 consensus = "🔴 Strong Sell"
             elif float(rec_mean) >= 4.0:
                 consensus = "🟠 Sell"
-            else:
+            elif float(rec_mean) >= 3.5:
                 consensus = "🟡 Moderate Sell"
+            elif float(rec_mean) >= 3.0:
+                consensus = "⚪ Hold"
+            else:
+                consensus = "🔵 Cautious Hold"
 
             results.append({
                 "Ticker":      ticker,
@@ -712,3 +716,276 @@ def fetch_strong_sell_candidates(
         .head(top_n)
         .reset_index(drop=True)
     )
+
+
+@st.cache_data(ttl=CACHE_TTL["fetch_nasdaq_oversold"], show_spinner=False)
+def fetch_nasdaq_rsi_scan() -> pd.DataFrame:
+    """
+    Scan all NASDAQ-100 stocks in a single batch download.
+    Returns every stock with RSI, moving averages, trend, day change,
+    volume ratio, and overbought/oversold status.
+    300 days of data ensures a stable MA200 calculation.
+    """
+    progress = st.empty()
+    progress.info("Downloading NASDAQ-100 price data…")
+
+    end_date   = datetime.today()
+    start_date = end_date - timedelta(days=300)  # 300 days → ~210 trading days → stable MA200
+
+    tickers = [t for t in NASDAQ_100_TICKERS if isinstance(t, str)]
+
+    try:
+        raw = yf.download(
+            tickers,
+            start=start_date.strftime("%Y-%m-%d"),
+            end=end_date.strftime("%Y-%m-%d"),
+            progress=False,
+            auto_adjust=True,
+        )
+    except Exception:
+        progress.empty()
+        return pd.DataFrame()
+
+    progress.empty()
+
+    if raw.empty:
+        return pd.DataFrame()
+
+    try:
+        is_multi = isinstance(raw.columns, pd.MultiIndex)
+        close_df  = raw["Close"]  if is_multi else raw
+        volume_df = raw["Volume"] if is_multi else None
+    except Exception:
+        return pd.DataFrame()
+
+    results = []
+    for ticker in NASDAQ_100_TICKERS:
+        try:
+            if not isinstance(ticker, str) or ticker not in close_df.columns:
+                continue
+            closes = close_df[ticker].dropna()
+            if len(closes) < 15:
+                continue
+
+            price = float(closes.iloc[-1])
+            rsi   = float(compute_rsi(closes.to_frame("Close")).iloc[-1])
+
+            ma50  = float(closes.iloc[-50:].mean())  if len(closes) >= 50  else None
+            ma200 = float(closes.iloc[-200:].mean()) if len(closes) >= 200 else None
+
+            pct_ma50  = round((price - ma50)  / ma50  * 100, 1) if ma50  else None
+            pct_ma200 = round((price - ma200) / ma200 * 100, 1) if ma200 else None
+
+            day_chg = round((closes.iloc[-1] - closes.iloc[-2]) / closes.iloc[-2] * 100, 2) \
+                      if len(closes) >= 2 else None
+
+            if ma50 and ma200:
+                trend = "📈 Uptrend" if ma50 > ma200 else "📉 Downtrend"
+            else:
+                trend = "—"
+
+            vol_ratio = None
+            if volume_df is not None and ticker in volume_df.columns:
+                vols = volume_df[ticker].dropna()
+                if len(vols) >= 21:
+                    avg_vol = float(vols.iloc[-21:-1].mean())
+                    today_vol = float(vols.iloc[-1])
+                    vol_ratio = round(today_vol / avg_vol, 2) if avg_vol > 0 else None
+
+            if rsi >= 70:
+                status = "🔴 Overbought"
+            elif rsi <= 30:
+                status = "🟢 Oversold"
+            else:
+                status = "⚪ Neutral"
+
+            results.append({
+                "Ticker":     ticker,
+                "Price":      round(price, 2),
+                "Day Chg %":  day_chg,
+                "RSI":        round(rsi, 1),
+                "% vs MA50":  pct_ma50,
+                "% vs MA200": pct_ma200,
+                "Trend":      trend,
+                "Vol Ratio":  vol_ratio,
+                "Status":     status,
+            })
+        except Exception:
+            continue
+
+    if not results:
+        return pd.DataFrame()
+
+    return (
+        pd.DataFrame(results)
+        .sort_values("RSI", ascending=False)
+        .reset_index(drop=True)
+    )
+
+
+@st.cache_data(ttl=CACHE_TTL["fetch_premarket_scan"], show_spinner=False)
+def fetch_premarket_scan() -> pd.DataFrame:
+    """
+    Scans NASDAQ-100 for today's pre-market movers.
+
+    Makes two batch downloads:
+      • 5-min bars (last 2 days, prepost=True) → pre-market prices & volume
+      • Daily bars (last 12 days)              → prev close + 7-day change
+
+    Returns one row per ticker with columns:
+      Ticker, PM Price, PM Chg %, PM Vol %, Prev Close, 7D Chg %
+
+    Cache TTL is 5 minutes — premarket prices change rapidly.
+    """
+    tickers = [t for t in NASDAQ_100_TICKERS if isinstance(t, str)]
+
+    # ── 1. Daily bars: prev close + 7-day context + avg volume ────────────────
+    try:
+        daily = yf.download(tickers, period="12d", auto_adjust=True, progress=False)
+    except Exception:
+        return pd.DataFrame()
+
+    if daily.empty:
+        return pd.DataFrame()
+
+    is_d = isinstance(daily.columns, pd.MultiIndex)
+    daily_close  = daily["Close"]  if is_d else daily
+    daily_volume = daily["Volume"] if is_d else None
+
+    # ── 2. Intraday 5-min bars with prepost for premarket prices ──────────────
+    intra_close  = pd.DataFrame()
+    intra_volume = pd.DataFrame()
+    try:
+        intra = yf.download(
+            tickers, period="2d", interval="5m",
+            prepost=True, auto_adjust=True, progress=False,
+        )
+        if not intra.empty:
+            is_i = isinstance(intra.columns, pd.MultiIndex)
+            intra_close  = intra["Close"]  if is_i else intra
+            intra_volume = intra["Volume"] if is_i else pd.DataFrame()
+    except Exception:
+        pass  # Fall through — PM columns will be None but daily data still returned
+
+    # ── 3. Compute premarket window mask (4:00–9:30 AM ET, today only) ────────
+    pm_close_df  = pd.DataFrame()
+    pm_volume_df = pd.DataFrame()
+
+    if not intra_close.empty:
+        now_et    = pd.Timestamp.now(tz="America/New_York")
+        today_str = now_et.strftime("%Y-%m-%d")
+        idx       = intra_close.index
+        idx_et    = (
+            idx.tz_convert("America/New_York") if idx.tzinfo is not None
+            else idx.tz_localize("UTC").tz_convert("America/New_York")
+        )
+        pm_mask = (
+            (idx_et.strftime("%Y-%m-%d") == today_str) &
+            (idx_et.hour >= 4) &
+            ((idx_et.hour < 9) | ((idx_et.hour == 9) & (idx_et.minute < 30)))
+        )
+        pm_close_df  = intra_close[pm_mask]
+        if not intra_volume.empty:
+            pm_volume_df = intra_volume[pm_mask]
+
+    # ── 4. Per-ticker metrics ─────────────────────────────────────────────────
+    results = []
+    for ticker in tickers:
+        try:
+            if ticker not in daily_close.columns:
+                continue
+            d_closes = daily_close[ticker].dropna()
+            if len(d_closes) < 2:
+                continue
+
+            prev_close = float(d_closes.iloc[-1])
+
+            # 7-trading-day change
+            ref = float(d_closes.iloc[max(0, len(d_closes) - 8)])
+            chg_7d = round((prev_close - ref) / ref * 100, 2) if ref > 0 else None
+
+            # Avg daily volume (last 10 days)
+            avg_dvol = None
+            if daily_volume is not None and ticker in daily_volume.columns:
+                dvols = daily_volume[ticker].dropna()
+                if len(dvols) >= 5:
+                    avg_dvol = float(dvols.iloc[-10:].mean())
+
+            # Premarket metrics
+            pm_price   = None
+            pm_chg     = None
+            pm_vol_pct = None
+
+            if not pm_close_df.empty and ticker in pm_close_df.columns:
+                pm_bars = pm_close_df[ticker].dropna()
+                if not pm_bars.empty:
+                    pm_price = round(float(pm_bars.iloc[-1]), 2)
+                    pm_chg   = round((pm_price - prev_close) / prev_close * 100, 2)
+
+                    if not pm_volume_df.empty and ticker in pm_volume_df.columns:
+                        pm_vol = float(pm_volume_df[ticker].fillna(0).sum())
+                        if avg_dvol and avg_dvol > 0:
+                            pm_vol_pct = round(pm_vol / avg_dvol * 100, 1)
+
+            results.append({
+                "Ticker":     ticker,
+                "PM Price":   pm_price,
+                "PM Chg %":   pm_chg,
+                "PM Vol %":   pm_vol_pct,
+                "Prev Close": round(prev_close, 2),
+                "7D Chg %":   chg_7d,
+            })
+        except Exception:
+            continue
+
+    if not results:
+        return pd.DataFrame()
+
+    df = pd.DataFrame(results)
+    # Stocks with PM data first, then sorted by largest absolute PM move
+    df["_has_pm"]  = df["PM Chg %"].notna().astype(int)
+    df["_abs_chg"] = df["PM Chg %"].abs().fillna(-1)
+    df = (
+        df.sort_values(["_has_pm", "_abs_chg"], ascending=[False, False])
+          .drop(columns=["_has_pm", "_abs_chg"])
+          .reset_index(drop=True)
+    )
+    return df
+
+
+@st.cache_data(ttl=CACHE_TTL["fetch_premarket_history"], show_spinner=False)
+def fetch_premarket_history() -> pd.DataFrame:
+    """
+    Returns the last 7 trading days of daily close prices for all NASDAQ-100 stocks.
+
+    Shape: rows = tickers, columns = date strings (e.g. "Apr 08").
+    Used to show a 7-day close heatmap alongside the premarket scanner.
+    """
+    tickers = [t for t in NASDAQ_100_TICKERS if isinstance(t, str)]
+    try:
+        raw = yf.download(tickers, period="12d", auto_adjust=True, progress=False)
+    except Exception:
+        return pd.DataFrame()
+
+    if raw.empty:
+        return pd.DataFrame()
+
+    is_multi  = isinstance(raw.columns, pd.MultiIndex)
+    close_df  = raw["Close"] if is_multi else raw
+
+    # Last 7 trading days, format date as column headers
+    close_df = close_df.dropna(how="all").tail(7)
+    close_df.index = pd.to_datetime(close_df.index).strftime("%b %d")
+
+    # Pivot: tickers as rows, dates as columns
+    result = close_df.T.round(2)
+    result.index.name = "Ticker"
+    return result
+
+
+# Keep old name as alias so existing imports don't break
+def fetch_nasdaq_oversold(rsi_max: float = 40.0, top_n: int = 50) -> pd.DataFrame:
+    df = fetch_nasdaq_rsi_scan()
+    if df.empty:
+        return df
+    return df[df["RSI"] <= rsi_max].head(top_n).reset_index(drop=True)

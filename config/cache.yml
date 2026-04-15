@@ -16,6 +16,9 @@ screeners:
   fetch_munger_candidates: 3600      # Munger quality watchlist
   fetch_strong_buy_candidates: 3600  # Analyst consensus strong buy
   fetch_strong_sell_candidates: 3600 # Analyst consensus strong sell
+  fetch_nasdaq_oversold: 1800        # NASDAQ-100 oversold RSI scanner
+  fetch_premarket_scan: 300          # Premarket movers — 5-min cache (prices change rapidly)
+  fetch_premarket_history: 3600      # 7-day daily close history — refresh hourly
 
 ai:
   fetch_ai_prediction: 3600     # Claude AI forecast — refresh hourly

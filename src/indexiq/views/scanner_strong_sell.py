@@ -16,16 +16,16 @@ def render_strong_sell_tab() -> None:
     # ── URL params ────────────────────────────────────────────────────────────
     params    = st.query_params
     auto_scan = params.get("scan", "0") == "1"
-    try:    _url_downside = max(0,   min(40, int(params.get("downside", 5))))
-    except: _url_downside = 5
-    try:    _url_analysts = max(1,   min(20, int(params.get("analysts", 5))))
-    except: _url_analysts = 5
+    try:    _url_downside = max(0,   min(40, int(params.get("downside", 0))))
+    except: _url_downside = 0
+    try:    _url_analysts = max(1,   min(20, int(params.get("analysts", 1))))
+    except: _url_analysts = 1
     try:
-        _r = float(params.get("rating", 3.5))
-        _url_rating = _r if _r in (3.5, 4.0, 4.5) else 3.5
-    except: _url_rating = 3.5
-    try:    _url_top      = max(5,   min(30, int(params.get("top",      20))))
-    except: _url_top      = 20
+        _r = float(params.get("rating", 2.5))
+        _url_rating = _r if _r in (2.5, 3.0, 3.5, 4.0, 4.5) else 2.5
+    except: _url_rating = 2.5
+    try:    _url_top      = max(5,   min(30, int(params.get("top",      30))))
+    except: _url_top      = 30
 
     # ── Controls ──────────────────────────────────────────────────────────────
     c1, c2, c3, c4, c5 = st.columns([2, 2, 2, 2, 1])
@@ -40,10 +40,12 @@ def render_strong_sell_tab() -> None:
         help="Require at least this many analysts to avoid thin coverage",
     )
     min_rating = c3.select_slider(
-        "Min Rating (consensus)",
-        options=[3.5, 4.0, 4.5],
+        "Min Rating (least bullish)",
+        options=[2.5, 3.0, 3.5, 4.0, 4.5],
         value=_url_rating,
         format_func=lambda v: {
+            2.5: "Hold & above (widest)",
+            3.0: "Cautious Hold & above",
             3.5: "Moderate Sell & above",
             4.0: "Sell & above",
             4.5: "Strong Sell only",
@@ -77,12 +79,26 @@ def render_strong_sell_tab() -> None:
         )
 
     if df.empty:
-        st.warning(
-            f"No stocks found with analyst rating ≥ {min_rating}, "
-            f"downside ≥ {min_downside}%, and ≥ {min_analysts} analysts. "
-            "Try relaxing the filters."
+        # Auto-fallback: show least-bullish stocks with fully relaxed filters
+        with st.spinner("No exact matches — showing least-bullish stocks available…"):
+            df = fetch_strong_sell_candidates(
+                min_downside=0.0,
+                min_analysts=1,
+                min_rating=2.5,
+                top_n=top_n,
+            )
+        if df.empty:
+            st.warning(
+                "No analyst data available right now. "
+                "Yahoo Finance may be rate-limiting — try again in a few minutes."
+            )
+            return
+        st.info(
+            f"No stocks matched rating ≥ {min_rating}, downside ≥ {min_downside}%, "
+            f"analysts ≥ {min_analysts}. "
+            "Showing the **least bullish** S&P 500 stocks instead — tighten filters to narrow down.",
+            icon="ℹ️",
         )
-        return
 
     st.success(f"✅ Found **{len(df)}** analyst-flagged candidates")
 
@@ -314,8 +330,10 @@ def _render_legend() -> None:
             "stretched valuation, or sector headwinds.\n\n"
             "- 🔴 **Strong Sell** (≥ 4.5) — overwhelming bearish conviction\n"
             "- 🟠 **Sell** (≥ 4.0) — majority bearish\n"
-            "- 🟡 **Moderate Sell** (≥ 3.5) — cautiously bearish\n\n"
-            "More analysts covering a stock = more reliable signal."
+            "- 🟡 **Moderate Sell** (≥ 3.5) — cautiously bearish\n"
+            "- ⚪ **Hold** (≥ 3.0) — neutral to cautious\n\n"
+            "**Note:** True Sell ratings are rare in the S&P 500 — analysts skew bullish. "
+            "Hold-rated stocks trading above analyst targets are equally useful bearish signals."
         )
     with col2:
         st.markdown("**What to look for:**")
@@ -323,10 +341,12 @@ def _render_legend() -> None:
         | Signal | Meaning |
         |---|---|
         | Rating ≥ 4.5 | 🔴 Analysts overwhelmingly bearish |
-        | Downside ≥ 20% | 🔴 Large gap to consensus target |
+        | Rating ≥ 3.5 | 🟡 Cautious — below average conviction |
+        | Rating ≥ 2.5 | ⚪ Hold — neutral, use as widest filter |
+        | Downside ≥ 10% | 🔴 Target well below current price |
         | Analysts ≥ 10 | High-confidence bearish coverage |
         | RSI ≥ 70 | Overbought — elevated short-term risk |
-        | SS Score ≥ 75 | 🔴 Exceptional bearish conviction setup |
+        | SS Score ≥ 60 | Strong bearish setup |
         """)
     st.markdown("Adjust filters and click **Scan** to find candidates.")
 

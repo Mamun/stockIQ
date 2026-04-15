@@ -111,48 +111,39 @@ def inject_seo() -> None:
 
     json_ld_str = json.dumps(_json_ld, ensure_ascii=False).replace("\\", "\\\\").replace("`", "\\`")
 
-    # Inject via st.components so the script runs in an iframe and uses
-    # window.parent.document (same-origin) — more reliable than st.markdown()
-    # because React does not re-execute <script> tags set via innerHTML.
-    # The script also fires an extra time on DOMContentLoaded / readystatechange
-    # so Googlebot's deferred rendering pass also sees the tags.
-    import streamlit.components.v1 as components
-
-    components.html(
-        f"""<!DOCTYPE html>
-<html><head></head><body>
-<script>
+    # st.html() renders directly into the page DOM (no iframe), so the script
+    # has direct access to document.head — no window.parent needed.
+    st.html(
+        f"""<script>
 (function inject() {{
-  var d = (window.parent || window).document;
-
   function upsertMeta(attr, key, content) {{
     var sel = 'meta[' + attr + '="' + key + '"]';
-    var el  = d.querySelector(sel);
+    var el  = document.querySelector(sel);
     if (!el) {{
-      el = d.createElement('meta');
+      el = document.createElement('meta');
       el.setAttribute(attr, key);
-      d.head.appendChild(el);
+      document.head.appendChild(el);
     }}
     el.setAttribute('content', content);
   }}
 
   function upsertCanonical(url) {{
-    var el = d.querySelector('link[rel="canonical"]');
+    var el = document.querySelector('link[rel="canonical"]');
     if (!el) {{
-      el = d.createElement('link');
+      el = document.createElement('link');
       el.rel = 'canonical';
-      d.head.appendChild(el);
+      document.head.appendChild(el);
     }}
     el.href = url;
   }}
 
   function upsertJsonLd(json) {{
-    var el = d.querySelector('script[data-indexiq-ld]');
+    var el = document.querySelector('script[data-indexiq-ld]');
     if (!el) {{
-      el = d.createElement('script');
+      el = document.createElement('script');
       el.type = 'application/ld+json';
       el.setAttribute('data-indexiq-ld', '1');
-      d.head.appendChild(el);
+      document.head.appendChild(el);
     }}
     el.textContent = json;
   }}
@@ -160,19 +151,14 @@ def inject_seo() -> None:
   function run() {{
 {chr(10).join(js_calls)}
     upsertCanonical("{_URL}");
-    d.title = "{_TITLE}";
+    document.title = "{_TITLE}";
     upsertJsonLd(`{json_ld_str}`);
   }}
 
   run();
-  // Re-run after Streamlit finishes loading so Googlebot's second-pass renderer
-  // also captures the tags when window.prerenderReady becomes true.
-  if (window.parent && window.parent.document.readyState !== 'complete') {{
-    window.parent.addEventListener('load', run);
+  if (document.readyState !== 'complete') {{
+    window.addEventListener('load', run);
   }}
 }})();
-</script>
-</body></html>""",
-        height=0,
-        scrolling=False,
+</script>"""
     )

@@ -16,16 +16,16 @@ def render_strong_buy_tab() -> None:
     # ── URL params ────────────────────────────────────────────────────────────
     params    = st.query_params
     auto_scan = params.get("scan", "0") == "1"
-    try:    _url_upside   = max(0,   min(40, int(params.get("upside",   5))))
-    except: _url_upside   = 5
-    try:    _url_analysts = max(1,   min(20, int(params.get("analysts", 5))))
-    except: _url_analysts = 5
+    try:    _url_upside   = max(0,   min(40, int(params.get("upside",   0))))
+    except: _url_upside   = 0
+    try:    _url_analysts = max(1,   min(20, int(params.get("analysts", 1))))
+    except: _url_analysts = 1
     try:
         _r = float(params.get("rating", 2.5))
         _url_rating = _r if _r in (1.5, 2.0, 2.5) else 2.5
     except: _url_rating = 2.5
-    try:    _url_top      = max(5,   min(30, int(params.get("top",      20))))
-    except: _url_top      = 20
+    try:    _url_top      = max(5,   min(30, int(params.get("top",      30))))
+    except: _url_top      = 30
 
     # ── Controls ──────────────────────────────────────────────────────────────
     c1, c2, c3, c4, c5 = st.columns([2, 2, 2, 2, 1])

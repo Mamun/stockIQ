@@ -35,5 +35,8 @@ _screener = _cfg["screener"]
 SCREENER_TICKER_COUNT: int  = int(os.environ.get("SCREENER_TICKER_COUNT", _screener["default_count"]))
 SPX_TICKERS: list[str]      = _screener["universe"][:SCREENER_TICKER_COUNT]
 
+# ── NASDAQ-100 ticker universe ─────────────────────────────────────────────────
+NASDAQ_100_TICKERS: list[str] = _cfg["nasdaq_100"]
+
 # ── Chart period options ───────────────────────────────────────────────────────
 PERIOD_OPTIONS: dict[str, int] = _cfg["period_options"]

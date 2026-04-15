@@ -119,19 +119,29 @@ except Exception:
 inject_seo()
 
 # ── Navigation ────────────────────────────────────────────────────────────────
-pages = [
-    st.Page("src/indexiq/views/spy_dashboard.py",    title="SPY Live",                icon="📈", url_path="spy",          default=True),
-    st.Page("src/indexiq/views/spy_gap_table.py",    title="SPY Gap Table",           icon="📋", url_path="spy-gaps"),
-    st.Page("src/indexiq/views/ai_forecast_page.py", title="SPY AI Forecast",         icon="🤖", url_path="spy-ai-forecast"),
-    st.Page("src/indexiq/views/analyzer.py",         title="Stock Analyzer",          icon="🔬", url_path="analyzer"),
-    st.Page("src/indexiq/views/screener.py",         title="Weekly/Monthly Screener", icon="📊", url_path="screener"),
-    st.Page("src/indexiq/views/bounce_radar.py",     title="Bounce Radar",            icon="📡", url_path="bounce-radar"),
-    st.Page("src/indexiq/views/squeeze_scanner.py",  title="Squeeze Scanner",         icon="🔥", url_path="squeeze"),
-    st.Page("src/indexiq/views/strong_buy.py",       title="Strong Buy",              icon="💎", url_path="strong-buy"),
-    st.Page("src/indexiq/views/strong_sell.py",      title="Strong Sell",             icon="🔻", url_path="strong-sell"),
-    st.Page("src/indexiq/views/munger_strategy.py",  title="Munger Watchlist",        icon="🎩", url_path="munger"),
-    st.Page("src/indexiq/views/about.py",            title="About",                   icon="ℹ️",  url_path="about"),
-]
+pages = {
+    "Market": [
+        st.Page("src/indexiq/views/spy_dashboard.py",    title="SPY Dashboard",           icon="📈", url_path="spy",             default=True),
+        st.Page("src/indexiq/views/ai_forecast_page.py", title="AI 10-Day Forecast",       icon="🤖", url_path="spy-ai-forecast"),
+        st.Page("src/indexiq/views/spy_gap_table.py",    title="SPY Gap Table",           icon="📋", url_path="spy-gaps"),
+    ],
+    "S&P 500 Tools": [
+        st.Page("src/indexiq/views/analyzer.py",         title="Stock Analyzer",          icon="🔬", url_path="analyzer"),
+        st.Page("src/indexiq/views/screener.py",         title="Candle Screener",         icon="📊", url_path="screener"),
+    ],
+    "Scanners": [
+        st.Page("src/indexiq/views/scanner_premarket.py",       title="Pre-Market Scanner",     icon="🌅", url_path="premarket"),
+        st.Page("src/indexiq/views/scanner_nasdaq_rsi.py",      title="NASDAQ RSI Scanner",     icon="📊", url_path="nasdaq-oversold"),
+        st.Page("src/indexiq/views/scanner_bounce_radar.py",    title="MA200 Bounce Radar",     icon="📡", url_path="bounce-radar"),
+        st.Page("src/indexiq/views/scanner_squeeze.py",         title="Short Squeeze Scanner",  icon="🔥", url_path="squeeze"),
+        st.Page("src/indexiq/views/scanner_strong_buy.py",      title="Analyst Buy Picks",      icon="💎", url_path="strong-buy"),
+        st.Page("src/indexiq/views/scanner_strong_sell.py",     title="Analyst Sell Picks",     icon="🔻", url_path="strong-sell"),
+        st.Page("src/indexiq/views/scanner_munger_strategy.py", title="Munger Value Picks",     icon="🎩", url_path="munger"),
+    ],
+    "Info": [
+        st.Page("src/indexiq/views/about.py",            title="About IndexIQ",           icon="ℹ️",  url_path="about"),
+    ],
+}
 
 pg = st.navigation(pages)
 
@@ -159,9 +169,7 @@ st.markdown("""
 st.markdown("""
 <style>
 [data-testid="stSidebarNav"] a[href$="/spy-gaps"],
-[data-testid="stSidebarNavLink"] a[href$="/spy-gaps"],
-[data-testid="stSidebarNav"] a[href$="/spy-ai-forecast"],
-[data-testid="stSidebarNavLink"] a[href$="/spy-ai-forecast"] { display: none !important; }
+[data-testid="stSidebarNavLink"] a[href$="/spy-gaps"] { display: none !important; }
 </style>
 """, unsafe_allow_html=True)
 

@@ -17,6 +17,10 @@ from indexiq.data.market import (
 from indexiq.data.screeners import (
     fetch_bounce_candidates,
     fetch_munger_candidates,
+    fetch_nasdaq_oversold,
+    fetch_nasdaq_rsi_scan,
+    fetch_premarket_history,
+    fetch_premarket_scan,
     fetch_spx_recommendations,
     fetch_squeeze_candidates,
     fetch_strong_buy_candidates,
@@ -38,4 +42,8 @@ __all__ = [
     "fetch_squeeze_candidates",
     "fetch_strong_buy_candidates",
     "fetch_strong_sell_candidates",
+    "fetch_nasdaq_oversold",
+    "fetch_nasdaq_rsi_scan",
+    "fetch_premarket_scan",
+    "fetch_premarket_history",
 ]

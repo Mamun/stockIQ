@@ -9,7 +9,7 @@ from indexiq.cache_ttl import CACHE_TTL
 logging.getLogger("yfinance").setLevel(logging.CRITICAL)
 
 
-@st.cache_data(ttl=CACHE_TTL["fetch_spx_quote"])
+@st.cache_data(ttl=CACHE_TTL["fetch_spx_quote"], show_spinner=False)
 def fetch_spx_quote() -> dict:
     """Near-real-time SPY quote via yfinance fast_info. Cached 60 s. Returns {} on error."""
     try:
@@ -44,7 +44,7 @@ def fetch_spx_quote() -> dict:
         return {}
 
 
-@st.cache_data(ttl=CACHE_TTL["fetch_spx_intraday"])
+@st.cache_data(ttl=CACHE_TTL["fetch_spx_intraday"], show_spinner=False)
 def fetch_spx_intraday(period: str = "1d", interval: str = "5m") -> pd.DataFrame:
     """
     SPY price history for any period / interval combination.
@@ -69,7 +69,7 @@ def fetch_spx_intraday(period: str = "1d", interval: str = "5m") -> pd.DataFrame
         return pd.DataFrame()
 
 
-@st.cache_data(ttl=CACHE_TTL["fetch_vix_ohlc"])
+@st.cache_data(ttl=CACHE_TTL["fetch_vix_ohlc"], show_spinner=False)
 def fetch_vix_ohlc(period: str = "1y") -> pd.DataFrame:
     """Daily VIX OHLC history (Open, High, Low, Close) for gap analysis. Cached 1 hour."""
     try:
@@ -88,7 +88,7 @@ def fetch_vix_ohlc(period: str = "1y") -> pd.DataFrame:
         return pd.DataFrame()
 
 
-@st.cache_data(ttl=CACHE_TTL["fetch_vix_history"])
+@st.cache_data(ttl=CACHE_TTL["fetch_vix_history"], show_spinner=False)
 def fetch_vix_history(period: str = "1y") -> pd.DataFrame:
     """
     Daily VIX close alongside SPY close for dual-axis comparison.
@@ -113,7 +113,7 @@ def fetch_vix_history(period: str = "1y") -> pd.DataFrame:
         return pd.DataFrame()
 
 
-@st.cache_data(ttl=CACHE_TTL["fetch_index_snapshot"])
+@st.cache_data(ttl=CACHE_TTL["fetch_index_snapshot"], show_spinner=False)
 def fetch_index_snapshot() -> pd.DataFrame:
     """Day-change snapshot for major indices used in the SPX dashboard. Cached 120 s."""
     symbols = {
