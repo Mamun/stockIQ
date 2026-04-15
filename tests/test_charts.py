@@ -5,9 +5,9 @@
 import pytest
 import plotly.graph_objects as go
 
-from indexiq.indicators import compute_mas, compute_rsi, compute_fibonacci, detect_reversal_patterns
-from indexiq.signals import find_crosses
-from indexiq.charts import build_chart
+from indexiq.models.indicators import compute_mas, compute_rsi, compute_fibonacci, detect_reversal_patterns
+from indexiq.models.signals import find_crosses
+from indexiq.views.components.charts import build_chart
 
 
 # ── Fixtures / helpers ────────────────────────────────────────────────────────

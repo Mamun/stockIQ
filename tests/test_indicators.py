@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from indexiq.indicators import (
+from indexiq.models.indicators import (
     compute_mas,
     compute_fibonacci,
     compute_rsi,

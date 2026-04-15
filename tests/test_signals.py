@@ -6,8 +6,8 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from indexiq.signals import signal_score, overall_signal, find_crosses
-from indexiq.indicators import compute_mas, compute_rsi
+from indexiq.models.signals import signal_score, overall_signal, find_crosses
+from indexiq.models.indicators import compute_mas, compute_rsi
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────

@@ -1,8 +1,7 @@
-import pandas as pd
 import streamlit as st
 
 from indexiq.data import fetch_spx_intraday
-from indexiq.indicators import compute_daily_gaps, compute_rsi
+from indexiq.models.indicators import compute_daily_gaps, compute_rsi
 from indexiq.views.ai_forecast import render_ai_forecast
 
 

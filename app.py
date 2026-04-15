@@ -110,7 +110,7 @@ try:
     if _src not in sys.path:
         sys.path.insert(0, _src)
 
-    from indexiq.seo import inject_seo
+    from indexiq.views.seo import inject_seo
 
 except Exception:
     _show_overloaded_page()

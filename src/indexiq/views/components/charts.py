@@ -3,7 +3,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
 from indexiq.config import MA_PERIODS, MA_COLORS, MA200W_COLOR, FIB_COLORS, REVERSAL_PATTERNS
-from indexiq.signals import find_crosses
+from indexiq.models.signals import find_crosses
 
 
 def build_chart(
@@ -147,7 +147,6 @@ def build_chart(
     # RSI subplot
     if show_rsi and rsi_row and "RSI" in df.columns:
         rsi = df["RSI"]
-        # Colour the RSI line by zone
         fig.add_trace(go.Scatter(
             x=df.index, y=rsi,
             name="RSI (14)",
@@ -155,7 +154,6 @@ def build_chart(
             hovertemplate="RSI: %{y:.1f}<extra></extra>",
         ), row=rsi_row, col=1)
 
-        # Overbought / oversold reference bands
         fig.add_hrect(y0=70, y1=100, fillcolor="rgba(239,68,68,0.08)",
                       line_width=0, row=rsi_row, col=1)
         fig.add_hrect(y0=0, y1=30, fillcolor="rgba(34,197,94,0.08)",

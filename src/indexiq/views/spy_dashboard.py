@@ -1,11 +1,15 @@
+import urllib.parse
+
 import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 from plotly.subplots import make_subplots
 
 from indexiq.data import fetch_index_snapshot, fetch_spx_intraday, fetch_spx_quote, fetch_vix_history, fetch_vix_ohlc
-from indexiq.indicators import compute_daily_gaps, compute_rsi, patch_today_gap
+from indexiq.models.indicators import compute_daily_gaps, compute_rsi, patch_today_gap
 from indexiq.views.ai_forecast import render_ai_forecast
+from indexiq.views.components.gap_table import render_gap_table
+from indexiq.views.components.summary_card import render_spy_summary_card
 
 
 # ── Main dashboard tab ─────────────────────────────────────────────────────────
@@ -33,7 +37,7 @@ def render_spy_dashboard_tab() -> None:
 
     st.markdown("#### SPY Overview")
     daily_df = fetch_spx_intraday(period="1y", interval="1d")
-    _render_spy_summary(quote, price, chg, chg_pct, daily_df)
+    render_spy_summary_card(quote, price, chg, chg_pct, daily_df)
 
     st.markdown("---")
 
@@ -98,24 +102,22 @@ def _render_vix_section() -> None:
         st.info("VIX data unavailable.")
         return
 
-    vix_now = float(vix_df["VIX"].iloc[-1])
+    vix_now  = float(vix_df["VIX"].iloc[-1])
     vix_prev = float(vix_df["VIX"].iloc[-2]) if len(vix_df) > 1 else vix_now
     vix_chg  = vix_now - vix_prev
     vix_52hi = float(vix_df["VIX"].max())
     vix_52lo = float(vix_df["VIX"].min())
     vix_avg  = float(vix_df["VIX"].mean())
 
-    # Zone classification
     if vix_now < 15:
         zone, zone_clr, zone_bg = "😌 Complacent", "#22C55E", "rgba(34,197,94,0.08)"
     elif vix_now < 20:
-        zone, zone_clr, zone_bg = "😐 Normal",     "#86EFAC", "rgba(134,239,172,0.08)"
+        zone, zone_clr, zone_bg = "😐 Normal",      "#86EFAC", "rgba(134,239,172,0.08)"
     elif vix_now < 30:
-        zone, zone_clr, zone_bg = "😨 Elevated",   "#F59E0B", "rgba(245,158,11,0.08)"
+        zone, zone_clr, zone_bg = "😨 Elevated",    "#F59E0B", "rgba(245,158,11,0.08)"
     else:
-        zone, zone_clr, zone_bg = "🔥 Extreme Fear","#EF4444", "rgba(239,68,68,0.08)"
+        zone, zone_clr, zone_bg = "🔥 Extreme Fear", "#EF4444", "rgba(239,68,68,0.08)"
 
-    # VIX level card + metrics
     c_card, c_metrics = st.columns([1, 3])
     with c_card:
         st.markdown(
@@ -154,14 +156,22 @@ def _render_vix_section() -> None:
     st.plotly_chart(_spy_vix_chart(vix_df), width="stretch")
 
     st.markdown("---")
-    _render_vix_gap_table()
+
+    # VIX gap table — no RSI, no $ prefix (VIX is not a dollar price)
+    vix_ohlc = fetch_vix_ohlc(period="1y")
+    if not vix_ohlc.empty:
+        vix_gaps = compute_daily_gaps(vix_ohlc)
+        render_gap_table(
+            vix_gaps,
+            title="VIX Daily Gaps (Last 30 Days)",
+            price_prefix="",
+        )
 
 
 def _spy_vix_chart(df) -> go.Figure:
     """Dual-axis chart: SPY price (left axis) + VIX (right axis, shaded zones)."""
     fig = make_subplots(specs=[[{"secondary_y": True}]])
 
-    # SPY line
     fig.add_trace(go.Scatter(
         x=df.index, y=df["SPY"],
         name="SPY",
@@ -170,7 +180,6 @@ def _spy_vix_chart(df) -> go.Figure:
         hovertemplate="SPY: <b>%{y:,.2f}</b><extra></extra>",
     ), secondary_y=False)
 
-    # VIX filled area
     fig.add_trace(go.Scatter(
         x=df.index, y=df["VIX"],
         name="VIX",
@@ -181,7 +190,6 @@ def _spy_vix_chart(df) -> go.Figure:
         hovertemplate="VIX: <b>%{y:.2f}</b><extra></extra>",
     ), secondary_y=True)
 
-    # Zone reference lines on VIX axis
     for level, color, label in [
         (15, "#22C55E", "VIX 15 — complacent"),
         (20, "#F59E0B", "VIX 20 — caution"),
@@ -208,63 +216,11 @@ def _spy_vix_chart(df) -> go.Figure:
     return fig
 
 
-def _render_vix_gap_table() -> None:
-    st.markdown("#### VIX Daily Gaps (Last 30 Days)")
-    vix_ohlc = fetch_vix_ohlc(period="1y")
-    if vix_ohlc.empty:
-        st.info("VIX OHLC data unavailable.")
-        return
-    gaps_df = compute_daily_gaps(vix_ohlc)
-    gaps_data = gaps_df.tail(30)[["Open", "Prev Close", "Gap", "Gap %", "Gap Filled", "Gap Confirmed"]].reset_index()
-    gaps_data.columns = ["Date", "Open", "Prev Close", "Gap $", "Gap %", "Filled", "Gap Confirmed"]
-    gaps_data["Date"] = gaps_data["Date"].dt.strftime("%m-%d")
-    gaps_data = gaps_data.sort_values("Date", ascending=False).reset_index(drop=True)
-    gaps_data["Status"] = gaps_data.apply(
-        lambda r: "—" if r["Gap $"] == 0
-        else ("✅ Filled" if r["Filled"]
-        else ("⏳ Pending" if not r.get("Gap Confirmed", True)
-        else "❌ Open")),
-        axis=1,
-    )
-    display = gaps_data[["Date", "Open", "Prev Close", "Gap $", "Gap %", "Status"]]
-
-    def _highlight(row):
-        gap    = gaps_data.loc[row.name, "Gap $"]
-        filled = gaps_data.loc[row.name, "Filled"]
-        if gap == 0 or bool(filled):
-            return [""] * len(row)
-        if gap > 0:
-            style = "background-color: rgba(34,197,94,0.20); color:#22C55E; font-weight:600"
-        else:
-            style = "background-color: rgba(239,68,68,0.25); color:#EF4444; font-weight:600"
-        return [style] * len(row)
-
-    st.dataframe(
-        display.style.apply(_highlight, axis=1).format(
-            {"Open": "{:.2f}", "Prev Close": "{:.2f}", "Gap $": "{:.2f}", "Gap %": "{:+.2f}%"},
-            na_rep="—",
-        ),
-        width="stretch", hide_index=True, height=600,
-    )
-
-
-def _render_spy_gap_table(daily_df, quote: dict) -> None:
-    head_col, btn_col = st.columns([8, 1])
-    head_col.markdown("#### Daily Gaps (Last 30 Days)")
-    with btn_col:
-        with st.popover("🔗 Share", use_container_width=True):
-            import urllib.parse
-            try:
-                parsed = urllib.parse.urlparse(st.context.url)
-                share_url = f"{parsed.scheme}://{parsed.netloc}/spy-gaps"
-            except Exception:
-                share_url = "/spy-gaps"
-            st.code(share_url, language=None)
-            st.caption("Copy the link above to share this page.")
+def _render_spy_gap_table(daily_df: pd.DataFrame, quote: dict) -> None:
     gaps_df = patch_today_gap(compute_daily_gaps(daily_df), quote)
-
-    # Next-day price direction: shift Close up by 1 so each row shows tomorrow's close
     gaps_df = gaps_df.copy()
+
+    # Next-day price direction
     gaps_df["Next Close"] = gaps_df["Close"].shift(-1)
     gaps_df["Next Day"] = gaps_df.apply(
         lambda r: "▲" if (pd.notna(r["Next Close"]) and r["Next Close"] > r["Close"])
@@ -273,187 +229,21 @@ def _render_spy_gap_table(daily_df, quote: dict) -> None:
         axis=1,
     )
 
-    # Attach RSI — deduplicate index first to prevent row expansion on duplicate dates
     rsi_dedup = compute_rsi(daily_df)[~daily_df.index.duplicated(keep="last")]
     gaps_df["RSI"] = rsi_dedup.reindex(gaps_df.index)
 
-    has_vol = "Volume" in gaps_df.columns
-    base_cols = ["Open", "Prev Close", "Gap", "Gap %", "Gap Filled", "Gap Confirmed", "RSI", "Next Day"]
-    if has_vol:
-        base_cols.insert(2, "Volume")
-    gaps_data = gaps_df.tail(30)[base_cols].reset_index()
-    if has_vol:
-        gaps_data.columns = ["Date", "Open", "Prev Close", "Volume", "Gap $", "Gap %", "Filled", "Gap Confirmed", "RSI", "Next Day"]
-    else:
-        gaps_data.columns = ["Date", "Open", "Prev Close", "Gap $", "Gap %", "Filled", "Gap Confirmed", "RSI", "Next Day"]
-    gaps_data["Date"] = gaps_data["Date"].dt.strftime("%m-%d")
-    gaps_data = gaps_data.sort_values("Date", ascending=False).reset_index(drop=True)
+    try:
+        parsed    = urllib.parse.urlparse(st.context.url)
+        share_url = f"{parsed.scheme}://{parsed.netloc}/spy-gaps"
+    except Exception:
+        share_url = "/spy-gaps"
 
-    gaps_data["Status"] = gaps_data.apply(
-        lambda r: "—" if r["Gap $"] == 0
-        else ("✅ Filled" if r["Filled"]
-        else ("⏳ Pending" if not r.get("Gap Confirmed", True)
-        else "❌ Open")),
-        axis=1,
-    )
-
-    gaps_data["RSI Zone"] = gaps_data["RSI"].apply(
-        lambda v: "—" if pd.isna(v) or v == 0
-        else ("Overbought" if v >= 70 else ("Oversold" if v <= 30 else "Neutral"))
-    )
-
-    display_cols = (
-        ["Date", "Open", "Prev Close"]
-        + (["Volume"] if has_vol else [])
-        + ["Gap $", "Gap %", "Status", "RSI", "RSI Zone", "Next Day"]
-    )
-    display = gaps_data[display_cols]
-
-    def _color_next_day(val):
-        if val == "▲":
-            return "color: #22C55E; font-weight: 700"
-        if val == "▼":
-            return "color: #EF4444; font-weight: 700"
-        return ""
-
-    def _highlight(row):
-        gap    = gaps_data.loc[row.name, "Gap $"]
-        filled = gaps_data.loc[row.name, "Filled"]
-        if gap == 0 or bool(filled):
-            return [""] * len(row)
-        style = (
-            "background-color: rgba(34,197,94,0.20); color:#22C55E; font-weight:600"
-            if gap > 0
-            else "background-color: rgba(239,68,68,0.25); color:#EF4444; font-weight:600"
-        )
-        return [style] * len(row)
-
-    def _color_rsi_zone(val):
-        if val == "Overbought":
-            return "color:#EF4444; font-weight:700"
-        if val == "Oversold":
-            return "color:#22C55E; font-weight:700"
-        if val == "Neutral":
-            return "color:#F59E0B"
-        return ""
-
-    def _color_rsi(val):
-        if pd.isna(val) or val == 0:
-            return ""
-        if val >= 70:
-            return "color:#EF4444; font-weight:700"
-        if val <= 30:
-            return "color:#22C55E; font-weight:700"
-        return "color:#F59E0B"
-
-    fmt = {"Open": "${:.2f}", "Prev Close": "${:.2f}", "Gap $": "${:.2f}", "Gap %": "{:+.2f}%", "RSI": "{:.1f}"}
-    if has_vol:
-        fmt["Volume"] = lambda x: f"{x/1_000_000:.1f}M" if x and x > 0 else "—"
-    st.dataframe(
-        display.style
-            .apply(_highlight, axis=1)
-            .map(_color_next_day, subset=["Next Day"])
-            .map(_color_rsi_zone, subset=["RSI Zone"])
-            .map(_color_rsi, subset=["RSI"])
-            .format(fmt, na_rep="—"),
-        width="stretch", hide_index=True, height=600,
-    )
-
-
-def _render_spy_summary(quote, price, chg, chg_pct, daily_df) -> None:
-    """Two-row summary card: price data row + technicals row."""
-    # ── Compute technicals ────────────────────────────────────────────────────
-    rsi_val = ma5 = ma50 = ma100 = ma200 = cross_label = cross_clr = None
-    if not daily_df.empty:
-        rsi_val = float(compute_rsi(daily_df).iloc[-1])
-
-        def _ma(p):
-            return float(daily_df["Close"].rolling(p).mean().iloc[-1]) if len(daily_df) >= p else None
-
-        ma5   = _ma(5)
-        ma50  = _ma(50)
-        ma100 = _ma(100)
-        ma200 = _ma(200)
-        if ma50 and ma200:
-            cross_label = "🌟 Golden Cross" if ma50 > ma200 else "💀 Death Cross"
-            cross_clr   = "#22C55E" if ma50 > ma200 else "#EF4444"
-
-    up_clr  = "#22C55E"
-    dn_clr  = "#EF4444"
-    neu_clr = "#F59E0B"
-    mut_clr = "#64748B"
-    val_clr = "#F1F5F9"
-    bg      = "#0F172A"
-    sep     = "#1E293B"
-
-    def cell(label, value, sub="", sub_clr=None):
-        sub_html = (
-            f'<div style="font-size:11px;color:{sub_clr or mut_clr};margin-top:2px;white-space:nowrap">{sub}</div>'
-            if sub else '<div style="font-size:11px">&nbsp;</div>'
-        )
-        return (
-            f'<div style="padding:10px 18px;border-right:1px solid {sep};'
-            f'display:flex;flex-direction:column;justify-content:center">'
-            f'<div style="font-size:11px;color:{mut_clr};text-transform:uppercase;'
-            f'letter-spacing:.05em;white-space:nowrap">{label}</div>'
-            f'<div style="font-size:17px;font-weight:700;color:{val_clr};white-space:nowrap">{value}</div>'
-            f'{sub_html}'
-            f'</div>'
-        )
-
-    def ma_cell(label, val):
-        if not val:
-            return ""
-        diff = (price - val) / val * 100
-        clr  = up_clr if diff >= 0 else dn_clr
-        return cell(label, f"{val:,.2f}", f"{diff:+.2f}% vs price", clr)
-
-    # ── Row 1: Price data ─────────────────────────────────────────────────────
-    chg_clr   = up_clr if chg >= 0 else dn_clr
-    arrow     = "▲" if chg >= 0 else "▼"
-    vol       = quote.get("volume", 0)
-    prev_close = quote.get("prev_close", 0)
-
-    price_row = "".join([
-        cell("SPY Price", f"{price:,.2f}", f"{arrow} {abs(chg):.2f} ({chg_pct:+.2f}%)", chg_clr),
-        cell("Prev Close", f"{prev_close:,.2f}" if prev_close else "—"),
-        cell("Day High",  f"{quote['day_high']:,.2f}" if quote["day_high"] else "—"),
-        cell("Day Low",   f"{quote['day_low']:,.2f}"  if quote["day_low"]  else "—"),
-        cell("52W High",  f"{quote['w52_high']:,.2f}" if quote["w52_high"] else "—"),
-        cell("52W Low",   f"{quote['w52_low']:,.2f}"  if quote["w52_low"]  else "—"),
-        cell("Volume",    f"{vol/1_000_000:.1f}M"     if vol else "—"),
-    ])
-
-    # ── Row 2: Technicals ─────────────────────────────────────────────────────
-    if rsi_val is not None:
-        rsi_clr = dn_clr if rsi_val >= 70 else up_clr if rsi_val <= 30 else neu_clr
-        rsi_sub = "Overbought" if rsi_val >= 70 else "Oversold" if rsi_val <= 30 else "Neutral"
-        rsi_cell = cell("RSI (14)", f"{rsi_val:.1f}", rsi_sub, rsi_clr)
-    else:
-        rsi_cell = ""
-
-    cross_cell = cell("MA Trend", cross_label, "MA50 vs MA200", cross_clr) if cross_label else ""
-
-    tech_row = "".join([
-        rsi_cell,
-        cross_cell,
-        ma_cell("MA 5",   ma5),
-        ma_cell("MA 50",  ma50),
-        ma_cell("MA 100", ma100),
-        ma_cell("MA 200", ma200),
-    ])
-
-    row_style = (
-        f'display:flex;flex-wrap:wrap;background:{bg};'
-        f'border-bottom:1px solid {sep}'
-    )
-    st.markdown(
-        f'<div style="background:{bg};border:1px solid {sep};border-radius:8px;'
-        f'overflow:hidden;margin-bottom:8px">'
-        f'<div style="{row_style}">{price_row}</div>'
-        f'<div style="{row_style};border-bottom:none">{tech_row}</div>'
-        f'</div>',
-        unsafe_allow_html=True,
+    render_gap_table(
+        gaps_df,
+        title="Daily Gaps (Last 30 Days)",
+        show_rsi=True,
+        show_next_day=True,
+        share_url=share_url,
     )
 
 
@@ -466,7 +256,6 @@ def _render_index_strip(df) -> None:
         is_vix  = row["Index"] == "VIX"
         price_s = f"{row['Price']:.2f}" if is_vix else f"{row['Price']:,.2f}"
         delta_s = f"{row['Change']:+.2f} ({row['Change %']:+.2f}%)"
-        # VIX rising = bad → invert delta colour
         col.metric(
             label=row["Index"],
             value=price_s,
@@ -491,7 +280,6 @@ def _spy_chart(df, ma_periods: list, prev_close: float | None = None, show_rsi: 
         vertical_spacing=0.03,
     )
 
-    # Candlesticks
     fig.add_trace(go.Candlestick(
         x=df.index,
         open=df["Open"], high=df["High"],
@@ -502,7 +290,6 @@ def _spy_chart(df, ma_periods: list, prev_close: float | None = None, show_rsi: 
         showlegend=False,
     ), row=1, col=1)
 
-    # MA overlays
     ma_colors = {20: "#F59E0B", 50: "#3B82F6", 200: "#EF4444"}
     for p in ma_periods:
         if len(df) >= p:
@@ -514,7 +301,6 @@ def _spy_chart(df, ma_periods: list, prev_close: float | None = None, show_rsi: 
                 name=f"MA{p}",
             ), row=1, col=1)
 
-    # Prev close reference line (intraday only)
     if prev_close is not None:
         fig.add_hline(
             y=prev_close, row=1, col=1,
@@ -524,7 +310,6 @@ def _spy_chart(df, ma_periods: list, prev_close: float | None = None, show_rsi: 
             annotation_position="top right",
         )
 
-    # Volume bars
     if "Volume" in df.columns:
         bar_colors = ["#22C55E" if c >= o else "#EF4444" for c, o in zip(df["Close"], df["Open"])]
         fig.add_trace(go.Bar(
@@ -536,7 +321,6 @@ def _spy_chart(df, ma_periods: list, prev_close: float | None = None, show_rsi: 
             showlegend=False,
         ), row=vol_row, col=1)
 
-    # RSI subplot
     if show_rsi and rsi_row:
         rsi = compute_rsi(df)
         fig.add_trace(go.Scatter(
@@ -574,5 +358,3 @@ def _spy_chart(df, ma_periods: list, prev_close: float | None = None, show_rsi: 
 
 
 render_spy_dashboard_tab()
-
-

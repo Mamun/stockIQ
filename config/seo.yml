@@ -1,0 +1,116 @@
+# ── Core identity ──────────────────────────────────────────────────────────────
+site:
+  name:        "IndexIQ"
+  url:         "https://stpicker.streamlit.app"
+  title:       "IndexIQ — Free S&P 500 Technical Analysis & Screener"
+  author:      "IndexIQ"
+  locale:      "en_US"
+  # og:image must be an absolute URL to a publicly accessible image (1200×630 px ideal)
+  # Host a screenshot on your GitHub repo and paste the raw URL here.
+  image:       "https://raw.githubusercontent.com/Mamun/indexiq/main/docs/social_preview.png"
+  image_width:  1200
+  image_height: 630
+
+description: >
+  Free stock market analyzer with real-time technical analysis.
+  Scan the S&P 500 for MA5/20/50/100/200, RSI, Fibonacci retracement,
+  short squeeze setups, MA-200 bounce candidates, Munger-quality stocks,
+  and AI-powered SPY forecasts — no login required.
+
+keywords:
+  - free stock screener
+  - S&P 500 technical analysis
+  - stock market analyzer
+  - moving average stock screener
+  - RSI overbought oversold stocks
+  - Fibonacci retracement calculator
+  - short squeeze scanner
+  - 200 day moving average stocks
+  - 200 week moving average
+  - stock bounce radar
+  - MA200 support stocks
+  - Charlie Munger stock strategy
+  - candlestick reversal patterns
+  - golden cross death cross
+  - stock trading signals
+  - weekly monthly stock screener
+  - SPY forecast AI
+  - SPY gap fill tracker
+  - free stock analysis tool
+  - S&P 500 screener free
+
+# ── JSON-LD FAQ rich snippets ──────────────────────────────────────────────────
+# Google can show these as expandable Q&A directly in search results.
+faq:
+  - q: "What is IndexIQ?"
+    a: >
+      IndexIQ is a free, open-source web app that provides institutional-grade
+      technical analysis for S&P 500 stocks — including moving averages, RSI,
+      Fibonacci retracement, candlestick patterns, short squeeze scanner, bounce
+      radar, Munger quality watchlist, and AI-powered SPY forecasts.
+
+  - q: "Is IndexIQ free to use?"
+    a: >
+      Yes, IndexIQ is completely free. No account, no login, and no API key
+      is required to use the stock analyzer, screener, or any other tool.
+
+  - q: "What is a short squeeze scanner?"
+    a: >
+      A short squeeze scanner finds stocks with high short interest and rising
+      RSI. When the price rises, short sellers are forced to buy shares to cover
+      losses, which accelerates the move upward. IndexIQ scores each candidate
+      by RSI momentum, short float percentage, and days-to-cover.
+
+  - q: "What is the 200-day moving average used for?"
+    a: >
+      The 200-day moving average is a key long-term support and resistance level.
+      Stocks that pull back to this level while oversold (RSI below 30) often
+      produce strong bounce setups. IndexIQ's Bounce Radar flags these candidates
+      automatically.
+
+  - q: "What is the 200-week moving average?"
+    a: >
+      The 200-week moving average represents roughly four years of price history.
+      Charlie Munger and other value investors use it as a proxy for intrinsic
+      value — buying quality companies when price approaches this long-term average.
+
+  - q: "What is Charlie Munger's stock strategy?"
+    a: >
+      Charlie Munger advocated buying exceptional businesses at fair prices —
+      strong ROE, high profit margins, consistent earnings growth, and low debt.
+      IndexIQ's Munger Watchlist screens the S&P 500 for these quality factors
+      and highlights stocks trading near their 200-week moving average.
+
+  - q: "How is RSI calculated?"
+    a: >
+      The Relative Strength Index (RSI-14) measures price momentum over 14
+      periods using Wilder's smoothing method. RSI above 70 signals overbought
+      conditions where a pullback is likely; below 30 signals oversold conditions
+      where a bounce is possible.
+
+  - q: "What is a Golden Cross and Death Cross?"
+    a: >
+      A Golden Cross occurs when the 50-day moving average crosses above the
+      200-day moving average — a strong bullish trend signal. A Death Cross is
+      the opposite: the 50-day crosses below the 200-day, signalling a potential
+      long-term downtrend.
+
+  - q: "What is a Fibonacci retracement?"
+    a: >
+      Fibonacci retracement levels (23.6%, 38.2%, 50%, 61.8%, 78.6%) mark
+      potential support and resistance zones derived from the Fibonacci sequence.
+      Traders use them to identify where a retracing stock may find buyers or
+      sellers before resuming its trend.
+
+  - q: "What candlestick patterns does IndexIQ detect?"
+    a: >
+      IndexIQ automatically detects seven reversal patterns: Hammer (bullish),
+      Bullish Engulfing, Morning Star (bullish), Shooting Star (bearish),
+      Bearish Engulfing, Evening Star (bearish), and Doji (neutral indecision).
+
+  - q: "What is the SPY AI Forecast?"
+    a: >
+      The SPY AI Forecast uses Claude (Anthropic's AI) to generate a 5-trading-day
+      directional forecast for SPY. It analyses the last 15 days of opening gaps,
+      RSI, gap fill rates, and the live quote to produce price targets, intraday
+      ranges, and confidence levels — refreshed every hour.

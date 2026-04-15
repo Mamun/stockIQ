@@ -6,8 +6,9 @@ import pandas as pd
 import streamlit as st
 import yfinance as yf
 
+from indexiq.cache_ttl import CACHE_TTL
 from indexiq.config import SPX_TICKERS
-from indexiq.indicators import compute_rsi
+from indexiq.models.indicators import compute_rsi
 
 logging.getLogger("yfinance").setLevel(logging.CRITICAL)
 
@@ -17,7 +18,7 @@ def _rsi_last(df: pd.DataFrame) -> float:
     return float(compute_rsi(df).iloc[-1])
 
 
-@st.cache_data(ttl=3600)
+@st.cache_data(ttl=CACHE_TTL["fetch_spx_recommendations"])
 def fetch_spx_recommendations() -> pd.DataFrame:
     """
     Weekly/monthly candle screener for SPX_TICKERS.
@@ -144,7 +145,7 @@ def fetch_spx_recommendations() -> pd.DataFrame:
     )
 
 
-@st.cache_data(ttl=1800)  # 30-min cache — scan is expensive
+@st.cache_data(ttl=CACHE_TTL["fetch_bounce_candidates"])  # scan is expensive
 def fetch_bounce_candidates(threshold_pct: float = 5.0, top_n: int = 30) -> pd.DataFrame:
     """
     Scan SPX_TICKERS for stocks within ±threshold_pct of their 200-day MA.
@@ -236,7 +237,7 @@ def fetch_bounce_candidates(threshold_pct: float = 5.0, top_n: int = 30) -> pd.D
     )
 
 
-@st.cache_data(ttl=3600)  # 1-hour cache — short interest is reported infrequently
+@st.cache_data(ttl=CACHE_TTL["fetch_squeeze_candidates"])  # short interest is reported infrequently
 def fetch_squeeze_candidates(
     rsi_min: float = 55.0,
     min_short_float: float = 0.5,
@@ -423,7 +424,7 @@ def _proximity_score(dist_pct: float) -> int:
     return 0
 
 
-@st.cache_data(ttl=3600)
+@st.cache_data(ttl=CACHE_TTL["fetch_munger_candidates"])
 def fetch_munger_candidates(
     threshold_pct: float = 15.0,
     min_quality: float = 30.0,
@@ -507,7 +508,7 @@ def fetch_munger_candidates(
     )
 
 
-@st.cache_data(ttl=3600)
+@st.cache_data(ttl=CACHE_TTL["fetch_strong_buy_candidates"])
 def fetch_strong_buy_candidates(
     min_upside: float = 5.0,
     min_analysts: int = 5,
@@ -611,7 +612,7 @@ def fetch_strong_buy_candidates(
     )
 
 
-@st.cache_data(ttl=3600)
+@st.cache_data(ttl=CACHE_TTL["fetch_strong_sell_candidates"])
 def fetch_strong_sell_candidates(
     min_downside: float = 5.0,
     min_analysts: int = 5,

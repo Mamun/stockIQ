@@ -1,0 +1,172 @@
+# ── Moving averages ────────────────────────────────────────────────────────────
+moving_averages:
+  periods: [5, 20, 50, 100, 200]
+  colors:
+    5:   "#F59E0B"   # amber
+    20:  "#10B981"   # emerald
+    50:  "#3B82F6"   # blue
+    100: "#8B5CF6"   # violet
+    200: "#EF4444"   # red
+  weekly_ma200_color: "#F0ABFC"  # fuchsia
+
+# ── Fibonacci retracement ──────────────────────────────────────────────────────
+fibonacci:
+  levels: [0.0, 0.236, 0.382, 0.5, 0.618, 0.786, 1.0]
+  colors: ["#94A3B8", "#F472B6", "#FB923C", "#FACC15", "#34D399", "#60A5FA", "#94A3B8"]
+
+# ── Candlestick reversal patterns ──────────────────────────────────────────────
+# Fields: col (DataFrame column), label, bullish (true/false/null), symbol, color
+reversal_patterns:
+  - col: pat_hammer
+    label: Hammer
+    bullish: true
+    symbol: triangle-up
+    color: "#4ADE80"
+  - col: pat_bull_engulf
+    label: Bullish Engulfing
+    bullish: true
+    symbol: triangle-up
+    color: "#16A34A"
+  - col: pat_morning_star
+    label: Morning Star
+    bullish: true
+    symbol: star
+    color: "#86EFAC"
+  - col: pat_shoot_star
+    label: Shooting Star
+    bullish: false
+    symbol: triangle-down
+    color: "#F97316"
+  - col: pat_bear_engulf
+    label: Bearish Engulfing
+    bullish: false
+    symbol: triangle-down
+    color: "#EF4444"
+  - col: pat_evening_star
+    label: Evening Star
+    bullish: false
+    symbol: star
+    color: "#DC2626"
+  - col: pat_doji
+    label: Doji
+    bullish: null
+    symbol: diamond
+    color: "#FACC15"
+
+# ── Screener ticker universe ───────────────────────────────────────────────────
+# Ordered by approximate S&P 500 market-cap weight.
+# Override how many tickers are used: export SCREENER_TICKER_COUNT=30
+screener:
+  default_count: 50
+  universe:
+    - AAPL
+    - MSFT
+    - NVDA
+    - AMZN
+    - GOOGL
+    - META
+    - BRK-B
+    - LLY
+    - AVGO
+    - TSLA
+    - JPM
+    - V
+    - UNH
+    - XOM
+    - MA
+    - HD
+    - PG
+    - JNJ
+    - ABBV
+    - WMT
+    - COST
+    - MRK
+    - ORCL
+    - CRM
+    - BAC
+    - AMD
+    - KO
+    - CVX
+    - MCD
+    - NFLX
+    - PFE
+    - ABT
+    - TXN
+    - CSCO
+    - PM
+    - LIN
+    - ACN
+    - NKE
+    - DIS
+    - AXP
+    - HON
+    - INTC
+    - IBM
+    - AMGN
+    - GE
+    - LOW
+    - SBUX
+    - BA
+    - RTX
+    - CAT
+    - NOW
+    - INTU
+    - ISRG
+    - GS
+    - SPGI
+    - MS
+    - BLK
+    - SYK
+    - PEP
+    - TMO
+    - PLD
+    - VRTX
+    - REGN
+    - MMC
+    - CB
+    - ETN
+    - DE
+    - BKNG
+    - MDT
+    - NEE
+    - MO
+    - T
+    - VZ
+    - CL
+    - BMY
+    - GILD
+    - CI
+    - ELV
+    - HCA
+    - MCO
+    - ICE
+    - TJX
+    - USB
+    - PNC
+    - AON
+    - ZTS
+    - COF
+    - APD
+    - ECL
+    - CME
+    - LRCX
+    - KLAC
+    - AMAT
+    - PANW
+    - MU
+    - SNPS
+    - CDNS
+    - ADI
+    - MRVL
+    - QCOM
+
+# ── Chart period options (label → days) ────────────────────────────────────────
+period_options:
+  "1 Week":   7
+  "2 Weeks":  14
+  "1 Month":  30
+  "3 Months": 90
+  "6 Months": 180
+  "1 Year":   365
+  "2 Years":  730
+  "5 Years":  1825
