@@ -116,12 +116,12 @@ def render_munger_tab() -> None:
         "Ticker", "Company", "Sector", "Price", "MA 200W",
         "Distance %", "RSI", "Quality Score", "Prox Score", "Munger Score",
     ]
-    st.dataframe(_style_table(df[display_cols]), width='stretch', hide_index=True)
+    st.dataframe(_style_table(df[display_cols]), width='stretch', hide_index=True, height=(len(df) + 1) * 35 + 4)
 
     # ── Quality breakdown expander per ticker ─────────────────────────────────
     with st.expander("🔬 Fundamental breakdown per stock", expanded=False):
         bd_df = df[["Ticker", "Company", "Quality Score", "Breakdown"]].copy()
-        st.dataframe(bd_df, width='stretch', hide_index=True)
+        st.dataframe(bd_df, width='stretch', hide_index=True, height=(len(bd_df) + 1) * 35 + 4)
 
     # ── Scatter: Distance % vs Quality Score ──────────────────────────────────
     st.markdown("#### Distance from MA 200W vs Quality Score — bubble size = Munger Score")

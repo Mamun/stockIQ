@@ -50,10 +50,15 @@ def render_spy_dashboard_tab() -> None:
         "6M":     ("6mo", "1d",  [20, 50, 200], False),
         "1Y":     ("1y",  "1d",  [20, 50, 200], False),
     }
+    spy_period_keys = list(period_map)
+    _spy_qp = st.query_params.get("period", "1Y")
+    spy_default_idx = spy_period_keys.index(_spy_qp) if _spy_qp in spy_period_keys else 5
+
     period_col, rsi_col = st.columns([6, 1])
     with period_col:
-        choice = st.radio("Period", list(period_map), horizontal=True, key="spy_period", index=5)
+        choice = st.radio("Period", spy_period_keys, horizontal=True, key="spy_period", index=spy_default_idx)
     show_rsi = rsi_col.checkbox("RSI", value=True)
+    st.query_params["period"] = choice
 
     yf_period, interval, mas, show_prev = period_map[choice]
 
@@ -96,7 +101,10 @@ def render_spy_dashboard_tab() -> None:
 # ── Private helpers ────────────────────────────────────────────────────────────
 
 def _render_vix_section() -> None:
-    """Current VIX level card + 1-year dual-axis SPY vs VIX chart."""
+    """Current VIX level card + dual-axis SPY vs VIX chart with period selection."""
+    vix_periods = ["1M", "3M", "6M", "1Y", "2Y", "5Y"]
+    vix_period_map = {"1M": "1mo", "3M": "3mo", "6M": "6mo", "1Y": "1y", "2Y": "2y", "5Y": "5y"}
+
     vix_df = fetch_vix_history(period="1y")
     if vix_df.empty or "VIX" not in vix_df.columns:
         st.info("VIX data unavailable.")
@@ -153,12 +161,25 @@ def _render_vix_section() -> None:
 &gt; 30 &nbsp;🔥&nbsp; Extreme fear / crisis
 </div>""", unsafe_allow_html=True)
 
-    st.plotly_chart(_spy_vix_chart(vix_df), width="stretch")
+    _vix_qp = st.query_params.get("vix_period", "1Y")
+    vix_default_idx = vix_periods.index(_vix_qp) if _vix_qp in vix_periods else 3
+
+    vix_choice = st.radio(
+        "Period", vix_periods, horizontal=True, key="vix_period", index=vix_default_idx
+    )
+    st.query_params["vix_period"] = vix_choice
+    yf_vix_period = vix_period_map[vix_choice]
+    vix_chart_df = fetch_vix_history(period=yf_vix_period)
+
+    if vix_chart_df.empty or "VIX" not in vix_chart_df.columns:
+        st.info("VIX chart data unavailable for this period.")
+    else:
+        st.plotly_chart(_spy_vix_chart(vix_chart_df), width="stretch")
 
     st.markdown("---")
 
     # VIX gap table — no RSI, no $ prefix (VIX is not a dollar price)
-    vix_ohlc = fetch_vix_ohlc(period="1y")
+    vix_ohlc = fetch_vix_ohlc(period=yf_vix_period)
     if not vix_ohlc.empty:
         vix_gaps = compute_daily_gaps(vix_ohlc)
         render_gap_table(
@@ -169,9 +190,18 @@ def _render_vix_section() -> None:
 
 
 def _spy_vix_chart(df) -> go.Figure:
-    """Dual-axis chart: SPY price (left axis) + VIX (right axis, shaded zones)."""
+    """Dual-axis chart: SPY price (left axis) + VIX with MAs (right axis)."""
     fig = make_subplots(specs=[[{"secondary_y": True}]])
 
+    # ── Compute tight y-axis ranges from actual data ───────────────────────────
+    spy_min, spy_max = df["SPY"].min(), df["SPY"].max()
+    vix_min, vix_max = df["VIX"].min(), df["VIX"].max()
+    spy_pad = (spy_max - spy_min) * 0.05
+    vix_pad = (vix_max - vix_min) * 0.12
+    spy_range = [spy_min - spy_pad, spy_max + spy_pad]
+    vix_range = [max(0, vix_min - vix_pad), vix_max + vix_pad]
+
+    # ── SPY line ──────────────────────────────────────────────────────────────
     fig.add_trace(go.Scatter(
         x=df.index, y=df["SPY"],
         name="SPY",
@@ -180,39 +210,69 @@ def _spy_vix_chart(df) -> go.Figure:
         hovertemplate="SPY: <b>%{y:,.2f}</b><extra></extra>",
     ), secondary_y=False)
 
+    # ── VIX fill floor (to data min, not 0) ───────────────────────────────────
+    vix_floor = vix_range[0]
+    fig.add_trace(go.Scatter(
+        x=df.index, y=[vix_floor] * len(df),
+        mode="lines", line=dict(width=0), showlegend=False,
+        hoverinfo="skip",
+    ), secondary_y=True)
+
+    # ── VIX line ──────────────────────────────────────────────────────────────
     fig.add_trace(go.Scatter(
         x=df.index, y=df["VIX"],
         name="VIX",
         mode="lines",
         line=dict(color="#F59E0B", width=1.5),
-        fill="tozeroy",
-        fillcolor="rgba(245,158,11,0.08)",
+        fill="tonexty",
+        fillcolor="rgba(245,158,11,0.10)",
         hovertemplate="VIX: <b>%{y:.2f}</b><extra></extra>",
     ), secondary_y=True)
 
+    # ── VIX Moving Averages ───────────────────────────────────────────────────
+    ma_colors = {5: "#A78BFA", 20: "#34D399", 50: "#3B82F6", 100: "#F87171"}
+    for period, color in ma_colors.items():
+        if len(df) >= period:
+            ma = df["VIX"].rolling(period).mean()
+            fig.add_trace(go.Scatter(
+                x=df.index, y=ma,
+                name=f"VIX MA{period}",
+                mode="lines",
+                line=dict(color=color, width=1.2, dash="dot"),
+                hovertemplate=f"MA{period}: <b>%{{y:.2f}}</b><extra></extra>",
+            ), secondary_y=True)
+
+    # ── VIX zone reference lines ───────────────────────────────────────────────
     for level, color, label in [
         (15, "#22C55E", "VIX 15 — complacent"),
         (20, "#F59E0B", "VIX 20 — caution"),
         (30, "#EF4444", "VIX 30 — fear"),
     ]:
-        fig.add_hline(
-            y=level, secondary_y=True,
-            line_dash="dot", line_color=color, line_width=1,
-            annotation_text=label,
-            annotation_font_size=9,
-            annotation_position="top right",
-        )
+        if vix_range[0] <= level <= vix_range[1]:
+            fig.add_hline(
+                y=level, secondary_y=True,
+                line_dash="dot", line_color=color, line_width=1,
+                annotation_text=label,
+                annotation_font_size=9,
+                annotation_position="top right",
+            )
 
     fig.update_layout(
         template="plotly_dark",
-        height=360,
+        height=380,
         margin=dict(l=60, r=80, t=20, b=40),
         hovermode="x unified",
         legend=dict(orientation="h", y=1.06, x=0),
         xaxis=dict(showgrid=False),
     )
-    fig.update_yaxes(title_text="SPY Price", secondary_y=False, gridcolor="#1E293B")
-    fig.update_yaxes(title_text="VIX", secondary_y=True, gridcolor="rgba(0,0,0,0)", showgrid=False)
+    fig.update_yaxes(
+        title_text="SPY Price", secondary_y=False,
+        gridcolor="#1E293B", range=spy_range,
+    )
+    fig.update_yaxes(
+        title_text="VIX", secondary_y=True,
+        gridcolor="rgba(0,0,0,0)", showgrid=False, range=vix_range,
+    )
     return fig
 
 

@@ -96,7 +96,7 @@ def render_squeeze_scanner_tab() -> None:
 
     # ── Results table ─────────────────────────────────────────────────────────
     st.markdown("#### Candidates — sorted by Squeeze Score ↓")
-    st.dataframe(_style_table(df), width='stretch', hide_index=True)
+    st.dataframe(_style_table(df), width='stretch', hide_index=True, height=(len(df) + 1) * 35 + 4)
 
     # ── Scatter: Short Float vs RSI (bubble = Squeeze Score) ─────────────────
     st.markdown("#### Short Float % vs RSI — bubble size = Squeeze Score")

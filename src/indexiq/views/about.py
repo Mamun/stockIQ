@@ -42,7 +42,7 @@ def render_about_tab() -> None:
         {"Pattern": "Bearish Engulfing", "Type": "Bearish", "Description": "Red candle fully engulfs prior green candle — strong reversal signal"},
         {"Pattern": "Evening Star",      "Type": "Bearish", "Description": "3-candle pattern: bullish → indecision → bearish — reversal from uptrend"},
         {"Pattern": "Doji",              "Type": "Neutral", "Description": "Open ≈ Close — market indecision, potential trend change"},
-    ]), width='stretch', hide_index=True)
+    ]), width='stretch', hide_index=True, height=8 * 35 + 4)
 
 
 render_about_tab()

@@ -119,6 +119,7 @@ def render_strong_buy_tab() -> None:
     st.dataframe(
         _style_table(df[display_cols]),
         width="stretch", hide_index=True,
+        height=(len(df) + 1) * 35 + 4,
     )
 
     st.markdown("---")

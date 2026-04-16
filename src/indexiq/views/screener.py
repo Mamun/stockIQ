@@ -96,6 +96,7 @@ def _render_signal_sections(df) -> None:
         st.dataframe(
             _style_table(tier_df[cols]),
             width="stretch", hide_index=True,
+            height=(len(tier_df) + 1) * 35 + 4,
         )
 
 

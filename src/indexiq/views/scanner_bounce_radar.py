@@ -59,7 +59,7 @@ def render_bounce_radar_tab() -> None:
     )
 
     styled = _style_table(df)
-    st.dataframe(styled, width='stretch', hide_index=True)
+    st.dataframe(styled, width='stretch', hide_index=True, height=(len(df) + 1) * 35 + 4)
 
     # ── RSI bar chart ─────────────────────────────────────────────────────────
     st.markdown("#### RSI Distribution")
