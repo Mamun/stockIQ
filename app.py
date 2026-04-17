@@ -7,7 +7,7 @@ import streamlit as st
 
 # ── Page config (must be first Streamlit call) ────────────────────────────────
 st.set_page_config(
-    page_title="StockIQ — Free S&P 500 Technical Analysis & Screener",
+    page_title="Stock Screener & AI Analyzer — StockIQ",
     page_icon="📈",
     layout="wide",
     initial_sidebar_state="expanded",
