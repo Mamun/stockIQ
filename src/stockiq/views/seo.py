@@ -155,10 +155,16 @@ def inject_seo() -> None:
     upsertJsonLd(`{json_ld_str}`);
   }}
 
+  // Run immediately, on load, and every 800ms for 15s to survive React re-renders.
+  // This ensures Googlebot sees the tags even if Streamlit's hydration clears <head>.
   run();
-  if (document.readyState !== 'complete') {{
-    window.addEventListener('load', run);
-  }}
+  window.addEventListener('load', run);
+  var _seoTicks = 0;
+  var _seoTimer = setInterval(function() {{
+    run();
+    _seoTicks++;
+    if (_seoTicks >= 19) clearInterval(_seoTimer); // stop after ~15 seconds
+  }}, 800);
 }})();
 </script>"""
     )
