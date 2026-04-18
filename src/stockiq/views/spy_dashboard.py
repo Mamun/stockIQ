@@ -6,6 +6,8 @@ import streamlit as st
 from plotly.subplots import make_subplots
 
 from stockiq.data import fetch_index_snapshot, fetch_put_call_ratio, fetch_spx_intraday, fetch_spx_quote, fetch_vix_history, fetch_vix_ohlc
+from stockiq.data.gap_cache import apply_gap_cache, save_confirmed_gaps
+from stockiq.data.ohlc_cache import enrich_with_cache
 from stockiq.models.indicators import compute_daily_gaps, compute_rsi, patch_today_gap
 from stockiq.views.ai_forecast import render_ai_forecast
 from stockiq.views.components.gap_table import render_gap_table
@@ -24,7 +26,7 @@ def render_spy_dashboard_tab() -> None:
     _render_header(quote)
 
     # ── 2. SPY technical snapshot (single row) ────────────────────────────────
-    daily_df = fetch_spx_intraday(period="1y", interval="1d")
+    daily_df = enrich_with_cache(fetch_spx_intraday(period="1y", interval="1d"), "SPY")
     render_spy_summary_card(quote, quote["price"], quote["change"], quote["change_pct"], daily_df)
 
     st.divider()
@@ -51,7 +53,7 @@ def render_spy_dashboard_tab() -> None:
     # ── Fill AI slot last ─────────────────────────────────────────────────────
     if not daily_df.empty:
         try:
-            gaps_df_for_ai = compute_daily_gaps(daily_df).copy()
+            gaps_df_for_ai = apply_gap_cache(patch_today_gap(compute_daily_gaps(daily_df), quote))
             rsi_dedup = compute_rsi(daily_df)[~daily_df.index.duplicated(keep="last")]
             gaps_df_for_ai["RSI"] = rsi_dedup.reindex(gaps_df_for_ai.index)
             with ai_slot.container():
@@ -358,7 +360,8 @@ def _spy_vix_chart(df) -> go.Figure:
 
 
 def _render_spy_gap_table(daily_df: pd.DataFrame, quote: dict) -> None:
-    gaps_df = patch_today_gap(compute_daily_gaps(daily_df), quote).copy()
+    gaps_df = apply_gap_cache(patch_today_gap(compute_daily_gaps(daily_df), quote))
+    save_confirmed_gaps(gaps_df)
 
     gaps_df["Next Close"] = gaps_df["Close"].shift(-1)
     gaps_df["Next Day"] = gaps_df.apply(

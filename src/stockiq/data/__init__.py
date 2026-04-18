@@ -7,6 +7,8 @@ Sub-modules:
   data.screeners  — scanner functions (bounce, squeeze, munger, strong buy/sell, screener)
 """
 from stockiq.data.fetch import fetch_ohlcv, get_company_name, search_companies
+from stockiq.data.gap_cache import apply_gap_cache, save_confirmed_gaps
+from stockiq.data.ohlc_cache import enrich_with_cache, load_ohlc_cache
 from stockiq.data.market import (
     fetch_index_snapshot,
     fetch_put_call_ratio,
