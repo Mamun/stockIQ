@@ -1,0 +1,51 @@
+# Frontend-only UI configuration — chart display options and pattern overlays.
+
+# ── Candlestick reversal patterns ──────────────────────────────────────────────
+# Fields: col (DataFrame column), label, bullish (true/false/null), symbol, color
+reversal_patterns:
+  - col: pat_hammer
+    label: Hammer
+    bullish: true
+    symbol: triangle-up
+    color: "#4ADE80"
+  - col: pat_bull_engulf
+    label: Bullish Engulfing
+    bullish: true
+    symbol: triangle-up
+    color: "#16A34A"
+  - col: pat_morning_star
+    label: Morning Star
+    bullish: true
+    symbol: star
+    color: "#86EFAC"
+  - col: pat_shoot_star
+    label: Shooting Star
+    bullish: false
+    symbol: triangle-down
+    color: "#F97316"
+  - col: pat_bear_engulf
+    label: Bearish Engulfing
+    bullish: false
+    symbol: triangle-down
+    color: "#EF4444"
+  - col: pat_evening_star
+    label: Evening Star
+    bullish: false
+    symbol: star
+    color: "#DC2626"
+  - col: pat_doji
+    label: Doji
+    bullish: null
+    symbol: diamond
+    color: "#FACC15"
+
+# ── Chart period options (label → days) ────────────────────────────────────────
+period_options:
+  "1 Week":   7
+  "2 Weeks":  14
+  "1 Month":  30
+  "3 Months": 90
+  "6 Months": 180
+  "1 Year":   365
+  "2 Years":  730
+  "5 Years":  1825

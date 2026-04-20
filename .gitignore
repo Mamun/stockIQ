@@ -8,7 +8,9 @@ venv/
 *.venv
 .pytest_cache/
 
-# Streamlit secrets only (keep config)
+# Streamlit secrets only (keep config.toml)
 .streamlit/secrets.toml
 .env
-.streamlit/secrets.toml
+
+# GCS service account key files
+*.json

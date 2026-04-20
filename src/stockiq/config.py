@@ -1,42 +1,36 @@
 """
-Application configuration loaded from config/app.yml.
+Frontend visual configuration.
 
-All other modules import from here as before — nothing else changes.
-To adjust colours, periods, tickers, or patterns edit config/app.yml.
+Reads from:
+  config/indicators.yml — MA periods + colors, Fibonacci levels + colors (shared with backend)
+  config/ui.yml         — reversal patterns, chart period options (frontend-only)
 """
-import os
 from pathlib import Path
 
 import yaml
 
-_cfg_path = Path(__file__).parent.parent.parent / "config" / "app.yml"
-with open(_cfg_path) as _f:
-    _cfg: dict = yaml.safe_load(_f)
+_cfg_dir = Path(__file__).parent.parent.parent / "config"
+
+with open(_cfg_dir / "indicators.yml") as _f:
+    _ind: dict = yaml.safe_load(_f)
+
+with open(_cfg_dir / "ui.yml") as _f:
+    _ui: dict = yaml.safe_load(_f)
 
 # ── Moving averages ────────────────────────────────────────────────────────────
-_ma = _cfg["moving_averages"]
-MA_PERIODS: list[int]       = _ma["periods"]
-MA_COLORS:  dict[int, str]  = {int(k): v for k, v in _ma["colors"].items()}
-MA200W_COLOR: str            = _ma["weekly_ma200_color"]
+_ma = _ind["moving_averages"]
+MA_PERIODS:   list[int]      = _ma["periods"]
+MA_COLORS:    dict[int, str] = {int(k): v for k, v in _ma["colors"].items()}
+MA200W_COLOR: str             = _ma["weekly_ma200_color"]
 
 # ── Fibonacci ──────────────────────────────────────────────────────────────────
-FIB_LEVELS: list[float] = _cfg["fibonacci"]["levels"]
-FIB_COLORS: list[str]   = _cfg["fibonacci"]["colors"]
+FIB_COLORS: list[str] = _ind["fibonacci"]["colors"]
 
 # ── Reversal patterns ──────────────────────────────────────────────────────────
-# Preserved as list-of-tuples: (col, label, bullish, symbol, color)
 REVERSAL_PATTERNS: list[tuple] = [
     (p["col"], p["label"], p["bullish"], p["symbol"], p["color"])
-    for p in _cfg["reversal_patterns"]
+    for p in _ui["reversal_patterns"]
 ]
 
-# ── Screener ticker pool ───────────────────────────────────────────────────────
-_screener = _cfg["screener"]
-SCREENER_TICKER_COUNT: int  = int(os.environ.get("SCREENER_TICKER_COUNT", _screener["default_count"]))
-SPX_TICKERS: list[str]      = _screener["universe"][:SCREENER_TICKER_COUNT]
-
-# ── NASDAQ-100 ticker universe ─────────────────────────────────────────────────
-NASDAQ_100_TICKERS: list[str] = _cfg["nasdaq_100"]
-
 # ── Chart period options ───────────────────────────────────────────────────────
-PERIOD_OPTIONS: dict[str, int] = _cfg["period_options"]
+PERIOD_OPTIONS: dict[str, int] = _ui["period_options"]

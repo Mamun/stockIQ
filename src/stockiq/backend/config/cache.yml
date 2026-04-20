@@ -1,0 +1,26 @@
+# Cache TTL (time-to-live) in seconds
+# Controls how long Streamlit caches each data-fetch function.
+# Change a value here and restart the app — no code changes needed.
+
+market:
+  fetch_spx_quote: 60           # Live SPY price — refresh every minute
+  fetch_spx_intraday: 120       # SPY bars — refresh every 2 minutes
+  fetch_vix_ohlc: 3600          # VIX OHLC — refresh hourly
+  fetch_vix_history: 3600       # SPY + VIX dual-axis history — refresh hourly
+  fetch_index_snapshot: 120     # Major indices strip — refresh every 2 minutes
+  fetch_put_call_ratio: 3600    # SPY options put/call ratio — refresh hourly
+
+screeners:
+  fetch_candle_momentum_scan: 3600    # Weekly/monthly candle screener — hourly
+  fetch_bounce_radar_scan: 1800       # MA200 bounce radar — 30 min (price-sensitive)
+  fetch_squeeze_scan: 3600            # Short squeeze — hourly (RSI moves intraday)
+  fetch_munger_strategy_scan: 43200   # Munger quality — 12 h (fundamentals are quarterly)
+  fetch_strong_buy_scan: 21600        # Analyst consensus buy — 6 h (ratings change weekly)
+  fetch_strong_sell_scan: 21600       # Analyst consensus sell — 6 h
+  fetch_nasdaq_rsi_scan: 1800         # NASDAQ-100 RSI — 30 min
+  fetch_premarket_scan: 300           # Premarket movers — 5 min (prices change rapidly)
+  fetch_premarket_history: 3600       # 7-day daily close history — hourly
+  fetch_etf_scan: 900                 # ETF scanner — 15 min
+
+ai:
+  fetch_ai_prediction: 3600     # Claude AI forecast — refresh hourly
