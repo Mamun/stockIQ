@@ -12,11 +12,9 @@ from stockiq.backend.services.spy_dashboard_service import (
     get_spy_gap_table_data,
     get_spy_quote,
     get_vix_chart_df,
+    get_vix_gap_history,
     get_vix_ohlc_df,
 )
-
-
-from stockiq.backend.models.indicators import compute_daily_gaps, compute_rsi
 from stockiq.frontend.views.ai_forecast import render_ai_forecast
 from stockiq.frontend.views.components.gap_table import render_gap_table
 from stockiq.frontend.views.components.summary_card import render_spy_summary_card
@@ -287,10 +285,9 @@ def _render_vix_section(vix_snapshot: dict) -> None:
         st.plotly_chart(_spy_vix_chart(vix_chart_df), width="stretch")
 
     # ── VIX gap table in expander ─────────────────────────────────────────────
-    vix_ohlc = get_vix_ohlc_df(period=yf_vix_period)
-    if not vix_ohlc.empty:
+    vix_gaps = get_vix_gap_history(period=yf_vix_period)
+    if not vix_gaps.empty:
         with st.expander("VIX Daily Gap History", expanded=False):
-            vix_gaps = compute_daily_gaps(vix_ohlc)
             render_gap_table(vix_gaps, title="", price_prefix="")
 
 
@@ -417,10 +414,9 @@ def _spy_chart(df, ma_periods: list, prev_close: float | None = None,
             name="Volume", showlegend=False,
         ), row=vol_row, col=1)
 
-    if show_rsi and rsi_row:
-        rsi = compute_rsi(df)
+    if show_rsi and rsi_row and "RSI" in df.columns:
         fig.add_trace(go.Scatter(
-            x=df.index, y=rsi, name="RSI (14)",
+            x=df.index, y=df["RSI"], name="RSI (14)",
             line=dict(color="#A78BFA", width=1.5),
             hovertemplate="RSI: %{y:.1f}<extra></extra>",
         ), row=rsi_row, col=1)

@@ -1,11 +1,14 @@
 import pandas as pd
 import streamlit as st
 
-from stockiq.backend.services.analyzer_service import get_company_display_name, get_stock_df, get_stock_signal, search_stocks
-from stockiq.backend.models.indicators import (
-    compute_daily_gaps,
-    compute_fibonacci,
-    patch_today_gap,
+from stockiq.backend.services.analyzer_service import (
+    get_company_display_name,
+    get_stock_crosses,
+    get_stock_df,
+    get_stock_fibonacci,
+    get_stock_gaps,
+    get_stock_signal,
+    search_stocks,
 )
 from stockiq.frontend.views.components.charts import build_chart
 from stockiq.frontend.views.components.gap_table import render_gap_table
@@ -140,16 +143,18 @@ def render_analyzer_tab() -> None:
         st.warning(f"Not enough data for the **{selected_period}** window. Try a longer period.")
         return
 
-    fib = compute_fibonacci(display_df)
+    fib = get_stock_fibonacci(display_df)
+    golden, death = get_stock_crosses(display_df)
     fig = build_chart(display_df, fib, ticker,
                       show_vol=True, show_fib=False,
-                      show_patterns=True, show_rsi=show_rsi)
+                      show_patterns=True, show_rsi=show_rsi,
+                      golden_dates=golden, death_dates=death)
     st.plotly_chart(fig, width="stretch")
 
     # ── Gap table ─────────────────────────────────────────────────────────────
     last = display_df.iloc[-1]
-    gaps_df = patch_today_gap(
-        compute_daily_gaps(display_df),
+    gaps_df = get_stock_gaps(
+        display_df,
         {"day_high": float(last["High"]), "day_low": float(last["Low"])},
     )
     if "RSI" in display_df.columns:

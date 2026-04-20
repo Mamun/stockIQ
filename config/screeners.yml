@@ -1,17 +1,8 @@
-# Backend data parameters — used by the backend service for calculations and data fetching.
-# Visual/UI parameters (colors, patterns) live in config/app.yml (frontend).
+# Backend-only screener configuration — ticker universes and scan limits.
+# Override how many tickers are scanned: export SCREENER_TICKER_COUNT=30
 
-# ── Moving averages ────────────────────────────────────────────────────────────
-moving_averages:
-  periods: [5, 20, 50, 100, 200]
-
-# ── Fibonacci retracement ──────────────────────────────────────────────────────
-fibonacci:
-  levels: [0.0, 0.236, 0.382, 0.5, 0.618, 0.786, 1.0]
-
-# ── Screener ticker universe ───────────────────────────────────────────────────
+# ── S&P 500 screener universe ──────────────────────────────────────────────────
 # Ordered by approximate S&P 500 market-cap weight.
-# Override how many tickers are used: export SCREENER_TICKER_COUNT=30
 screener:
   default_count: 200
   universe:

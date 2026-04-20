@@ -35,8 +35,7 @@ def get_short_interest() -> dict[str, ShortInterestData]:
     bucket_name = os.environ.get("GCS_BUCKET", "").strip()
     if not bucket_name:
         logger.debug("GCS_BUCKET not set — short interest cache unavailable")
-        _cache = {}
-        return _cache
+        return {}
 
     try:
         from google.cloud import storage
@@ -46,15 +45,14 @@ def get_short_interest() -> dict[str, ShortInterestData]:
 
         if not blob.exists():
             logger.warning("GCS short interest not found at gs://%s/%s", bucket_name, _GCS_OBJECT)
-            _cache = {}
-            return _cache
+            return {}
 
         _cache = json.loads(blob.download_as_text(encoding="utf-8"))
         logger.info("Loaded GCS short interest: %d tickers from gs://%s/%s",
                     len(_cache), bucket_name, _GCS_OBJECT)
     except Exception as exc:
-        logger.warning("Failed to load GCS short interest (%s) — will call yfinance", exc)
-        _cache = {}
+        logger.warning("Failed to load GCS short interest (%s) — will retry next call", exc)
+        return {}  # don't set _cache so the next call retries
 
     return _cache
 

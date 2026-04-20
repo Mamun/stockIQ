@@ -12,6 +12,7 @@ from stockiq.backend.services.market_service import (
     get_market_overview,
     get_put_call_ratio,
     get_vix_chart_df,
+    get_vix_gap_history,
     get_vix_ohlc_df,
 )
 from stockiq.backend.services.spy_service import (
@@ -29,5 +30,6 @@ __all__ = [
     "get_market_overview",
     "get_put_call_ratio",
     "get_vix_chart_df",
+    "get_vix_gap_history",
     "get_vix_ohlc_df",
 ]

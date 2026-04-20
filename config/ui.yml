@@ -1,20 +1,4 @@
-# Frontend visual configuration — colors, patterns, chart options.
-# Backend data parameters (MA periods, Fibonacci levels, ticker universes)
-# have moved to src/stockiq/backend/config/app.yml.
-
-# ── Moving averages ────────────────────────────────────────────────────────────
-moving_averages:
-  colors:
-    5:   "#F59E0B"   # amber
-    20:  "#10B981"   # emerald
-    50:  "#3B82F6"   # blue
-    100: "#8B5CF6"   # violet
-    200: "#EF4444"   # red
-  weekly_ma200_color: "#F0ABFC"  # fuchsia
-
-# ── Fibonacci retracement ──────────────────────────────────────────────────────
-fibonacci:
-  colors: ["#94A3B8", "#F472B6", "#FB923C", "#FACC15", "#34D399", "#60A5FA", "#94A3B8"]
+# Frontend-only UI configuration — chart display options and pattern overlays.
 
 # ── Candlestick reversal patterns ──────────────────────────────────────────────
 # Fields: col (DataFrame column), label, bullish (true/false/null), symbol, color

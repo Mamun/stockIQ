@@ -1,8 +1,7 @@
 import plotly.graph_objects as go
 import streamlit as st
 
-from stockiq.backend.config import SCREENER_TICKER_COUNT
-from stockiq.backend.services.scanners import get_candle_momentum_scan
+from stockiq.backend.services.scanners import get_candle_momentum_scan, get_screener_info
 
 _SIGNAL_TIERS = [
     "🟢 Strong Buy",
@@ -22,6 +21,9 @@ _TIER_COLORS = {
 
 
 def render_candle_momentum_screener_tab() -> None:
+    _info = get_screener_info()
+    _ticker_count = _info["ticker_count"]
+
     st.title("📊 Weekly/Monthly Screener")
     st.markdown(
         "Scans the S&P 500 universe for **candle momentum** across weekly and monthly timeframes. "
@@ -29,7 +31,7 @@ def render_candle_momentum_screener_tab() -> None:
         "so you can spot real momentum — not just green dots."
     )
     st.caption(
-        f"Universe: top {SCREENER_TICKER_COUNT} S&P 500 stocks · "
+        f"Universe: top {_ticker_count} S&P 500 stocks · "
         "Set `SCREENER_TICKER_COUNT` env var to change · Cached 1 hour"
     )
     st.markdown("---")
@@ -38,7 +40,7 @@ def render_candle_momentum_screener_tab() -> None:
         _render_legend()
         return
 
-    with st.spinner(f"📊 Analyzing {SCREENER_TICKER_COUNT} stocks…"):
+    with st.spinner(f"📊 Analyzing {_ticker_count} stocks…"):
         df = get_candle_momentum_scan()
 
     if df.empty:

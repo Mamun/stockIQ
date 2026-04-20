@@ -104,9 +104,22 @@ try:
     try:
         for _key, _val in st.secrets.items():
             if isinstance(_val, str):
-                os.environ.setdefault(_key, _val)
+                os.environ[_key] = _val  # always override .env so Cloud secrets win
+
+        # Service account JSON stored as a TOML table in Streamlit secrets.
+        # Streamlit Cloud has no persistent filesystem, so we write the key to a
+        # temp file and point GOOGLE_APPLICATION_CREDENTIALS at it.
+        if "gcs_service_account" in st.secrets:
+            import json, tempfile
+            _sa = dict(st.secrets["gcs_service_account"])
+            _sa_file = tempfile.NamedTemporaryFile(
+                mode="w", suffix=".json", delete=False
+            )
+            json.dump(_sa, _sa_file)
+            _sa_file.flush()
+            os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = _sa_file.name
     except Exception:
-        pass  # No secrets.toml locally — keys come from .env via load_dotenv()
+        pass  # No secrets configured locally — credentials come from .env
 
     # Ensure src/ is on the path so `stockiq` resolves on Streamlit Cloud
     _src = os.path.join(os.path.dirname(__file__), "src")

@@ -8,6 +8,7 @@ from stockiq.backend.data.market import (
     fetch_vix_history,
     fetch_vix_ohlc,
 )
+from stockiq.backend.models.indicators import compute_daily_gaps
 
 _VIX_ZONES = [
     (15,  "Calm"),
@@ -73,6 +74,14 @@ def _get_vix_snapshot(period: str = "1y") -> dict:
         "avg":        round(float(vix.mean()), 2),
         "zone":       zone,
     }
+
+
+def get_vix_gap_history(period: str = "1y") -> pd.DataFrame:
+    """VIX daily gap history computed from OHLC. Empty DataFrame if data unavailable."""
+    df = fetch_vix_ohlc(period=period)
+    if df.empty:
+        return pd.DataFrame()
+    return compute_daily_gaps(df)
 
 
 def get_market_overview() -> dict:

@@ -36,8 +36,7 @@ def get_fundamentals() -> dict[str, FundamentalsData]:
     bucket_name = os.environ.get("GCS_BUCKET", "").strip()
     if not bucket_name:
         logger.debug("GCS_BUCKET not set — fundamentals cache unavailable")
-        _cache = {}
-        return _cache
+        return {}
 
     try:
         from google.cloud import storage
@@ -47,15 +46,14 @@ def get_fundamentals() -> dict[str, FundamentalsData]:
 
         if not blob.exists():
             logger.warning("GCS fundamentals not found at gs://%s/%s", bucket_name, _GCS_OBJECT)
-            _cache = {}
-            return _cache
+            return {}
 
         _cache = json.loads(blob.download_as_text(encoding="utf-8"))
         logger.info("Loaded GCS fundamentals: %d tickers from gs://%s/%s",
                     len(_cache), bucket_name, _GCS_OBJECT)
     except Exception as exc:
-        logger.warning("Failed to load GCS fundamentals (%s) — will call yfinance", exc)
-        _cache = {}
+        logger.warning("Failed to load GCS fundamentals (%s) — will retry next call", exc)
+        return {}  # don't set _cache so the next call retries
 
     return _cache
 

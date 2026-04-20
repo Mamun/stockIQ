@@ -20,8 +20,12 @@ def _get_spy_daily_df() -> pd.DataFrame:
 
 
 def get_spy_chart_df(period: str, interval: str) -> pd.DataFrame:
-    """SPY OHLCV for any period/interval combination (chart display). Cached 120 s."""
-    return fetch_spx_intraday(period=period, interval=interval)
+    """SPY OHLCV + RSI for any period/interval combination (chart display). Cached 120 s."""
+    df = fetch_spx_intraday(period=period, interval=interval)
+    if not df.empty:
+        df = df.copy()
+        df["RSI"] = compute_rsi(df)
+    return df
 
 
 def _get_spy_long_rsi() -> pd.Series:

@@ -4,12 +4,15 @@ import pandas as pd
 
 from stockiq.backend.data.yf_fetch import fetch_ohlcv, get_company_name, search_companies
 from stockiq.backend.models.indicators import (
+    compute_daily_gaps,
+    compute_fibonacci,
     compute_mas,
     compute_rsi,
     compute_weekly_ma200,
     detect_reversal_patterns,
+    patch_today_gap,
 )
-from stockiq.backend.models.signals import overall_signal, signal_score
+from stockiq.backend.models.signals import find_crosses, overall_signal, signal_score
 
 
 def search_stocks(query: str) -> list[dict]:
@@ -51,6 +54,21 @@ def get_stock_signal(df: pd.DataFrame) -> dict:
         "latest":  latest,
         "prev":    prev,
     }
+
+
+def get_stock_fibonacci(df: pd.DataFrame) -> dict:
+    """Fibonacci retracement levels for the given OHLCV DataFrame."""
+    return compute_fibonacci(df)
+
+
+def get_stock_gaps(df: pd.DataFrame, quote: dict) -> pd.DataFrame:
+    """Daily gap history with today's gap patched from a live quote dict."""
+    return patch_today_gap(compute_daily_gaps(df), quote)
+
+
+def get_stock_crosses(df: pd.DataFrame) -> tuple:
+    """Golden-cross and death-cross dates for the given indicator DataFrame."""
+    return find_crosses(df)
 
 
 def get_company_display_name(ticker: str) -> str:

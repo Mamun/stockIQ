@@ -2,9 +2,7 @@ import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
-from stockiq.backend.config import MA_PERIODS
-from stockiq.config import MA_COLORS, MA200W_COLOR, FIB_COLORS, REVERSAL_PATTERNS
-from stockiq.backend.models.signals import find_crosses
+from stockiq.config import MA_COLORS, MA200W_COLOR, MA_PERIODS, FIB_COLORS, REVERSAL_PATTERNS
 
 
 def build_chart(
@@ -15,6 +13,8 @@ def build_chart(
     show_fib: bool,
     show_patterns: bool,
     show_rsi: bool = False,
+    golden_dates=(),
+    death_dates=(),
 ) -> go.Figure:
     # Determine subplot layout
     if show_vol and show_rsi:
@@ -67,8 +67,6 @@ def build_chart(
         ), row=1, col=1)
 
     # Golden / Death cross markers
-    golden_dates, death_dates = find_crosses(df)
-
     if len(golden_dates):
         fig.add_trace(go.Scatter(
             x=golden_dates,

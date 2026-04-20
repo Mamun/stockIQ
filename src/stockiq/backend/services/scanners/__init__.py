@@ -12,6 +12,8 @@ To add a new scanner:
   3. Re-export it here in __all__
 """
 
+from stockiq.backend.config import SCREENER_TICKER_COUNT
+
 from .etf import get_etf_scan
 from .nasdaq import get_nasdaq_rsi_scan, get_premarket_scan
 from .spx import (
@@ -22,6 +24,12 @@ from .spx import (
     get_strong_buy_scan,
     get_strong_sell_scan,
 )
+
+
+def get_screener_info() -> dict:
+    """Screener runtime configuration for display in the UI."""
+    return {"ticker_count": SCREENER_TICKER_COUNT}
+
 
 __all__ = [
     # SPX
@@ -36,4 +44,6 @@ __all__ = [
     "get_premarket_scan",
     # ETF
     "get_etf_scan",
+    # Config
+    "get_screener_info",
 ]

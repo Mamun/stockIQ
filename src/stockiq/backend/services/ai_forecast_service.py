@@ -1,12 +1,10 @@
-"""AI forecast service — assembles context and delegates to the model layer."""
+"""AI forecast service — assembles context and delegates to the LLM layer."""
 
 import pandas as pd
 
-from stockiq.backend.models.ai_forecast import (
-    PROVIDERS,
-    _get_secret,
+from stockiq.backend.llm import PROVIDERS, fetch_ai_prediction, get_secret
+from stockiq.backend.models.spy_context import (
     build_forecast_context,
-    fetch_ai_prediction,
     is_market_open,
     next_market_open_str,
 )
@@ -22,12 +20,12 @@ def get_providers() -> dict[str, dict]:
 def has_app_key(provider: str) -> bool:
     """Return True if the app-level API key for this provider is configured."""
     env_var = PROVIDERS[provider]["env_var"]
-    return bool(_get_secret(env_var))
+    return bool(get_secret(env_var))
 
 
 def get_app_key(provider: str) -> str:
     """Return the app-level API key for the given provider (empty string if absent)."""
-    return _get_secret(PROVIDERS[provider]["env_var"])
+    return get_secret(PROVIDERS[provider]["env_var"])
 
 
 def get_market_status() -> dict:
