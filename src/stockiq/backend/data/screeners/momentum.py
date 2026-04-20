@@ -295,7 +295,7 @@ def fetch_premarket_scan() -> pd.DataFrame:
 
     df = pd.DataFrame(results)
     df["_has_pm"]  = df["PM Chg %"].notna().astype(int)
-    df["_abs_chg"] = df["PM Chg %"].abs().fillna(-1)
+    df["_abs_chg"] = pd.to_numeric(df["PM Chg %"], errors="coerce").abs().fillna(-1)
     df = (
         df.sort_values(["_has_pm", "_abs_chg"], ascending=[False, False])
           .drop(columns=["_has_pm", "_abs_chg"])

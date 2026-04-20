@@ -182,12 +182,20 @@ def _render_vix_section(vix_snapshot: dict) -> None:
     )
 
     # ── Scope selector for P/C ratio ──────────────────────────────────────────
-    _scope_opts  = ["Daily", "Monthly", "Quarterly"]
-    _scope_keys  = {"Daily": "daily", "Monthly": "monthly", "Quarterly": "quarterly"}
+    _scope_opts  = ["Daily", "7 Days", "14 Days", "21 Days", "Monthly"]
+    _scope_keys  = {
+        "Daily":   "daily",
+        "7 Days":  "7d",
+        "14 Days": "14d",
+        "21 Days": "21d",
+        "Monthly": "monthly",
+    }
     _scope_notes = {
-        "Daily":     "Today's option volume · 4 nearest expirations · resets each trading day",
-        "Monthly":   "Open interest · all expirations within 30 days · reflects near-term hedging",
-        "Quarterly": "Open interest · all expirations within 90 days · structural positioning",
+        "Daily":   "Today's option volume · 4 nearest expirations · resets each trading day",
+        "7 Days":  "Open interest · expirations within 7 days · very short-term positioning",
+        "14 Days": "Open interest · expirations within 14 days · 2-week hedging horizon",
+        "21 Days": "Open interest · expirations within 21 days · 3-week hedging horizon",
+        "Monthly": "Open interest · all expirations within 30 days · reflects near-term hedging",
     }
     _, pc_scope_col = st.columns([2, 1])
     with pc_scope_col:
