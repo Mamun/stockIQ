@@ -27,7 +27,7 @@ def _cell(label: str, value: str, sub: str = "", sub_clr: str | None = None) -> 
     )
     return (
         f'<div style="padding:10px 18px;border-right:1px solid {_SEP};'
-        f'display:flex;flex-direction:column;justify-content:center">'
+        f'display:flex;flex-direction:column;justify-content:center;flex:1;min-width:80px">'
         f'<div style="font-size:11px;color:{_MUT};text-transform:uppercase;'
         f'letter-spacing:.05em;white-space:nowrap">{label}</div>'
         f'<div style="font-size:17px;font-weight:700;color:{_VAL};white-space:nowrap">{value}</div>'
@@ -164,7 +164,7 @@ def render_spy_summary_card(
         bar_filled  = max(2, min(98, round(pos_pct)))
         bar_clr     = _UP if pos_pct >= 50 else _DN
         range_cell  = (
-            f'<div style="padding:8px 18px;border-right:1px solid {_SEP};min-width:240px">'
+            f'<div style="padding:8px 18px;border-right:1px solid {_SEP};flex:1;min-width:180px">'
             f'<div style="font-size:11px;color:{_MUT};text-transform:uppercase;'
             f'letter-spacing:.05em;margin-bottom:5px">52W Range</div>'
             f'<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">'
@@ -244,10 +244,10 @@ def render_spy_summary_card(
         _ma_cell("MA 200", ma200, price) if ma200 else "",
     ])
 
-    row_style = f"display:flex;flex-wrap:wrap;background:{_BG}"
+    row_style = f"display:flex;flex-wrap:nowrap;background:{_BG};width:100%"
     st.markdown(
         f'<div style="background:{_BG};border:1px solid {_SEP};border-radius:8px;'
-        f'overflow:hidden;margin-bottom:4px">'
+        f'overflow:hidden;margin-bottom:4px;width:100%">'
         f'<div style="{row_style}">{single_row}</div>'
         f'</div>',
         unsafe_allow_html=True,

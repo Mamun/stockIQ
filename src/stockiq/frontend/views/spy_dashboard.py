@@ -506,7 +506,11 @@ def _render_options_section(current_price: float) -> None:
     # Seed call — nearest expiration + full list
     seed = get_spy_options_analysis(expiration="", current_price=current_price)
     if not seed:
-        st.caption("Options data unavailable — market may be closed.")
+        st.info(
+            "⚠️ Options data unavailable. Yahoo Finance blocks options chain requests "
+            "from cloud/server IPs. This section works when running the app locally.",
+            icon=None,
+        )
         return
 
     exp_map = dict(zip(seed["exp_labels"], seed["expirations"]))
@@ -578,7 +582,12 @@ def _render_options_section(current_price: float) -> None:
                 unsafe_allow_html=True,
             )
         else:
-            st.caption("P/C ratio unavailable")
+            st.markdown(
+                '<div style="padding:16px;font-size:11px;color:#64748B;line-height:1.6">'
+                'P/C ratio unavailable.<br>Yahoo Finance options data is blocked on cloud servers.'
+                '</div>',
+                unsafe_allow_html=True,
+            )
 
     with mp_col:
         st.markdown(
