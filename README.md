@@ -7,7 +7,7 @@
 [![Live App](https://img.shields.io/badge/Live%20App-stpicker.streamlit.app-brightgreen)](https://stpicker.streamlit.app/)
 [![Sponsor](https://img.shields.io/badge/Sponsor-❤-pink)](https://github.com/sponsors/Mamun)
 
-> **StockIQ** is a free, open-source web app that gives retail investors institutional-grade technical analysis — moving averages, RSI, Fibonacci retracements, candlestick patterns, and AI-powered forecasts — without a Bloomberg terminal.
+> **StockIQ** is a free, open-source web app that gives retail investors institutional-grade technical analysis — moving averages, RSI, Fibonacci retracements, candlestick patterns, options intelligence, and AI-powered forecasts — without a Bloomberg terminal.
 
 ## Try it now — no install needed
 
@@ -19,31 +19,46 @@ The live app runs on Streamlit Community Cloud and is free to use. No account or
 
 ## Features
 
+### Market
+
 | Page | What it does |
 |------|-------------|
-| **SPY Live** | Real-time SPY price, index snapshot (S&P 500 / Nasdaq / Dow / Russell / VIX), intraday chart |
-| **SPY Gap Table** | Every daily gap since 2022, live fill status updated during the session |
-| **SPY AI Forecast** | Claude-powered 10-day SPY directional forecast with technical context |
-| **Stock Analyzer** | Interactive chart with MA5/20/50/100/200, weekly MA200, RSI, Fibonacci retracement, 7 reversal patterns, Golden/Death cross, signal score |
-| **Weekly/Monthly Screener** | Top 50 S&P 500 stocks ranked by candle pattern strength (Strong Buy → Sell) |
-| **Bounce Radar** | Stocks within 5% of their 200-day MA — classic mean-reversion setups |
-| **Squeeze Scanner** | High RSI + short interest = potential short squeeze candidates |
-| **Strong Buy** | Analyst consensus: highest-rated stocks with ≥5% upside to price target |
-| **Strong Sell** | Analyst consensus: most-downgraded stocks with ≥5% downside |
-| **Munger Watchlist** | Quality companies (ROE, margins, growth, low debt) near their 200-week MA |
+| **SPY Dashboard** | Real-time SPY price, index strip (S&P 500 / Nasdaq / Dow / Russell / VIX), RSI summary card, candlestick chart with VWAP (intraday) and options levels (daily), Options Intelligence section (Put/Call ratio, Max Pain, OI butterfly), SPY gap table, and VIX Fear Gauge |
+| **SPY AI Outlook** | Claude-powered 10-day SPY directional forecast with technical context — gaps, RSI, price action, key levels |
+| **SPY Gap Table** | Every daily gap since 2022, live fill status, intraday High/Low, RSI, and next-day direction — shareable standalone URL |
+
+### S&P 500 Tools
+
+| Page | What it does |
+|------|-------------|
+| **Stock Analyzer** | Interactive candlestick chart with MA5/20/50/100/200, weekly MA200, RSI subplot, Fibonacci retracement, 7 reversal patterns, Golden/Death cross, signal score card |
+| **Candle Screener** | Top 50 S&P 500 stocks ranked by candle pattern strength (Strong Buy → Sell), weekly and monthly views |
+
+### Scanners
+
+| Page | What it does |
+|------|-------------|
+| **Pre-Market Scanner** | NASDAQ-100 pre-market movers with a 7-day daily close heatmap |
+| **NASDAQ RSI Scanner** | NASDAQ-100 stocks filtered by RSI — quickly spot oversold / overbought conditions |
+| **MA200 Bounce Radar** | Stocks within 5% of their 200-day MA — classic mean-reversion setups |
+| **Short Squeeze Scanner** | High RSI + short interest = potential short squeeze candidates |
+| **Analyst Buy Picks** | Highest-rated S&P 500 stocks by analyst consensus with ≥5% upside to price target |
+| **Analyst Sell Picks** | Most-downgraded stocks with ≥5% downside to price target |
+| **Munger Value Picks** | Quality companies (ROE, margins, growth, low debt) near their 200-week MA |
+| **ETF Scanner** | Curated ETF categories — Retail Favorites, Semiconductors, Software — ranked by RSI and momentum |
 
 ---
 
 ## Screenshots
 
-### SPY Gap Fill Tracker
-Track every daily gap since 2022 with live fill status, intraday High/Low, RSI, and next-day direction — updated in real time during the session.
+### SPY Dashboard
+Full-page market hub: live SPY price, index strip, candlestick chart with VWAP, Options Intelligence (Max Pain, Put/Call ratio, OI butterfly), gap table, and VIX Fear Gauge.
 
 ![SPY Gap Table](docs/screenshots/spy_gaptable.png)
 
 ---
 
-### AI-Powered SPY Forecast
+### AI-Powered SPY Outlook
 Claude analyses recent gaps, RSI, and price action to generate a 10-day directional outlook with key levels and a plain-English rationale.
 
 ![SPY AI Forecast](docs/screenshots/spy_ai_claude_forecast.png)
@@ -69,7 +84,7 @@ Curated ETF categories — Retail Favorites, Semiconductors, Software — ranked
 ### Prerequisites
 
 - Python 3.11 or 3.12
-- An [Anthropic API key](https://console.anthropic.com/) (only required for the AI Forecast page)
+- An [Anthropic API key](https://console.anthropic.com/) (only required for the AI Outlook page)
 
 ### Installation
 
@@ -133,18 +148,32 @@ Tests are network-free — all `yfinance` calls are mocked.
 
 ```
 .
-├── app.py              # Streamlit entry point — navigation wiring
-├── config.py           # MA periods, colors, Fibonacci levels, ticker universe
-├── indicators.py       # MA, RSI, Fibonacci, gap detection, reversal patterns
-├── signals.py          # Signal scoring, golden/death cross detection
-├── charts.py           # Plotly interactive chart builder
-├── seo.py              # Meta tags & JSON-LD schema injection
-├── data/
-│   ├── fetch.py        # yfinance OHLCV download & company search
-│   ├── market.py       # SPY/VIX/index snapshot helpers (with TTL caching)
-│   └── screeners.py    # Multi-ticker screeners (bounce, squeeze, Munger, analyst)
-├── views/              # Streamlit page modules (one file per page)
-└── tests/              # pytest test suite
+├── app.py                          # Streamlit entry point — navigation wiring
+├── src/stockiq/
+│   ├── config.py                   # MA periods, colors, Fibonacci levels, ticker universe
+│   ├── backend/
+│   │   ├── models/                 # Pure data models (indicators, signals, options, spy context)
+│   │   ├── data/
+│   │   │   ├── yf_fetch.py         # yfinance OHLCV download & company search
+│   │   │   ├── market.py           # SPY/VIX/index snapshot helpers (TTL-cached)
+│   │   │   ├── screeners/          # Per-strategy screener modules (candle, analyst, volatility, ETF, …)
+│   │   │   ├── local_ohlc_cache.py # Local OHLC cache for gap detection
+│   │   │   ├── local_gap_cache.py  # Local gap cache
+│   │   │   └── gcs_*.py            # GCS-backed caches (fundamentals, short interest, analyst consensus)
+│   │   ├── services/
+│   │   │   ├── spy_service.py      # SPY quote, chart, gap table
+│   │   │   ├── market_service.py   # VIX, indices, put/call ratio, options analysis
+│   │   │   ├── spy_dashboard_service.py  # Facade combining spy + market for the dashboard page
+│   │   │   ├── analyzer_service.py # Per-ticker technical analysis pipeline
+│   │   │   ├── ai_forecast_service.py    # Claude forecast composition
+│   │   │   └── scanners/           # Scanner services (NASDAQ, SPX, ETF, pre-market)
+│   │   ├── llm/                    # Claude provider + prompt templates
+│   │   └── cache.py                # TTL cache decorator
+│   └── frontend/
+│       └── views/                  # Streamlit page modules (one file per page)
+│           └── components/         # Reusable UI components (charts, gap table, summary card)
+├── scripts/                        # Offline GCS cache build scripts
+└── tests/                          # pytest test suite
 ```
 
 ---
@@ -159,6 +188,7 @@ Tests are network-free — all `yfinance` calls are mocked.
 | [pandas](https://pandas.pydata.org) | Data manipulation |
 | [NumPy](https://numpy.org) | Numerical computation |
 | [Anthropic SDK](https://github.com/anthropics/anthropic-sdk-python) | Claude AI forecast |
+| [Google Cloud Storage](https://cloud.google.com/storage) | Pre-built screener cache (GCS bucket) |
 
 ---
 
@@ -185,11 +215,11 @@ StockIQ is free and open source. Hosting, API costs, and development time are fu
 | **GitHub Sponsors** | [github.com/sponsors/Mamun](https://github.com/sponsors/Mamun) |
 | **Ko-fi** | [ko-fi.com/stockiq](https://ko-fi.com/stockiq) |
 | **Open Collective** | [opencollective.com/stockiq](https://opencollective.com/stockiq) |
-| **Buy Me a Coffee** | [buymeacoffee.com/stockiq](https://buymeacoffee.com/stockiq) |
+| **Buy Me a Coffee** | [buymeacoffee.com/mamuninfo](https://buymeacoffee.com/mamuninfo) |
 
 Your sponsorship helps keep the project free for everyone and funds:
 
-- Anthropic API costs for the AI Forecast feature
+- Anthropic API costs for the AI Outlook feature
 - Ongoing data-quality improvements
 - New screeners and indicators requested by the community
 
