@@ -2,6 +2,8 @@
 
 import os
 
+import requests as _requests
+
 from stockiq.backend.cache import MemoryCache
 from stockiq.backend.config import CACHE_TTL
 from stockiq.backend.llm.prompts import _SYSTEM, _USER_TMPL, _parse_json
@@ -14,11 +16,23 @@ PROVIDERS: dict[str, dict] = {
         "env_var": "GROQ_API_KEY",
         "free":    True,
     },
+    "deepseek": {
+        "label":   "DeepSeek-V3 (DeepSeek)",
+        "model":   "deepseek-chat",
+        "env_var": "DEEPSEEK_API_KEY",
+        "free":    False,
+    },
     "gemini": {
-        "label":   "Gemini 2.0 Flash (Google)",
-        "model":   "gemini-2.0-flash",
+        "label":   "Gemini 2.5 Flash (Google)",
+        "model":   "gemini-2.5-flash-preview-04-17",
         "env_var": "GOOGLE_API_KEY",
         "free":    True,
+    },
+    "openai": {
+        "label":   "GPT-4.1 Mini (OpenAI)",
+        "model":   "gpt-4.1-mini",
+        "env_var": "OPENAI_API_KEY",
+        "free":    False,
     },
     "anthropic": {
         "label":   "Claude (Anthropic)",
@@ -67,6 +81,50 @@ def _call_groq(context_json: str, user_key: str = "") -> list[dict]:
     return _parse_json(text) if text else []
 
 
+def _call_openai(context_json: str, user_key: str = "") -> list[dict]:
+    api_key = user_key or get_secret("OPENAI_API_KEY")
+    if not api_key:
+        return []
+    resp = _requests.post(
+        "https://api.openai.com/v1/chat/completions",
+        headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+        json={
+            "model":      PROVIDERS["openai"]["model"],
+            "max_tokens": 4096,
+            "messages": [
+                {"role": "system", "content": _SYSTEM},
+                {"role": "user",   "content": _USER_TMPL.format(context_json=context_json)},
+            ],
+        },
+        timeout=30,
+    )
+    resp.raise_for_status()
+    text = resp.json()["choices"][0]["message"]["content"] or ""
+    return _parse_json(text) if text else []
+
+
+def _call_deepseek(context_json: str, user_key: str = "") -> list[dict]:
+    api_key = user_key or get_secret("DEEPSEEK_API_KEY")
+    if not api_key:
+        return []
+    resp = _requests.post(
+        "https://api.deepseek.com/chat/completions",
+        headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+        json={
+            "model":      PROVIDERS["deepseek"]["model"],
+            "max_tokens": 4096,
+            "messages": [
+                {"role": "system", "content": _SYSTEM},
+                {"role": "user",   "content": _USER_TMPL.format(context_json=context_json)},
+            ],
+        },
+        timeout=30,
+    )
+    resp.raise_for_status()
+    text = resp.json()["choices"][0]["message"]["content"] or ""
+    return _parse_json(text) if text else []
+
+
 def _call_gemini(context_json: str, user_key: str = "") -> list[dict]:
     from google import genai
     from google.genai import types
@@ -85,7 +143,9 @@ def _call_gemini(context_json: str, user_key: str = "") -> list[dict]:
 
 _CALLERS = {
     "anthropic": _call_anthropic,
+    "openai":    _call_openai,
     "groq":      _call_groq,
+    "deepseek":  _call_deepseek,
     "gemini":    _call_gemini,
 }
 

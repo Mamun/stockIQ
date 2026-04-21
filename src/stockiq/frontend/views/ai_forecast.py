@@ -76,6 +76,8 @@ No other user can see or use your key.
 def _key_signup_url(provider: str) -> str:
     return {
         "groq":      "https://console.groq.com/keys",
+        "deepseek":  "https://platform.deepseek.com/api_keys",
+        "openai":    "https://platform.openai.com/api-keys",
         "gemini":    "https://aistudio.google.com/apikey",
         "anthropic": "https://console.anthropic.com/settings/keys",
     }.get(provider, "")
@@ -97,7 +99,9 @@ def _provider_selector() -> str:
         help=(
             "Free providers need their own API key — sign up takes < 1 minute.\n\n"
             "• **Groq** → groq.com/keys → set `GROQ_API_KEY`\n"
+            "• **DeepSeek** → platform.deepseek.com → set `DEEPSEEK_API_KEY`\n"
             "• **Gemini** → aistudio.google.com → set `GOOGLE_API_KEY`\n"
+            "• **OpenAI** → platform.openai.com → set `OPENAI_API_KEY`\n"
             "• **Claude** → console.anthropic.com → set `ANTHROPIC_API_KEY`"
         ),
     )
@@ -169,7 +173,7 @@ def render_ai_forecast(gaps_df: pd.DataFrame, quote: dict, show_share_btn: bool 
             predictions = get_ai_forecast(gaps_df, provider=provider, user_key=user_key, cache_key=cache_key)
         except Exception as e:
             err = str(e)
-            if "429" in err or "RESOURCE_EXHAUSTED" in err or "quota" in err.lower() or "rate" in err.lower():
+            if "429" in err or "402" in err or "Payment Required" in err or "RESOURCE_EXHAUSTED" in err or "quota" in err.lower() or "rate" in err.lower():
                 st.markdown("""
 <div style="
     background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
