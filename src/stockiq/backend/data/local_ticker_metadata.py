@@ -1,32 +1,21 @@
 """
-GCS-backed ticker metadata cache (company name + sector).
+Local ticker metadata cache (company name + sector).
 
-Priority on get_metadata():
-  1. GCS  — fresh data uploaded by scripts/build_metadata_cache.py
-  2. Static fallback below — covers all 200 SPX universe tickers, no network needed
+Populated by: scripts/build_metadata_cache.py (run as needed)
+Cache file:   cache/screener/ticker_metadata.json
 
-This means the scan works instantly at full speed even with no GCS bucket configured.
-GCS is optional but recommended to keep names/sectors up to date.
-
-Required env var (only if using GCS):
-  GCS_BUCKET  — name of your GCS bucket (e.g. "my-stockiq-bucket")
-
-Optional:
-  GOOGLE_APPLICATION_CREDENTIALS — path to service-account JSON key
-  (not needed when using `gcloud auth application-default login`)
-
-GCS object path: screener/ticker_metadata.json
-Schema: {"AAPL": {"name": "Apple Inc.", "sector": "Technology"}, ...}
+Falls back to a static hardcoded dict when the cache file is absent,
+so the app works out of the box without running any build scripts first.
 """
 
 import json
 import logging
-import os
+from pathlib import Path
 from typing import TypedDict
 
 logger = logging.getLogger(__name__)
 
-_GCS_OBJECT = "screener/ticker_metadata.json"
+_CACHE_FILE = Path(__file__).parent.parent.parent.parent.parent / "cache" / "screener" / "ticker_metadata.json"
 _metadata_cache: dict | None = None
 
 
@@ -36,7 +25,7 @@ class TickerMeta(TypedDict):
 
 
 # Static fallback — covers all 200 tickers in the SPX universe.
-# Company names and sectors change rarely; GCS cache overrides these when available.
+# Company names and sectors change rarely; the local cache overrides these when available.
 _STATIC_FALLBACK: dict[str, TickerMeta] = {
     # ── Mega-cap / top 50 ─────────────────────────────────────────────────────
     "AAPL":  {"name": "Apple Inc.",                     "sector": "Technology"},
@@ -247,46 +236,24 @@ _STATIC_FALLBACK: dict[str, TickerMeta] = {
 def get_metadata() -> dict[str, TickerMeta]:
     """
     Return ticker metadata dict, with this priority:
-      1. GCS (if GCS_BUCKET is set and object exists)
-      2. Static hardcoded fallback (always available, no network)
+      1. Local cache file (if cache/screener/ticker_metadata.json exists)
+      2. Static hardcoded fallback (always available, no file needed)
     """
     global _metadata_cache
     if _metadata_cache is not None:
         return _metadata_cache
 
-    bucket_name = os.environ.get("GCS_BUCKET", "").strip()
-    if not bucket_name:
-        logger.debug("GCS_BUCKET not set — using static fallback metadata")
+    if not _CACHE_FILE.exists():
+        logger.debug("Ticker metadata cache not found at %s — using static fallback", _CACHE_FILE)
         _metadata_cache = dict(_STATIC_FALLBACK)
         return _metadata_cache
 
     try:
-        from google.cloud import storage  # lazy import — optional dependency
-
-        client = storage.Client()
-        bucket = client.bucket(bucket_name)
-        blob = bucket.blob(_GCS_OBJECT)
-
-        if not blob.exists():
-            logger.warning(
-                "GCS metadata not found at gs://%s/%s — using static fallback",
-                bucket_name, _GCS_OBJECT,
-            )
-            _metadata_cache = dict(_STATIC_FALLBACK)
-            return _metadata_cache
-
-        raw = blob.download_as_text(encoding="utf-8")
-        gcs_data = json.loads(raw)
-
-        # Merge: static fallback as base, GCS data overrides
-        merged = {**_STATIC_FALLBACK, **gcs_data}
-        _metadata_cache = merged
-        logger.info(
-            "Loaded GCS metadata: %d tickers from gs://%s/%s",
-            len(gcs_data), bucket_name, _GCS_OBJECT,
-        )
+        gcs_data = json.loads(_CACHE_FILE.read_text(encoding="utf-8"))
+        _metadata_cache = {**_STATIC_FALLBACK, **gcs_data}
+        logger.info("Loaded ticker metadata: %d tickers from %s", len(gcs_data), _CACHE_FILE)
     except Exception as exc:
-        logger.warning("Failed to load GCS metadata (%s) — using static fallback", exc)
+        logger.warning("Failed to load ticker metadata cache (%s) — using static fallback", exc)
         _metadata_cache = dict(_STATIC_FALLBACK)
 
     return _metadata_cache

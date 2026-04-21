@@ -10,10 +10,10 @@ import yfinance as yf
 from stockiq.backend.cache import ttl_cache
 from stockiq.backend.config import CACHE_TTL, NASDAQ_100_TICKERS, SPX_TICKERS
 from stockiq.backend.models.indicators import compute_rsi
-from stockiq.backend.data.gcs_ticker_names import get_metadata
-from stockiq.backend.data.gcs_short_interest import get_short_interest
-from stockiq.backend.data.gcs_ticker_fundamentals import get_fundamentals
-from stockiq.backend.data.gcs_analyst_consensus import get_analyst_consensus
+from stockiq.backend.data.local_ticker_metadata import get_metadata
+from stockiq.backend.data.local_short_interest import get_short_interest
+from stockiq.backend.data.local_fundamentals import get_fundamentals
+from stockiq.backend.data.local_analyst_consensus import get_analyst_consensus
 
 logging.getLogger("yfinance").setLevel(logging.CRITICAL)
 logger = logging.getLogger(__name__)

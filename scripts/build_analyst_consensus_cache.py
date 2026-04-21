@@ -1,5 +1,5 @@
 """
-Build and upload analyst consensus cache to GCS.
+Build analyst consensus cache.
 
 Fetches recommendationMean, numberOfAnalystOpinions, targetMeanPrice,
 targetHighPrice, targetLowPrice for every SPX ticker via yfinance.
@@ -10,14 +10,10 @@ Current price is intentionally excluded; it's fetched live in the app.
 Usage (from project root):
     python scripts/build_analyst_consensus_cache.py
 
-Required env var:
-    GCS_BUCKET=your-bucket-name
-
-Uploads to: gs://<GCS_BUCKET>/screener/analyst_consensus.json
+Writes to: cache/screener/analyst_consensus.json
 """
 
 import json
-import os
 import sys
 import time
 from pathlib import Path
@@ -25,13 +21,10 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 import yfinance as yf
-from dotenv import load_dotenv
-
-load_dotenv()
 
 from stockiq.backend.config import SPX_TICKERS  # noqa: E402
 
-_GCS_OBJECT  = "screener/analyst_consensus.json"
+_OUTPUT_FILE = Path(__file__).parent.parent / "cache" / "screener" / "analyst_consensus.json"
 _BATCH_SIZE  = 10
 _BATCH_PAUSE = 3.0
 
@@ -67,31 +60,18 @@ def fetch_analyst_consensus(tickers: list[str]) -> dict[str, dict]:
     return data
 
 
-def upload_to_gcs(bucket_name: str, data: dict) -> None:
-    from google.cloud import storage
-
-    payload = json.dumps(data, ensure_ascii=False, indent=2)
-    client  = storage.Client()
-    blob    = client.bucket(bucket_name).blob(_GCS_OBJECT)
-    blob.upload_from_string(payload, content_type="application/json")
-    print(f"\nUploaded {len(data)} tickers → gs://{bucket_name}/{_GCS_OBJECT}")
-
-
 def main() -> None:
-    bucket_name = os.environ.get("GCS_BUCKET", "").strip()
-    if not bucket_name:
-        print("ERROR: GCS_BUCKET env var is not set.")
-        sys.exit(1)
-
     tickers = SPX_TICKERS
-    print(f"Building analyst consensus cache for {len(tickers)} tickers → gs://{bucket_name}/{_GCS_OBJECT}\n")
+    print(f"Building analyst consensus cache for {len(tickers)} tickers → {_OUTPUT_FILE}\n")
 
     data = fetch_analyst_consensus(tickers)
 
     with_rating = sum(1 for v in data.values() if v.get("recommendationMean") is not None)
     print(f"\nFetched: {len(data)} tickers  ({with_rating} with analyst ratings)")
 
-    upload_to_gcs(bucket_name, data)
+    _OUTPUT_FILE.parent.mkdir(parents=True, exist_ok=True)
+    _OUTPUT_FILE.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+    print(f"Saved → {_OUTPUT_FILE}")
     print("Done. Refresh weekly — analyst consensus changes slowly.")
 
 
