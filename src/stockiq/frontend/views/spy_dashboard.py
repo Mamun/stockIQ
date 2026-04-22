@@ -1,16 +1,12 @@
 import urllib.parse
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 from plotly.subplots import make_subplots
 
-from stockiq.backend.services.market_service import (
-    get_market_overview,
-    get_vix_chart_df,
-    get_vix_gap_history,
-    get_vix_ohlc_df,
-)
+from stockiq.backend.services.market_service import get_market_overview
 from stockiq.backend.services.spy_service import (
     get_put_call_ratio,
     get_spy_chart_df,
@@ -21,13 +17,6 @@ from stockiq.backend.services.spy_service import (
 from stockiq.frontend.views.ai_forecast import render_ai_forecast
 from stockiq.frontend.views.components.gap_table import render_gap_table
 from stockiq.frontend.views.components.summary_card import render_spy_summary_card
-
-_VIX_ZONE_COLORS = {
-    "Calm":         ("#22C55E", "rgba(34,197,94,0.10)"),
-    "Normal":       ("#86EFAC", "rgba(134,239,172,0.10)"),
-    "Elevated":     ("#F59E0B", "rgba(245,158,11,0.10)"),
-    "Extreme Fear": ("#EF4444", "rgba(239,68,68,0.10)"),
-}
 
 
 # ── Main dashboard tab ─────────────────────────────────────────────────────────
@@ -85,11 +74,6 @@ def render_spy_dashboard_tab() -> None:
 
     # ── 7. SPY gap table ──────────────────────────────────────────────────────
     _render_spy_gap_table(gap_data)
-
-    st.divider()
-
-    # ── 8. Fear Gauge — VIX ───────────────────────────────────────────────────
-    _render_vix_section(overview["vix"])
 
     # ── Fill AI slot last ─────────────────────────────────────────────────────
     try:
@@ -227,152 +211,6 @@ def _render_spy_gap_table(gap_data: dict) -> None:
     render_gap_table(gaps_df, title="Daily Gaps (Last 30 Days)",
                      show_rsi=True, show_next_day=True, share_url=share_url)
 
-
-def _render_vix_section(vix_snapshot: dict) -> None:
-    """VIX zone card + 52w stats + dual-axis chart + gap table."""
-    if not vix_snapshot:
-        st.info("VIX data unavailable.")
-        return
-
-    vix_periods    = ["1M", "3M", "6M", "1Y", "2Y", "5Y"]
-    vix_period_map = {"1M": "1mo", "3M": "3mo", "6M": "6mo", "1Y": "1y", "2Y": "2y", "5Y": "5y"}
-
-    vix_now  = vix_snapshot["current"]
-    vix_chg  = vix_snapshot["change"]
-    vix_52hi = vix_snapshot["high_52w"]
-    vix_52lo = vix_snapshot["low_52w"]
-    vix_avg  = vix_snapshot["avg"]
-    zone     = vix_snapshot["zone"]
-    zone_clr, zone_bg = _VIX_ZONE_COLORS.get(zone, ("#94A3B8", "rgba(148,163,184,0.10)"))
-
-    st.markdown(
-        '<div style="font-size:11px;font-weight:700;color:#64748B;'
-        'letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px">'
-        'Fear Gauge — VIX</div>',
-        unsafe_allow_html=True,
-    )
-
-    col_vix, col_stats = st.columns([1, 2])
-
-    with col_vix:
-        chg_arrow = "▲" if vix_chg >= 0 else "▼"
-        st.markdown(
-            f"""
-<div style="background:{zone_bg};border:1px solid {zone_clr}55;border-radius:10px;
-            padding:16px;height:100%;box-sizing:border-box">
-  <div style="font-size:10px;color:#94A3B8;font-weight:700;letter-spacing:.07em;
-              text-transform:uppercase">VIX · CBOE</div>
-  <div style="font-size:38px;font-weight:900;color:#F1F5F9;line-height:1;margin:6px 0 4px">
-    {vix_now:.2f}
-  </div>
-  <div style="font-size:13px;font-weight:700;color:{zone_clr}">{zone}</div>
-  <div style="font-size:11px;color:#64748B;margin-top:6px">
-    {chg_arrow}&nbsp;{abs(vix_chg):.2f} vs prev close
-  </div>
-</div>""",
-            unsafe_allow_html=True,
-        )
-
-    with col_stats:
-        s1, s2 = st.columns(2)
-        s1.metric("1Y High",   f"{vix_52hi:.2f}", help="Highest VIX close in the past year")
-        s1.metric("1Y Avg",    f"{vix_avg:.2f}",  help="Average VIX close over the past year")
-        s2.metric("1Y Low",    f"{vix_52lo:.2f}", help="Lowest VIX close in the past year")
-        s2.metric("vs 1Y Avg", f"{vix_now - vix_avg:+.2f}",
-                  delta_color="inverse",
-                  help="Positive = more fearful than average")
-        st.markdown(
-            '<div style="font-size:10px;color:#475569;margin-top:6px;line-height:1.6">'
-            '&lt;15 😌 Calm &nbsp;·&nbsp; 15–20 😐 Normal &nbsp;·&nbsp;'
-            '20–30 😨 Elevated &nbsp;·&nbsp; &gt;30 🔥 Extreme Fear'
-            '</div>',
-            unsafe_allow_html=True,
-        )
-
-    st.markdown("<div style='margin-top:16px'></div>", unsafe_allow_html=True)
-
-    _vix_qp = st.query_params.get("vix_period", "1Y")
-    vix_default_idx = vix_periods.index(_vix_qp) if _vix_qp in vix_periods else 3
-
-    vix_choice = st.radio("Period ", vix_periods, horizontal=True,
-                          key="vix_period", index=vix_default_idx)
-    st.query_params["vix_period"] = vix_choice
-    yf_vix_period = vix_period_map[vix_choice]
-    vix_chart_df  = get_vix_chart_df(period=yf_vix_period)
-
-    if not vix_chart_df.empty and "VIX" in vix_chart_df.columns:
-        st.plotly_chart(_spy_vix_chart(vix_chart_df), width="stretch")
-
-    vix_gaps = get_vix_gap_history(period=yf_vix_period)
-    if not vix_gaps.empty:
-        render_gap_table(vix_gaps, title="", price_prefix="")
-
-
-def _spy_vix_chart(df) -> go.Figure:
-    """Dual-axis chart: SPY price (left axis) + VIX with MAs (right axis)."""
-    fig = make_subplots(specs=[[{"secondary_y": True}]])
-
-    spy_min, spy_max = df["SPY"].min(), df["SPY"].max()
-    vix_min, vix_max = df["VIX"].min(), df["VIX"].max()
-    spy_pad = (spy_max - spy_min) * 0.05
-    vix_pad = (vix_max - vix_min) * 0.12
-    spy_range = [spy_min - spy_pad, spy_max + spy_pad]
-    vix_range = [max(0, vix_min - vix_pad), vix_max + vix_pad]
-
-    fig.add_trace(go.Scatter(
-        x=df.index, y=df["SPY"],
-        name="SPY", mode="lines",
-        line=dict(color="#3B82F6", width=2),
-        hovertemplate="SPY: <b>%{y:,.2f}</b><extra></extra>",
-    ), secondary_y=False)
-
-    vix_floor = vix_range[0]
-    fig.add_trace(go.Scatter(
-        x=df.index, y=[vix_floor] * len(df),
-        mode="lines", line=dict(width=0), showlegend=False, hoverinfo="skip",
-    ), secondary_y=True)
-
-    fig.add_trace(go.Scatter(
-        x=df.index, y=df["VIX"],
-        name="VIX", mode="lines",
-        line=dict(color="#F59E0B", width=1.5),
-        fill="tonexty", fillcolor="rgba(245,158,11,0.10)",
-        hovertemplate="VIX: <b>%{y:.2f}</b><extra></extra>",
-    ), secondary_y=True)
-
-    ma_colors = {5: "#A78BFA", 20: "#34D399", 50: "#3B82F6", 100: "#F87171"}
-    for period, color in ma_colors.items():
-        if len(df) >= period:
-            fig.add_trace(go.Scatter(
-                x=df.index, y=df["VIX"].rolling(period).mean(),
-                name=f"VIX MA{period}", mode="lines",
-                line=dict(color=color, width=1.2, dash="dot"),
-                hovertemplate=f"MA{period}: <b>%{{y:.2f}}</b><extra></extra>",
-            ), secondary_y=True)
-
-    for level, color, label in [
-        (15, "#22C55E", "15"), (20, "#F59E0B", "20"), (30, "#EF4444", "30"),
-    ]:
-        if vix_range[0] <= level <= vix_range[1]:
-            fig.add_hline(
-                y=level, secondary_y=True,
-                line_dash="dot", line_color=color, line_width=1,
-                annotation_text=label, annotation_font_size=9,
-                annotation_position="top right",
-            )
-
-    fig.update_layout(
-        template="plotly_dark", height=360,
-        margin=dict(l=60, r=80, t=20, b=40),
-        hovermode="x unified",
-        legend=dict(orientation="h", y=1.06, x=0),
-        xaxis=dict(showgrid=False),
-    )
-    fig.update_yaxes(title_text="SPY", secondary_y=False,
-                     gridcolor="#1E293B", range=spy_range)
-    fig.update_yaxes(title_text="VIX", secondary_y=True,
-                     gridcolor="rgba(0,0,0,0)", showgrid=False, range=vix_range)
-    return fig
 
 
 def _spy_chart(
@@ -630,6 +468,127 @@ def _render_options_section(current_price: float) -> None:
             )
         else:
             st.caption("No OI data for this expiration.")
+
+    # ── Heatmap: Strike × Expiration ─────────────────────────────────────────
+    st.markdown(
+        '<div style="font-size:11px;font-weight:700;color:#64748B;'
+        'letter-spacing:.08em;text-transform:uppercase;margin:20px 0 10px">'
+        'Heatmap — Open Interest by Strike × Expiration</div>',
+        unsafe_allow_html=True,
+    )
+    with st.spinner("Loading heatmap…"):
+        call_pivot, put_pivot = _fetch_multi_exp_oi(
+            seed["expirations"], seed["exp_labels"], current_price,
+        )
+    if not call_pivot.empty:
+        st.plotly_chart(
+            _oi_heatmap_chart(call_pivot, put_pivot, current_price),
+            width="stretch",
+        )
+    else:
+        st.caption("Heatmap data unavailable.")
+
+
+def _fetch_multi_exp_oi(
+    expirations: list[str],
+    exp_labels: list[str],
+    current_price: float,
+    max_exp: int = 8,
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Fetch call/put OI for up to max_exp expirations in parallel.
+    Returns (call_pivot, put_pivot) indexed by strike, columns = exp_labels."""
+    exps   = expirations[:max_exp]
+    labels = exp_labels[:max_exp]
+
+    def _fetch(pair):
+        exp, label = pair
+        try:
+            d = get_spy_options_analysis(expiration=exp, current_price=current_price)
+            if d and not d["oi_df"].empty:
+                df = d["oi_df"].set_index("strike")
+                return label, df["call_oi"], df["put_oi"]
+        except Exception:
+            pass
+        return label, None, None
+
+    call_frames: dict = {}
+    put_frames:  dict = {}
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        futures = {pool.submit(_fetch, pair): pair for pair in zip(exps, labels)}
+        for future in as_completed(futures):
+            label, call_s, put_s = future.result()
+            if call_s is not None:
+                call_frames[label] = call_s
+                put_frames[label]  = put_s
+
+    if not call_frames:
+        return pd.DataFrame(), pd.DataFrame()
+
+    call_pivot = pd.DataFrame(call_frames).fillna(0).sort_index()
+    put_pivot  = pd.DataFrame(put_frames).fillna(0).sort_index()
+    ordered    = [lb for lb in labels if lb in call_pivot.columns]
+    return call_pivot[ordered], put_pivot[ordered]
+
+
+def _oi_heatmap_chart(
+    call_pivot: pd.DataFrame,
+    put_pivot: pd.DataFrame,
+    current_price: float,
+) -> go.Figure:
+    """Diverging heatmap: green = call-heavy strikes, red = put-heavy strikes."""
+    net     = call_pivot.sub(put_pivot, fill_value=0)
+    strikes = net.index.tolist()
+    exps    = net.columns.tolist()
+    abs_max = float(net.abs().max().max()) or 1
+
+    fig = go.Figure(go.Heatmap(
+        z=net.values.tolist(),
+        x=exps,
+        y=strikes,
+        colorscale=[
+            [0.00, "#7F1D1D"],
+            [0.25, "#DC2626"],
+            [0.45, "#6B7280"],
+            [0.50, "#9CA3AF"],
+            [0.55, "#6B7280"],
+            [0.75, "#16A34A"],
+            [1.00, "#14532D"],
+        ],
+        zmid=0, zmin=-abs_max, zmax=abs_max,
+        colorbar=dict(
+            title=dict(text="Net OI<br>(Calls−Puts)", font=dict(size=10, color="#94A3B8")),
+            tickfont=dict(size=9, color="#94A3B8"),
+            len=0.85,
+        ),
+        hovertemplate=(
+            "Expiry: <b>%{x}</b><br>"
+            "Strike: <b>$%{y:,.0f}</b><br>"
+            "Net OI: <b>%{z:,.0f}</b><br>"
+            "<i>+ = call-heavy &nbsp;· &nbsp;− = put-heavy</i>"
+            "<extra></extra>"
+        ),
+    ))
+
+    fig.add_shape(
+        type="line", xref="paper", yref="y",
+        x0=0, x1=1, y0=current_price, y1=current_price,
+        line=dict(color="#3B82F6", width=2),
+    )
+    fig.add_annotation(
+        xref="paper", yref="y", x=1.01, y=current_price,
+        text=f"<b>${current_price:,.0f}</b>",
+        showarrow=False, font=dict(color="#3B82F6", size=10), xanchor="left",
+    )
+
+    fig.update_layout(
+        template="plotly_dark",
+        height=480,
+        margin=dict(l=70, r=130, t=10, b=60),
+        xaxis=dict(title="Expiration", tickangle=-30, side="bottom", gridcolor="#1E293B"),
+        yaxis=dict(title="Strike ($)", dtick=5, gridcolor="#1E293B"),
+        hovermode="closest",
+    )
+    return fig
 
 
 def _oi_butterfly_chart(

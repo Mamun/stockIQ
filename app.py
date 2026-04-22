@@ -138,6 +138,7 @@ inject_seo()
 pages = {
     "Market": [
         st.Page("src/stockiq/frontend/views/spy_dashboard.py",    title="SPY Dashboard",       icon="📈", url_path="spy",             default=True),
+        st.Page("src/stockiq/frontend/views/volatility.py",       title="Volatility / VIX",    icon="📉", url_path="volatility"),
         st.Page("src/stockiq/frontend/views/ai_forecast_page.py", title="SPY AI Outlook",      icon="🤖", url_path="spy-ai-forecast"),
         st.Page("src/stockiq/frontend/views/spy_gap_table.py",    title="SPY Gap Table",        icon="📋", url_path="spy-gaps"),
     ],
