@@ -17,7 +17,10 @@ from stockiq.backend.data.local_gap_cache import apply_gap_cache, save_confirmed
 from stockiq.backend.data.local_ohlc_cache import enrich_with_cache
 from stockiq.backend.data.yf_fetch import fetch_ohlcv
 from stockiq.backend.models.indicators import compute_daily_gaps, compute_rsi, patch_today_gap
-from stockiq.backend.models.options import compute_max_pain, compute_oi_by_strike, label_expirations
+from stockiq.backend.models.options import (
+    compute_max_pain, compute_oi_by_strike, label_expirations,
+    compute_gex, compute_expected_move,
+)
 
 _QUOTE_FETCHERS = {
     "yahoo": fetch_spx_quote,
@@ -169,13 +172,17 @@ def get_spy_options_analysis(
     if not data:
         return None
 
-    max_pain = compute_max_pain(data["calls"], data["puts"])
-    oi_df    = compute_oi_by_strike(data["calls"], data["puts"], current_price or max_pain)
+    max_pain      = compute_max_pain(data["calls"], data["puts"])
+    oi_df         = compute_oi_by_strike(data["calls"], data["puts"], current_price or max_pain)
+    gex_df        = compute_gex(data["calls"], data["puts"], current_price or max_pain, data["expiration"])
+    expected_move = compute_expected_move(data["calls"], data["puts"], current_price or max_pain)
 
     return {
-        "max_pain":    max_pain,
-        "oi_df":       oi_df,
-        "expiration":  data["expiration"],
-        "expirations": data["expirations"],
-        "exp_labels":  label_expirations(data["expirations"]),
+        "max_pain":      max_pain,
+        "oi_df":         oi_df,
+        "gex_df":        gex_df,
+        "expected_move": expected_move,
+        "expiration":    data["expiration"],
+        "expirations":   data["expirations"],
+        "exp_labels":    label_expirations(data["expirations"]),
     }

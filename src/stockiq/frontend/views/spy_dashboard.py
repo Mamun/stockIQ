@@ -334,6 +334,78 @@ def _render_options_section(current_price: float) -> None:
         unsafe_allow_html=True,
     )
 
+    with st.expander("What is Options Intelligence?", expanded=False):
+        st.markdown(
+            """
+**Options Intelligence** uses the SPY options chain to reveal where large market participants
+are positioned, giving clues about likely price ranges and directional pressure.
+
+---
+**Who are the players?**
+
+🏦 **Dealers (Market Makers)**
+Banks and firms like Citadel Securities or Susquehanna that *sell* options to everyone else.
+They don't take directional bets — they delta-hedge constantly to stay neutral. This hedging
+activity is what moves the stock price in predictable ways. When you see GEX, max pain, or
+call/put walls, you're reading what dealers are *forced* to do as price moves.
+
+🛡️ **Hedgers (Institutional)**
+Pension funds, asset managers, and hedge funds that buy puts to protect large stock portfolios,
+or buy calls to get upside exposure without holding shares. Their positions show up as large OI
+at key strikes — especially deep OTM puts bought months out as portfolio insurance. They drive
+high put/call ratios without necessarily being "bearish" — they're just managing risk.
+
+🧑‍💻 **Retail Investors**
+Individual traders buying short-dated calls or puts, often chasing momentum or news.
+Retail tends to buy OTM options close to expiry (especially 0DTE). Their activity spikes
+the put/call ratio intraday and creates the demand that dealers hedge against. High retail
+call buying into a rally is often a contrarian warning sign.
+
+---
+
+**Put/Call Ratio (P/C)**
+Compares the total volume or open interest of put contracts (bearish bets) vs call contracts
+(bullish bets). A ratio above 1.0 means more puts than calls — often a sign of fear or
+hedging. A low ratio signals complacency or bullish sentiment.
+
+**Max Pain**
+The strike price at which the total dollar loss for all open option contracts is greatest —
+meaning dealers and market makers profit most if price expires there. Prices tend to
+*gravitate toward max pain* as expiration approaches, especially in the final days.
+> *Example: SPY is trading at $560 but max pain is $550. As Friday expiry nears,
+> selling pressure may push SPY closer to $550 — where the most option buyers lose.*
+
+**Call Wall / Put Wall**
+The strikes with the highest call or put open interest act as magnetic price levels.
+A heavy **call wall** above price can cap upside (dealers sell as price rises there).
+A heavy **put wall** below can provide a floor (dealers buy as price falls there).
+
+**OI Butterfly Chart**
+Shows call OI (green, right) and put OI (red, left) by strike for a chosen expiration.
+Wide bars = heavy positioning. The blue line is the current SPY price; the orange dotted
+line is max pain.
+
+**OI Heatmap**
+Plots net OI (calls minus puts) across all near-term expirations simultaneously.
+Green cells = call-heavy strikes; red cells = put-heavy strikes. Useful for spotting
+which strikes are consistently defended across multiple expiration dates.
+
+**Expected Move**
+The ATM straddle price (nearest call + nearest put) tells you what the options market implies
+as the ±price range by expiration. This is a 1-sigma move — roughly a 68% probability that
+SPY stays within that range.
+> *Example: ±$9.40 with SPY at $560 means options imply a range of $550.60 – $569.40 by expiry.*
+
+**Gamma Exposure (GEX)**
+Measures how aggressively dealers must hedge as SPY moves. When GEX is positive, dealers buy
+on dips and sell on rips — the market self-stabilises and stays range-bound. When GEX turns
+negative, dealer hedging amplifies moves — small drops can become sharp sell-offs.
+The GEX chart shows which individual strikes carry the most stabilising or amplifying force.
+> *Example: Large positive GEX at $555 means dealers will buy heavily if SPY falls to $555,
+> acting as a floor. Large negative GEX at $545 means a break below $545 may accelerate.*
+            """
+        )
+
     _scope_opts  = ["Daily", "7 Days", "14 Days", "21 Days", "Monthly"]
     _scope_keys  = {
         "Daily":   "daily",
@@ -469,6 +541,21 @@ def _render_options_section(current_price: float) -> None:
         else:
             st.caption("No OI data for this expiration.")
 
+    # ── Row 2: Expected Move · GEX summary · GEX chart ───────────────────────
+    gex_df = data.get("gex_df", pd.DataFrame())
+    em     = data.get("expected_move")
+
+    em_col, gex_col, gex_chart_col = st.columns([1, 1, 3])
+    with em_col:
+        _render_expected_move_card(em, selected_label)
+    with gex_col:
+        _render_gex_summary_card(gex_df)
+    with gex_chart_col:
+        if not gex_df.empty:
+            st.plotly_chart(_gex_chart(gex_df, current_price), width="stretch")
+        else:
+            st.caption("GEX chart unavailable.")
+
     # ── Heatmap: Strike × Expiration ─────────────────────────────────────────
     st.markdown(
         '<div style="font-size:11px;font-weight:700;color:#64748B;'
@@ -587,6 +674,120 @@ def _oi_heatmap_chart(
         xaxis=dict(title="Expiration", tickangle=-30, side="bottom", gridcolor="#1E293B"),
         yaxis=dict(title="Strike ($)", dtick=5, gridcolor="#1E293B"),
         hovermode="closest",
+    )
+    return fig
+
+
+def _render_expected_move_card(em: dict | None, exp_label: str) -> None:
+    if not em:
+        st.markdown(
+            '<div style="padding:16px;font-size:11px;color:#64748B">Expected move unavailable.</div>',
+            unsafe_allow_html=True,
+        )
+        return
+    st.markdown(
+        f"""
+<div style="background:rgba(255,255,255,0.03);border:1px solid #1E293B;border-radius:10px;
+            padding:16px;height:100%;box-sizing:border-box">
+  <div style="font-size:10px;color:#94A3B8;font-weight:700;letter-spacing:.07em;
+              text-transform:uppercase;margin-bottom:4px">Expected Move · {exp_label}</div>
+  <div style="font-size:32px;font-weight:900;color:#A78BFA;line-height:1;margin:4px 0">
+    ±${em['move']:,.2f}
+  </div>
+  <div style="font-size:12px;color:#64748B;margin-top:4px">±{em['pct']:.1f}% of spot</div>
+  <div style="font-size:11px;color:#475569;margin-top:10px;line-height:1.8">
+    Range: <b style="color:#F1F5F9">${em['low']:,.2f}</b> – <b style="color:#F1F5F9">${em['high']:,.2f}</b><br>
+    ATM strike: <b style="color:#F1F5F9">${em['atm_strike']:,.0f}</b>
+  </div>
+  <div style="font-size:9px;color:#334155;margin-top:8px;line-height:1.5">
+    ATM straddle price — 68% probability price stays within this range at expiry.
+  </div>
+</div>""",
+        unsafe_allow_html=True,
+    )
+
+
+def _render_gex_summary_card(gex_df: "pd.DataFrame") -> None:
+    if gex_df.empty:
+        st.markdown(
+            '<div style="padding:16px;font-size:11px;color:#64748B">GEX unavailable.</div>',
+            unsafe_allow_html=True,
+        )
+        return
+    total_gex = gex_df["gex"].sum()
+    total_b   = total_gex / 1e9
+    if total_gex >= 0:
+        gex_color  = "#22C55E"
+        gex_signal = "Positive GEX"
+        gex_note   = "Dealers buy dips & sell rips — price tends to stay range-bound"
+    else:
+        gex_color  = "#EF4444"
+        gex_signal = "Negative GEX"
+        gex_note   = "Dealers amplify moves — expect larger intraday swings"
+    peak_support = float(gex_df.loc[gex_df["gex"].idxmax(), "strike"])
+    peak_resist  = float(gex_df.loc[gex_df["gex"].idxmin(), "strike"])
+    st.markdown(
+        f"""
+<div style="background:rgba(255,255,255,0.03);border:1px solid #1E293B;border-radius:10px;
+            padding:16px;height:100%;box-sizing:border-box">
+  <div style="font-size:10px;color:#94A3B8;font-weight:700;letter-spacing:.07em;
+              text-transform:uppercase;margin-bottom:4px">Gamma Exposure (GEX)</div>
+  <div style="font-size:32px;font-weight:900;color:{gex_color};line-height:1;margin:4px 0">
+    {total_b:+.1f}B
+  </div>
+  <div style="font-size:12px;font-weight:700;color:{gex_color};margin-bottom:8px">
+    {gex_signal}
+  </div>
+  <div style="font-size:10px;color:#64748B;line-height:1.8">
+    {gex_note}<br>
+    Peak dealer support: <b style="color:#22C55E">${peak_support:,.0f}</b><br>
+    Peak dealer flip: <b style="color:#EF4444">${peak_resist:,.0f}</b>
+  </div>
+  <div style="font-size:9px;color:#334155;margin-top:8px;line-height:1.5">
+    Positive = stabilising · Negative = moves may accelerate through key levels.
+  </div>
+</div>""",
+        unsafe_allow_html=True,
+    )
+
+
+def _gex_chart(gex_df: "pd.DataFrame", current_price: float, n_strikes: int = 30) -> go.Figure:
+    """Horizontal bar chart of GEX by strike — green = stabilising, red = amplifying."""
+    import numpy as np
+    strikes = gex_df["strike"].values
+    idx  = int(np.searchsorted(strikes, current_price))
+    half = n_strikes // 2
+    lo   = max(0, idx - half)
+    hi   = min(len(gex_df), lo + n_strikes)
+    lo   = max(0, hi - n_strikes)
+    gex_df = gex_df.iloc[lo:hi]
+
+    colors = ["#22C55E" if v >= 0 else "#EF4444" for v in gex_df["gex"]]
+    fig = go.Figure(go.Bar(
+        x=gex_df["gex"] / 1e6,
+        y=gex_df["strike"],
+        orientation="h",
+        marker_color=colors,
+        opacity=0.8,
+        hovertemplate="Strike: <b>$%{y:,.0f}</b><br>GEX: <b>%{x:,.1f}M</b><extra></extra>",
+    ))
+    fig.add_shape(
+        type="line", xref="paper", yref="y",
+        x0=0, x1=1, y0=current_price, y1=current_price,
+        line=dict(color="#3B82F6", width=2),
+    )
+    fig.add_annotation(
+        xref="paper", yref="y", x=1.01, y=current_price,
+        text=f"<b>${current_price:,.0f}</b>",
+        showarrow=False, font=dict(color="#3B82F6", size=10), xanchor="left",
+    )
+    fig.add_vline(x=0, line_color="#475569", line_width=1)
+    fig.update_layout(
+        template="plotly_dark", height=420,
+        margin=dict(l=60, r=100, t=10, b=40),
+        xaxis=dict(title="Gamma Exposure ($M)", gridcolor="#1E293B"),
+        yaxis=dict(title="Strike", gridcolor="#1E293B", dtick=5),
+        hovermode="y unified",
     )
     return fig
 
