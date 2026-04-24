@@ -115,6 +115,101 @@ def patch_today_gap(gaps_df: pd.DataFrame, quote: dict) -> pd.DataFrame:
     return gaps_df
 
 
+def compute_buying_pressure(df: pd.DataFrame, timeframe: str = "monthly") -> dict:
+    """
+    Buying Pressure (BX) signal — detects selling exhaustion and onset of real buying.
+
+    Three conditions (2/3 = signal, 3/3 = strong signal):
+      1. RSI turning up from oversold  (RSI < 45 and rising vs previous bar)
+      2. Volume surge                  (current bar > 1.5× trailing 20-bar average)
+      3. Bullish close                 (candle closes in upper 60% of High–Low range)
+
+    timeframe: 'monthly' | 'weekly' | 'daily'
+    """
+    freq_map = {"monthly": "MS", "weekly": "W-FRI"}
+    freq = freq_map.get(timeframe)
+
+    if freq:
+        agg_spec = {k: v for k, v in {
+            "Open": "first", "High": "max", "Low": "min",
+            "Close": "last", "Volume": "sum",
+        }.items() if k in df.columns}
+        bars = df.resample(freq).agg(agg_spec).dropna(subset=["Close"])
+
+        # Drop the current incomplete bar — signal must be based on a finished period
+        today = pd.Timestamp.today().normalize()
+        last_period = bars.index[-1].to_period(
+            "M" if timeframe == "monthly" else "W"
+        )
+        current_period = today.to_period(
+            "M" if timeframe == "monthly" else "W"
+        )
+        if last_period >= current_period:
+            bars = bars.iloc[:-1]
+    else:
+        bars = df.copy()
+
+    if len(bars) < 22:
+        return {"signal": False, "strength": 0,
+                "conditions_met": [], "conditions_missing": [],
+                "timeframe": timeframe, "rsi": None}
+
+    bars = bars.copy()
+    bars["RSI"] = compute_rsi(bars)
+    if "Volume" in bars.columns:
+        bars["_vol_ma20"] = bars["Volume"].rolling(20).mean()
+
+    latest = bars.iloc[-1]
+    prev   = bars.iloc[-2]
+
+    met     = []
+    missing = []
+
+    # 1. RSI turning up from oversold
+    rsi_now  = latest.get("RSI", np.nan)
+    rsi_prev = prev.get("RSI",   np.nan)
+    if not (np.isnan(rsi_now) or np.isnan(rsi_prev)):
+        if rsi_now < 45 and rsi_now > rsi_prev:
+            met.append(f"RSI turning up from oversold ({rsi_now:.1f} ↑ from {rsi_prev:.1f})")
+        elif rsi_now >= 45:
+            missing.append(f"RSI not oversold ({rsi_now:.1f} — needs < 45)")
+        else:
+            missing.append(f"RSI still falling ({rsi_now:.1f} ↓ from {rsi_prev:.1f})")
+
+    # 2. Volume surge
+    if "Volume" in bars.columns:
+        vol_now = latest.get("Volume",    np.nan)
+        vol_avg = latest.get("_vol_ma20", np.nan)
+        if not (np.isnan(vol_now) or np.isnan(vol_avg)) and vol_avg > 0:
+            ratio = vol_now / vol_avg
+            if ratio >= 1.5:
+                met.append(f"Volume surge ({ratio:.1f}× average)")
+            else:
+                missing.append(f"Volume below threshold ({ratio:.1f}× avg — needs 1.5×)")
+
+    # 3. Bullish close (close in upper 60% of candle range)
+    h, l, c = float(latest["High"]), float(latest["Low"]), float(latest["Close"])
+    rng = h - l
+    if rng > 0:
+        pos = (c - l) / rng
+        if pos >= 0.60:
+            met.append(f"Bullish close — {pos * 100:.0f}% up the candle range")
+        else:
+            missing.append(f"Weak close — {pos * 100:.0f}% up range (needs ≥ 60%)")
+
+    strength  = len(met)
+    bar_label = bars.index[-1].strftime("%b %Y" if timeframe == "monthly" else "%d %b %Y")
+    return {
+        "signal":             strength >= 2,
+        "strength":           strength,
+        "conditions_met":     met,
+        "conditions_missing": missing,
+        "timeframe":          timeframe,
+        "rsi":                rsi_now if not np.isnan(rsi_now) else None,
+        "bar_label":          bar_label,
+    }
+
+
 def compute_rsi(df: pd.DataFrame, period: int = 14) -> pd.Series:
     """
     Wilder's RSI.  Returns a Series named 'RSI' aligned to df.index.

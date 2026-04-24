@@ -4,6 +4,7 @@ import pandas as pd
 
 from stockiq.backend.data.yf_fetch import fetch_ohlcv, get_company_name, search_companies
 from stockiq.backend.models.indicators import (
+    compute_buying_pressure,
     compute_daily_gaps,
     compute_fibonacci,
     compute_mas,
@@ -69,6 +70,11 @@ def get_stock_gaps(df: pd.DataFrame, quote: dict) -> pd.DataFrame:
 def get_stock_crosses(df: pd.DataFrame) -> tuple:
     """Golden-cross and death-cross dates for the given indicator DataFrame."""
     return find_crosses(df)
+
+
+def get_buying_pressure(df: pd.DataFrame, timeframe: str = "monthly") -> dict:
+    """BX signal for the given timeframe: 'monthly' | 'weekly' | 'daily'."""
+    return compute_buying_pressure(df, timeframe)
 
 
 def get_company_display_name(ticker: str) -> str:

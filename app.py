@@ -141,6 +141,7 @@ pages = {
         st.Page("src/stockiq/frontend/views/volatility.py",       title="Volatility / VIX",    icon="📉", url_path="volatility"),
         st.Page("src/stockiq/frontend/views/ai_forecast_page.py", title="SPY AI Outlook",      icon="🤖", url_path="spy-ai-forecast"),
         st.Page("src/stockiq/frontend/views/spy_gap_table.py",    title="SPY Gap Table",        icon="📋", url_path="spy-gaps"),
+        st.Page("src/stockiq/frontend/views/dte_guide.py",        title="0DTE Options Guide",  icon="⚡", url_path="0dte-guide"),
     ],
     "S&P 500 Tools": [
         st.Page("src/stockiq/frontend/views/analyzer.py",         title="Stock Analyzer",      icon="🔬", url_path="analyzer"),

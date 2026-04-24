@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SPY 0DTE Options Guide — StockIQ</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0F172A;
+    --surface: #1E293B;
+    --card: #1E293B;
+    --border: #334155;
+    --accent: #F1C40F;
+    --accent2: #EF4444;
+    --accent3: #10B981;
+    --text: #F8FAFC;
+    --muted: #94A3B8;
+    --green: #10B981;
+    --red: #EF4444;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grid texture */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(241,196,15,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(241,196,15,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container { max-width: 960px; margin: 0 auto; padding: 40px 24px; position: relative; z-index: 1; }
+
+  /* Header */
+  .header { margin-bottom: 48px; }
+  .eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  h1 {
+    font-size: clamp(36px, 6vw, 64px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -2px;
+  }
+  h1 span { color: var(--accent); }
+  .subtitle {
+    margin-top: 12px;
+    color: var(--muted);
+    font-size: 15px;
+    font-family: 'Space Mono', monospace;
+    max-width: 540px;
+  }
+
+  /* Clock bar */
+  .clock-bar {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 4px;
+    padding: 16px 20px;
+    margin-bottom: 40px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .clock-label { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); letter-spacing: 2px; }
+  .clock-value { font-family: 'Space Mono', monospace; font-size: 22px; font-weight: 700; color: var(--accent); }
+  .clock-session {
+    margin-left: auto;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    padding: 6px 14px;
+    border-radius: 3px;
+    background: rgba(241,196,15,0.12);
+    color: var(--accent);
+    border: 1px solid rgba(241,196,15,0.3);
+  }
+
+  /* Section title */
+  .section-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* Timeline */
+  .timeline { margin-bottom: 48px; }
+  .timeline-track {
+    position: relative;
+    display: flex;
+    gap: 0;
+    height: 80px;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    margin-bottom: 20px;
+  }
+  .t-seg {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: filter 0.2s;
+    position: relative;
+  }
+  .t-seg:hover { filter: brightness(1.2); }
+  .t-seg .t-time { font-size: 9px; opacity: 0.7; margin-top: 4px; }
+  .t-seg.premarket { background: #1e2a4a; color: #7B8EC8; width: 10%; }
+  .t-seg.open      { background: #0f2a1e; color: var(--green); width: 12%; }
+  .t-seg.morning   { background: #132a0e; color: #4ADE80; width: 20%; }
+  .t-seg.midday    { background: #1E293B; color: var(--muted); width: 20%; }
+  .t-seg.afternoon { background: #2a1a0e; color: #FB923C; width: 20%; }
+  .t-seg.power     { background: #2a1010; color: var(--red); width: 10%; }
+  .t-seg.expiry    { background: #2a1f00; color: var(--accent); width: 8%; }
+  .t-seg.active {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+    z-index: 2;
+  }
+
+  .phase-detail {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 20px 24px;
+    display: none;
+  }
+  .phase-detail.visible { display: block; }
+  .phase-detail h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+  .phase-detail p { color: var(--muted); font-size: 14px; line-height: 1.6; }
+  .phase-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+  .tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    padding: 4px 10px;
+    border-radius: 3px;
+    letter-spacing: 1px;
+  }
+  .tag.green  { background: rgba(16,185,129,0.12); color: var(--green); border: 1px solid rgba(16,185,129,0.25); }
+  .tag.red    { background: rgba(239,68,68,0.12);  color: var(--red);   border: 1px solid rgba(239,68,68,0.25); }
+  .tag.amber  { background: rgba(241,196,15,0.12); color: var(--accent); border: 1px solid rgba(241,196,15,0.25); }
+  .tag.gray   { background: rgba(148,163,184,0.12); color: var(--muted); border: 1px solid rgba(148,163,184,0.2); }
+
+  /* Strategy cards */
+  .strategies { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 48px; }
+  .strat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 20px;
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+  .strat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+  .strat-card.bull::before { background: var(--green); }
+  .strat-card.bear::before { background: var(--red); }
+  .strat-card.neutral::before { background: var(--accent); }
+  .strat-card:hover { border-color: #444455; transform: translateY(-2px); }
+  .strat-card.open { border-color: var(--accent); }
+
+  .strat-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+  .strat-name { font-size: 17px; font-weight: 700; }
+  .strat-bias {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    padding: 3px 8px;
+    border-radius: 2px;
+    letter-spacing: 1px;
+  }
+  .strat-bias.bull { background: rgba(16,185,129,0.15); color: var(--green); }
+  .strat-bias.bear { background: rgba(239,68,68,0.15); color: var(--red); }
+  .strat-bias.neutral { background: rgba(241,196,15,0.15); color: var(--accent); }
+
+  .strat-desc { color: var(--muted); font-size: 13px; line-height: 1.6; margin-bottom: 14px; }
+  .strat-body { display: none; }
+  .strat-card.open .strat-body { display: block; }
+
+  .strat-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+  .meta-item { }
+  .meta-label { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--muted); letter-spacing: 1px; margin-bottom: 3px; }
+  .meta-value { font-size: 13px; font-weight: 700; }
+  .meta-value.green { color: var(--green); }
+  .meta-value.red { color: var(--red); }
+  .meta-value.amber { color: var(--accent); }
+
+  .divider { height: 1px; background: var(--border); margin: 12px 0; }
+
+  .rule-list { list-style: none; margin-top: 10px; }
+  .rule-list li {
+    display: flex; gap: 10px;
+    font-size: 13px; color: var(--muted);
+    line-height: 1.5; margin-bottom: 6px;
+  }
+  .rule-list li::before { content: '→'; color: var(--accent); flex-shrink: 0; font-family: monospace; }
+
+  /* Gamma chart */
+  .gamma-section { margin-bottom: 48px; }
+  .gamma-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 20px; }
+  .gamma-chart { position: relative; height: 120px; margin: 16px 0 8px; }
+  .gamma-svg { width: 100%; height: 100%; }
+  .gamma-label { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); display: flex; justify-content: space-between; }
+
+  /* Risk table */
+  .risk-section { margin-bottom: 48px; }
+  .risk-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+  .risk-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px;
+  }
+  .risk-icon { font-size: 22px; margin-bottom: 10px; }
+  .risk-title { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+  .risk-text { font-size: 12px; color: var(--muted); line-height: 1.6; }
+  .risk-level { font-family: 'Space Mono', monospace; font-size: 9px; margin-top: 10px; padding: 3px 8px; display: inline-block; border-radius: 2px; letter-spacing: 1px; }
+  .risk-level.extreme { background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid rgba(239,68,68,0.25); }
+  .risk-level.high { background: rgba(241,196,15,0.15); color: var(--accent); border: 1px solid rgba(241,196,15,0.25); }
+
+  /* Checklist */
+  .checklist-section { margin-bottom: 48px; }
+  .checklist { background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 20px; }
+  .check-item {
+    display: flex; gap: 14px; align-items: flex-start;
+    padding: 10px 0; border-bottom: 1px solid var(--border);
+    cursor: pointer;
+  }
+  .check-item:last-child { border-bottom: none; }
+  .checkbox {
+    width: 18px; height: 18px; border: 1px solid var(--border);
+    border-radius: 3px; flex-shrink: 0; margin-top: 2px;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .check-item.checked .checkbox { background: var(--accent); border-color: var(--accent); }
+  .check-item.checked .checkbox::after { content: '✓'; color: #000; font-size: 11px; font-weight: 700; }
+  .check-text { font-size: 13px; line-height: 1.5; }
+  .check-text strong { color: var(--text); font-size: 13px; }
+  .check-text span { color: var(--muted); display: block; font-size: 12px; margin-top: 2px; }
+  .check-item.checked .check-text strong { color: var(--muted); text-decoration: line-through; }
+
+  .footer-note {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    text-align: center;
+    padding: 24px 0 0;
+    border-top: 1px solid var(--border);
+    line-height: 1.8;
+  }
+  .footer-note strong { color: var(--red); }
+
+  /* Animation */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .animate { animation: fadeUp 0.4s ease both; }
+  .animate:nth-child(2) { animation-delay: 0.05s; }
+  .animate:nth-child(3) { animation-delay: 0.10s; }
+  .animate:nth-child(4) { animation-delay: 0.15s; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <div class="header animate">
+    <div class="eyebrow">// SPY Options Playbook</div>
+    <h1>0DTE<br><span>Trading Guide</span></h1>
+    <p class="subtitle">Zero days to expiry — highest gamma, fastest decay, maximum risk.</p>
+  </div>
+
+  <!-- Live clock -->
+  <div class="clock-bar animate">
+    <div>
+      <div class="clock-label">NY Time</div>
+      <div class="clock-value" id="clock">--:--:--</div>
+    </div>
+    <div>
+      <div class="clock-label">Session</div>
+      <div class="clock-value" id="session-phase" style="font-size:15px;">--</div>
+    </div>
+    <div class="clock-session" id="session-label">Loading…</div>
+  </div>
+
+  <!-- Timeline -->
+  <div class="timeline animate">
+    <div class="section-title">Day Structure — click a phase</div>
+    <div class="timeline-track" id="timeline">
+      <div class="t-seg premarket" data-phase="0" onclick="selectPhase(0)">PRE<div class="t-time">4–9:30</div></div>
+      <div class="t-seg open"      data-phase="1" onclick="selectPhase(1)">OPEN<div class="t-time">9:30–10</div></div>
+      <div class="t-seg morning"   data-phase="2" onclick="selectPhase(2)">MORNING<div class="t-time">10–12</div></div>
+      <div class="t-seg midday"    data-phase="3" onclick="selectPhase(3)">MIDDAY<div class="t-time">12–2</div></div>
+      <div class="t-seg afternoon" data-phase="4" onclick="selectPhase(4)">AFTERNOON<div class="t-time">2–3:30</div></div>
+      <div class="t-seg power"     data-phase="5" onclick="selectPhase(5)">POWER<div class="t-time">3:30–4</div></div>
+      <div class="t-seg expiry"    data-phase="6" onclick="selectPhase(6)">EXPIRY<div class="t-time">4:00</div></div>
+    </div>
+    <div class="phase-detail" id="phase-detail"></div>
+  </div>
+
+  <!-- Gamma visualization -->
+  <div class="gamma-section animate">
+    <div class="section-title">Gamma Exposure Throughout the Day</div>
+    <div class="gamma-wrap">
+      <p style="font-size:13px; color:var(--muted); margin-bottom:4px;">Gamma spikes as expiry approaches — small SPY moves cause massive option P&amp;L swings near close.</p>
+      <div class="gamma-chart">
+        <svg class="gamma-svg" viewBox="0 0 600 120" preserveAspectRatio="none">
+          <!-- Grid lines -->
+          <line x1="0" y1="30"  x2="600" y2="30"  stroke="#334155" stroke-width="0.5"/>
+          <line x1="0" y1="60"  x2="600" y2="60"  stroke="#334155" stroke-width="0.5"/>
+          <line x1="0" y1="90"  x2="600" y2="90"  stroke="#334155" stroke-width="0.5"/>
+          <!-- Gamma curve: low in morning, explodes near close -->
+          <defs>
+            <linearGradient id="ggrad" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%"   stop-color="#10B981" stop-opacity="0.6"/>
+              <stop offset="60%"  stop-color="#F1C40F" stop-opacity="0.7"/>
+              <stop offset="100%" stop-color="#EF4444" stop-opacity="0.9"/>
+            </linearGradient>
+          </defs>
+          <path d="M0 100 C50 98, 100 95, 150 90 C200 85, 250 82, 300 78 C350 72, 400 62, 450 48 C480 38, 510 22, 540 8 C560 2, 580 1, 600 0 L600 120 L0 120 Z"
+                fill="url(#ggrad)" opacity="0.15"/>
+          <path d="M0 100 C50 98, 100 95, 150 90 C200 85, 250 82, 300 78 C350 72, 400 62, 450 48 C480 38, 510 22, 540 8 C560 2, 580 1, 600 0"
+                fill="none" stroke="url(#ggrad)" stroke-width="2.5" stroke-linecap="round"/>
+          <!-- Time markers -->
+          <line x1="85"  y1="0" x2="85"  y2="120" stroke="#334155" stroke-width="0.5" stroke-dasharray="3,3"/>
+          <line x1="171" y1="0" x2="171" y2="120" stroke="#334155" stroke-width="0.5" stroke-dasharray="3,3"/>
+          <line x1="342" y1="0" x2="342" y2="120" stroke="#334155" stroke-width="0.5" stroke-dasharray="3,3"/>
+          <line x1="513" y1="0" x2="513" y2="120" stroke="#334155" stroke-width="0.5" stroke-dasharray="3,3"/>
+          <!-- Labels -->
+          <text x="85"  y="112" fill="#94A3B8" font-size="8" text-anchor="middle" font-family="monospace">10:00</text>
+          <text x="171" y="112" fill="#94A3B8" font-size="8" text-anchor="middle" font-family="monospace">12:00</text>
+          <text x="342" y="112" fill="#94A3B8" font-size="8" text-anchor="middle" font-family="monospace">2:00</text>
+          <text x="513" y="112" fill="#94A3B8" font-size="8" text-anchor="middle" font-family="monospace">3:30</text>
+          <text x="590" y="112" fill="#EF4444" font-size="8" text-anchor="end" font-family="monospace">4PM</text>
+          <!-- Y labels -->
+          <text x="4" y="100" fill="#94A3B8" font-size="8" font-family="monospace">LOW</text>
+          <text x="4" y="34"  fill="#94A3B8" font-size="8" font-family="monospace">HIGH</text>
+        </svg>
+      </div>
+      <div class="gamma-label">
+        <span>→ Low gamma at open (cheap options, forgiving)</span>
+        <span>EXTREME gamma at close →</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Strategies -->
+  <div class="animate">
+    <div class="section-title">Core 0DTE Strategies — click to expand</div>
+    <div class="strategies">
+
+      <div class="strat-card bull" onclick="toggleStrat(this)">
+        <div class="strat-header">
+          <div class="strat-name">Long Call</div>
+          <div class="strat-bias bull">BULLISH</div>
+        </div>
+        <div class="strat-desc">Buy a call, expect SPY to move up fast. Cheapest directional bet, but theta kills you if SPY stalls.</div>
+        <div class="strat-body">
+          <div class="divider"></div>
+          <div class="strat-meta">
+            <div class="meta-item">
+              <div class="meta-label">Max Loss</div>
+              <div class="meta-value red">Premium paid</div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-label">Max Gain</div>
+              <div class="meta-value green">Unlimited</div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-label">Best entry</div>
+              <div class="meta-value amber">9:45–11:00</div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-label">Strike</div>
+              <div class="meta-value">ATM or 1 strike OTM</div>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <ul class="rule-list">
+            <li>Enter after the open settles (avoid first 15 min chop)</li>
+            <li>Only trade with clear bullish catalyst or trend</li>
+            <li>Exit before 2pm — theta accelerates hard after that</li>
+            <li>Avoid buying if VIX is elevated (IV makes it pricey)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="strat-card bear" onclick="toggleStrat(this)">
+        <div class="strat-header">
+          <div class="strat-name">Long Put</div>
+          <div class="strat-bias bear">BEARISH</div>
+        </div>
+        <div class="strat-desc">Buy a put, expect SPY to drop fast. Gap-fill trades or FOMC-reaction fades are common setups.</div>
+        <div class="strat-body">
+          <div class="divider"></div>
+          <div class="strat-meta">
+            <div class="meta-item">
+              <div class="meta-label">Max Loss</div>
+              <div class="meta-value red">Premium paid</div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-label">Max Gain</div>
+              <div class="meta-value green">Large (SPY → 0)</div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-label">Best entry</div>
+              <div class="meta-value amber">After gap-up open</div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-label">Strike</div>
+              <div class="meta-value">ATM or 1 strike OTM</div>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <ul class="rule-list">
+            <li>Gap-fill fade: SPY gaps up big → buy puts if likely to fill</li>
+            <li>Check VIX — low VIX means puts are cheaper to buy</li>
+            <li>Size smaller than calls (market has upward bias)</li>
+            <li>Have a clear invalidation level before entering</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="strat-card bull" onclick="toggleStrat(this)">
+        <div class="strat-header">
+          <div class="strat-name">Bull Call Spread</div>
+          <div class="strat-bias bull">BULLISH</div>
+        </div>
+        <div class="strat-desc">Buy a call, sell a higher call. Reduces cost dramatically — the go-to for defined-risk bullish plays.</div>
+        <div class="strat-body">
+          <div class="divider"></div>
+          <div class="strat-meta">
+            <div class="meta-item">
+              <div class="meta-label">Max Loss</div>
+              <div class="meta-value red">Net debit paid</div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-label">Max Gain</div>
+              <div class="meta-value green">Spread width − debit</div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-label">Example</div>
+              <div class="meta-value amber">Buy 580C / Sell 582C</div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-label">Width</div>
+              <div class="meta-value">$1–$3 strikes wide</div>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <ul class="rule-list">
+            <li>Ideal when you expect a moderate move, not a moon shot</li>
+            <li>Use $1–$2 wide spreads for low cost, tight risk/reward</li>
+            <li>Close at 50–75% of max profit — don't hold to expiry</li>
+            <li>The short leg caps your gain but also funds the trade</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="strat-card bear" onclick="toggleStrat(this)">
+        <div class="strat-header">
+          <div class="strat-name">Bear Put Spread</div>
+          <div class="strat-bias bear">BEARISH</div>
+        </div>
+        <div class="strat-desc">Buy a put, sell a lower put. Same logic as bull call spread but for downside. Reduces theta exposure.</div>
+        <div class="strat-body">
+          <div class="divider"></div>
+          <div class="strat-meta">
+            <div class="meta-item">
+              <div class="meta-label">Max Loss</div>
+              <div class="meta-value red">Net debit paid</div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-label">Max Gain</div>
+              <div class="meta-value green">Spread width − debit</div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-label">Example</div>
+              <div class="meta-value amber">Buy 578P / Sell 576P</div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-label">Width</div>
+              <div class="meta-value">$1–$3 strikes wide</div>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <ul class="rule-list">
+            <li>Best after a sharp gap-up where mean reversion is likely</li>
+            <li>Look for resistance confluence before entering</li>
+            <li>Exit at 50% profit — don't let theta eat back gains</li>
+            <li>Avoid on strong trending days — trend beats mean reversion</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="strat-card neutral" onclick="toggleStrat(this)">
+        <div class="strat-header">
+          <div class="strat-name">Iron Condor</div>
+          <div class="strat-bias neutral">NEUTRAL</div>
+        </div>
+        <div class="strat-desc">Sell a call spread + sell a put spread. Collect premium, profit if SPY stays in a range all day.</div>
+        <div class="strat-body">
+          <div class="divider"></div>
+          <div class="strat-meta">
+            <div class="meta-item">
+              <div class="meta-label">Max Loss</div>
+              <div class="meta-value red">Spread width − credit</div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-label">Max Gain</div>
+              <div class="meta-value green">Net credit received</div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-label">Best on</div>
+              <div class="meta-value amber">Low VIX, choppy days</div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-label">Wings</div>
+              <div class="meta-value">0.10–0.20 delta strikes</div>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <ul class="rule-list">
+            <li>Enter after 10am when the opening range is set</li>
+            <li>Place strikes outside the expected move (check options chain)</li>
+            <li>Best on low-VIX, no-news days — avoid before FOMC/CPI</li>
+            <li>Close at 50% credit received to lock gains, manage risk</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="strat-card neutral" onclick="toggleStrat(this)">
+        <div class="strat-header">
+          <div class="strat-name">Straddle / Strangle</div>
+          <div class="strat-bias neutral">VOLATILITY</div>
+        </div>
+        <div class="strat-desc">Buy both a call and put. Profit from a big move in either direction. Works on high-catalyst days.</div>
+        <div class="strat-body">
+          <div class="divider"></div>
+          <div class="strat-meta">
+            <div class="meta-item">
+              <div class="meta-label">Max Loss</div>
+              <div class="meta-value red">Both premiums</div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-label">Max Gain</div>
+              <div class="meta-value green">Unlimited (either way)</div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-label">Best on</div>
+              <div class="meta-value amber">FOMC / CPI days</div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-label">Risk</div>
+              <div class="meta-value red">IV crush kills it</div>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <ul class="rule-list">
+            <li>Only use when a big move is expected but direction unknown</li>
+            <li>Enter before the catalyst — exit immediately after</li>
+            <li>IV crush after the event will destroy value if SPY stalls</li>
+            <li>Strangle = OTM call + OTM put — cheaper but needs bigger move</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Risk section -->
+  <div class="risk-section animate">
+    <div class="section-title">0DTE Specific Risks</div>
+    <div class="risk-grid">
+      <div class="risk-card">
+        <div class="risk-icon">⚡</div>
+        <div class="risk-title">Gamma explosion</div>
+        <div class="risk-text">After 2pm, gamma is so high that a $1 SPY move can double or zero your option. One tick against you = massive loss.</div>
+        <span class="risk-level extreme">EXTREME</span>
+      </div>
+      <div class="risk-card">
+        <div class="risk-icon">⏱</div>
+        <div class="risk-title">Theta incineration</div>
+        <div class="risk-text">The entire time value decays to zero by 4pm. Even if SPY moves your way but slowly — theta can exceed your delta gains.</div>
+        <span class="risk-level extreme">EXTREME</span>
+      </div>
+      <div class="risk-card">
+        <div class="risk-icon">📉</div>
+        <div class="risk-title">IV crush after events</div>
+        <div class="risk-text">After FOMC or CPI, IV collapses. You can be right on direction and still lose because IV drops faster than delta gains.</div>
+        <span class="risk-level high">HIGH</span>
+      </div>
+      <div class="risk-card">
+        <div class="risk-icon">🎯</div>
+        <div class="risk-title">Pin risk at expiry</div>
+        <div class="risk-text">If SPY closes exactly at your strike, you face unpredictable assignment risk. Always close positions before 3:50pm.</div>
+        <span class="risk-level high">HIGH</span>
+      </div>
+      <div class="risk-card">
+        <div class="risk-icon">📊</div>
+        <div class="risk-title">Wide bid/ask at close</div>
+        <div class="risk-text">OTM options near expiry can have $0.05–$0.30 wide spreads. You lose edge on entry AND exit. Always use limit orders.</div>
+        <span class="risk-level high">HIGH</span>
+      </div>
+      <div class="risk-card">
+        <div class="risk-icon">🧠</div>
+        <div class="risk-title">FOMO & overtrading</div>
+        <div class="risk-text">0DTE moves fast. The urge to re-enter after a loss is the #1 account killer. Define max daily loss and stop cold.</div>
+        <span class="risk-level extreme">EXTREME</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pre-trade checklist -->
+  <div class="checklist-section animate">
+    <div class="section-title">Pre-Trade Checklist</div>
+    <div class="checklist">
+      <div class="check-item" onclick="toggleCheck(this)">
+        <div class="checkbox"></div>
+        <div class="check-text">
+          <strong>Check VIX level</strong>
+          <span>VIX &lt;16: buy options. VIX &gt;25: sell premium (condors/spreads).</span>
+        </div>
+      </div>
+      <div class="check-item" onclick="toggleCheck(this)">
+        <div class="checkbox"></div>
+        <div class="check-text">
+          <strong>Check economic calendar</strong>
+          <span>FOMC, CPI, NFP = IV crush risk. Know before you trade.</span>
+        </div>
+      </div>
+      <div class="check-item" onclick="toggleCheck(this)">
+        <div class="checkbox"></div>
+        <div class="check-text">
+          <strong>Note premarket gap size and direction</strong>
+          <span>Big gap-up → fade candidate. Small gap → trend follow setup.</span>
+        </div>
+      </div>
+      <div class="check-item" onclick="toggleCheck(this)">
+        <div class="checkbox"></div>
+        <div class="check-text">
+          <strong>Wait for the opening range (first 15 min)</strong>
+          <span>Mark the 9:30–9:45 high and low. These are key levels for the day.</span>
+        </div>
+      </div>
+      <div class="check-item" onclick="toggleCheck(this)">
+        <div class="checkbox"></div>
+        <div class="check-text">
+          <strong>Define your max loss before entering</strong>
+          <span>0DTE: never risk more than you can see go to zero instantly.</span>
+        </div>
+      </div>
+      <div class="check-item" onclick="toggleCheck(this)">
+        <div class="checkbox"></div>
+        <div class="check-text">
+          <strong>Check delta and cost of target option</strong>
+          <span>ATM delta ~0.50. OTM delta &lt;0.30 = needs a bigger move to profit.</span>
+        </div>
+      </div>
+      <div class="check-item" onclick="toggleCheck(this)">
+        <div class="checkbox"></div>
+        <div class="check-text">
+          <strong>Set a hard exit time: no holding past 3:45pm</strong>
+          <span>Gamma and pin risk make the last 15 min a coin flip. Just close.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    <strong>⚠ Warning:</strong> 0DTE options can go to zero within minutes. This is educational only, not financial advice.<br>
+    Most 0DTE traders lose money. Paper trade first. Understand the Greeks before risking real capital.
+  </div>
+
+</div>
+
+<script>
+// Clock
+function updateClock() {
+  const now = new Date();
+  const ny = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
+  const h = ny.getHours(), m = ny.getMinutes(), s = ny.getSeconds();
+  const fmt = n => String(n).padStart(2, '0');
+  document.getElementById('clock').textContent = `${fmt(h)}:${fmt(m)}:${fmt(s)}`;
+
+  const mins = h * 60 + m;
+  let phase = '', label = '';
+  if (mins < 4*60)         { phase = 'CLOSED';     label = 'Market Closed (Overnight)'; }
+  else if (mins < 9*60+30) { phase = 'PRE-MKT';    label = 'Pre-Market — futures moving'; }
+  else if (mins < 9*60+45) { phase = 'OPEN CHAOS'; label = '⚠ First 15 min — avoid entering'; }
+  else if (mins < 12*60)   { phase = 'MORNING';    label = 'Best window for directional plays'; }
+  else if (mins < 14*60)   { phase = 'MIDDAY';     label = 'Low volume — avoid new entries'; }
+  else if (mins < 15*60+30){ phase = 'AFTERNOON';  label = 'Trend continuation or reversal'; }
+  else if (mins < 15*60+45){ phase = 'POWER HOUR'; label = '⚡ Gamma spikes — manage positions'; }
+  else if (mins < 16*60)   { phase = 'DANGER';     label = '⚠ Close all 0DTE before 3:45pm'; }
+  else                     { phase = 'CLOSED';     label = 'Market Closed — SPY options expired'; }
+
+  document.getElementById('session-phase').textContent = phase;
+  document.getElementById('session-label').textContent = label;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// Phase detail data
+const phases = [
+  {
+    title: 'Pre-Market (4:00 – 9:30 AM)',
+    color: '#6060aa',
+    text: 'Futures (ES, NQ) are moving. Note where SPY futures are relative to yesterday\'s close — that gap becomes your first trade thesis. Check economic calendar, scan for news. Do NOT enter 0DTE options yet — spreads are too wide and theta burns without liquidity.',
+    tags: [
+      { label: 'CHECK: gap size vs prev close', cls: 'amber' },
+      { label: 'CHECK: VIX futures', cls: 'amber' },
+      { label: 'DO NOT: trade yet', cls: 'red' }
+    ]
+  },
+  {
+    title: 'Open (9:30 – 9:45 AM)',
+    color: '#3dd68c',
+    text: 'The most volatile 15 minutes of the day. Options spreads are wide, direction is uncertain, market makers are adjusting. Gap fills happen here OR the gap extends. Mark the high and low of this candle — they define the opening range for the rest of the day.',
+    tags: [
+      { label: 'MARK: opening range high/low', cls: 'amber' },
+      { label: 'WATCH: gap fill attempt', cls: 'amber' },
+      { label: 'AVOID: entering trades', cls: 'red' }
+    ]
+  },
+  {
+    title: 'Morning Session (9:45 AM – 12:00 PM)',
+    color: '#8fd460',
+    text: 'Best window for 0DTE directional plays. Momentum is established, volume is high, bid/ask spreads tighten. If SPY breaks above the opening range, that\'s a bullish signal. Below = bearish. Enter here for maximum time value before theta accelerates.',
+    tags: [
+      { label: 'BEST: directional entries', cls: 'green' },
+      { label: 'SIGNAL: opening range breakout', cls: 'green' },
+      { label: 'THETA: still manageable', cls: 'amber' }
+    ]
+  },
+  {
+    title: 'Midday Chop (12:00 PM – 2:00 PM)',
+    color: '#888899',
+    text: 'Volume drops off. SPY often chops sideways. New trades here face significant theta decay without movement. If you\'re already in a position, manage it carefully. If flat, wait for the afternoon session to set up. Many experienced traders take no new 0DTE positions during this window.',
+    tags: [
+      { label: 'AVOID: new entries', cls: 'red' },
+      { label: 'MANAGE: existing positions', cls: 'amber' },
+      { label: 'THETA: accelerating', cls: 'red' }
+    ]
+  },
+  {
+    title: 'Afternoon Session (2:00 – 3:30 PM)',
+    color: '#e07050',
+    text: 'FOMC days: 2pm statement moves market hard — be positioned before or stay out. Non-FOMC: look for a continuation or reversal of the morning trend. Volume picks back up. Gamma is climbing fast — a $1 SPY move now has much larger option impact than the same move at 10am.',
+    tags: [
+      { label: 'FOMC: big move at 2pm', cls: 'red' },
+      { label: 'GAMMA: rising fast', cls: 'red' },
+      { label: 'EXITS: tighten stops', cls: 'amber' }
+    ]
+  },
+  {
+    title: 'Power Hour (3:30 – 3:50 PM)',
+    color: '#f05050',
+    text: 'Gamma is at peak levels. A $0.50 SPY move can 5x or zero your option. Major institutions rebalance portfolios — this creates sharp, sudden moves. This is not the time to enter new positions. Exit or tightly manage anything you\'re holding.',
+    tags: [
+      { label: 'GAMMA: extreme', cls: 'red' },
+      { label: 'EXIT: most positions now', cls: 'red' },
+      { label: 'NO: new entries', cls: 'red' }
+    ]
+  },
+  {
+    title: 'Expiry (3:50 – 4:00 PM)',
+    color: '#f0c040',
+    text: 'All 0DTE options expire worthless or are exercised at 4pm. Pin risk: if SPY closes at your strike, assignment is unpredictable. OTM options within $0.05 of being ITM can flip at the last second. Close ALL 0DTE positions by 3:45–3:50pm. There is no reason to hold to expiry.',
+    tags: [
+      { label: 'PIN RISK: real', cls: 'red' },
+      { label: 'CLOSE ALL by 3:50pm', cls: 'red' },
+      { label: 'OPTIONS expire at 4pm', cls: 'amber' }
+    ]
+  }
+];
+
+let activePhase = null;
+function selectPhase(i) {
+  const segs = document.querySelectorAll('.t-seg');
+  segs.forEach(s => s.classList.remove('active'));
+  segs[i].classList.add('active');
+
+  const detail = document.getElementById('phase-detail');
+  const p = phases[i];
+  detail.innerHTML = `
+    <h3 style="color:${p.color}">${p.title}</h3>
+    <p>${p.text}</p>
+    <div class="phase-tags">${p.tags.map(t => `<span class="tag ${t.cls}">${t.label}</span>`).join('')}</div>
+  `;
+  detail.classList.add('visible');
+}
+
+// Auto-highlight based on time
+function autoHighlight() {
+  const now = new Date();
+  const ny = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
+  const mins = ny.getHours() * 60 + ny.getMinutes();
+  let idx = 0;
+  if (mins < 9*60+30)      idx = 0;
+  else if (mins < 9*60+45) idx = 1;
+  else if (mins < 12*60)   idx = 2;
+  else if (mins < 14*60)   idx = 3;
+  else if (mins < 15*60+30)idx = 4;
+  else if (mins < 15*60+50)idx = 5;
+  else                     idx = 6;
+  if (activePhase !== idx) { selectPhase(idx); activePhase = idx; }
+}
+autoHighlight();
+setInterval(autoHighlight, 30000);
+
+// Strategy toggle
+function toggleStrat(el) {
+  const wasOpen = el.classList.contains('open');
+  document.querySelectorAll('.strat-card').forEach(c => c.classList.remove('open'));
+  if (!wasOpen) el.classList.add('open');
+}
+
+// Checklist
+function toggleCheck(el) {
+  el.classList.toggle('checked');
+}
+</script>
+</body>
+</html>
