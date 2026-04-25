@@ -51,7 +51,7 @@ def render_gap_table(
 
     # ── Build display DataFrame ───────────────────────────────────────────────
     has_vol = "Volume" in gaps_df.columns
-    base_cols = ["Open", "Close", "High", "Low", "Gap", "Gap %", "Gap Filled", "Gap Confirmed"]
+    base_cols = ["Open", "High", "Low", "Close", "Gap", "Gap %", "Gap Filled", "Gap Confirmed"]
     if has_vol:
         base_cols.insert(2, "Volume")
     if show_rsi and "RSI" in gaps_df.columns:
@@ -62,10 +62,10 @@ def render_gap_table(
     gaps_data = gaps_df.tail(rows)[base_cols].reset_index()
 
     # Rename columns to display-friendly names
-    col_names = ["Date", "Open", "Close"]
+    col_names = ["Date", "Open", "High"]
     if has_vol:
         col_names.append("Volume")
-    col_names += ["High", "Low", "Gap $", "Gap %", "Filled", "Gap Confirmed"]
+    col_names += ["Low", "Close", "Gap $", "Gap %", "Filled", "Gap Confirmed"]
     if show_rsi and "RSI" in gaps_df.columns:
         col_names.append("RSI")
     if show_next_day and "Next Day" in gaps_df.columns:
@@ -91,7 +91,7 @@ def render_gap_table(
         )
 
     # ── Select display columns ────────────────────────────────────────────────
-    display_cols = ["Date", "Open", "Close", "High", "Low"]
+    display_cols = ["Date", "Open", "High", "Low", "Close"]
     if has_vol:
         display_cols.append("Volume")
     display_cols += ["Gap $", "Gap %", "Status"]
