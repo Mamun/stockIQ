@@ -1,7 +1,11 @@
-import plotly.graph_objects as go
 import streamlit as st
 
 from stockiq.backend.services.scanners import get_squeeze_scan
+from stockiq.frontend.theme import DN, UP
+from stockiq.frontend.views.components.scanner_charts import (
+    days_to_cover_bar,
+    squeeze_scatter,
+)
 
 
 def render_squeeze_scanner_tab() -> None:
@@ -39,7 +43,7 @@ def render_squeeze_scanner_tab() -> None:
         "Max results",
         min_value=10, max_value=50, value=_url_top, step=5,
     )
-    scan_btn = c4.button("🔍 Scan", width='stretch', type="primary")
+    scan_btn = c4.button("🔍 Scan", width="stretch", type="primary")
 
     st.markdown("---")
 
@@ -47,7 +51,6 @@ def render_squeeze_scanner_tab() -> None:
         _render_legend()
         return
 
-    # Sync current filter state into URL so the page is shareable
     st.query_params["rsi"]   = str(rsi_min)
     st.query_params["short"] = str(min_short_float)
     st.query_params["top"]   = str(top_n)
@@ -96,52 +99,50 @@ def render_squeeze_scanner_tab() -> None:
 
     # ── Results table ─────────────────────────────────────────────────────────
     st.markdown("#### Candidates — sorted by Squeeze Score ↓")
-    st.dataframe(_style_table(df), width='stretch', hide_index=True, height=(len(df) + 1) * 35 + 4)
+    st.dataframe(_style_table(df), width="stretch", hide_index=True, height=(len(df) + 1) * 35 + 4)
 
-    # ── Scatter: Short Float vs RSI (bubble = Squeeze Score) ─────────────────
+    # ── Charts ────────────────────────────────────────────────────────────────
     st.markdown("#### Short Float % vs RSI — bubble size = Squeeze Score")
-    st.plotly_chart(_scatter_chart(df), width='stretch')
+    st.plotly_chart(squeeze_scatter(df), width="stretch")
 
-    # ── Days-to-cover bar chart ────────────────────────────────────────────────
     st.markdown("#### Days to Cover")
     st.caption("Higher = shorts need more trading days to exit → more fuel if squeeze ignites")
-    st.plotly_chart(_days_to_cover_chart(df), width='stretch')
+    st.plotly_chart(days_to_cover_bar(df), width="stretch")
 
 
 # ── Private helpers ────────────────────────────────────────────────────────────
 
 def _style_table(df):
     def _row(row):
-        n = len(row)
-        styles = [""] * n
-        cols = list(df.columns)
+        styles = [""] * len(row)
+        cols   = list(df.columns)
 
-        rsi = row["RSI"]
         rsi_i = cols.index("RSI")
+        rsi   = row["RSI"]
         if rsi >= 80:
-            styles[rsi_i] = "color:#EF4444;font-weight:700"
+            styles[rsi_i] = f"color:{DN};font-weight:700"
         elif rsi >= 70:
             styles[rsi_i] = "color:#F97316;font-weight:700"
         else:
             styles[rsi_i] = "color:#FACC15;font-weight:600"
 
-        spf = row["Short % Float"]
         spf_i = cols.index("Short % Float")
+        spf   = row["Short % Float"]
         if spf >= 15:
-            styles[spf_i] = "color:#EF4444;font-weight:700"
+            styles[spf_i] = f"color:{DN};font-weight:700"
         elif spf >= 8:
             styles[spf_i] = "color:#F97316;font-weight:600"
 
-        chg = row["Short Chg % MoM"]
         chg_i = cols.index("Short Chg % MoM")
+        chg   = row["Short Chg % MoM"]
         if chg > 0:
-            styles[chg_i] = "color:#EF4444"   # shorts growing = more pressure
+            styles[chg_i] = f"color:{DN}"
         elif chg < 0:
-            styles[chg_i] = "color:#22C55E"   # shorts covering = pressure easing
+            styles[chg_i] = f"color:{UP}"
 
         sc_i = cols.index("Squeeze Score")
         if row["Squeeze Score"] >= 50:
-            styles[sc_i] = "color:#EF4444;font-weight:700"
+            styles[sc_i] = f"color:{DN};font-weight:700"
         elif row["Squeeze Score"] >= 30:
             styles[sc_i] = "color:#F97316;font-weight:600"
 
@@ -155,77 +156,6 @@ def _style_table(df):
         "Short Chg % MoM": "{:+.1f}%",
         "Squeeze Score":   "{:.1f}",
     })
-
-
-def _scatter_chart(df) -> go.Figure:
-    """Short Float % (x) vs RSI (y), bubble size = Squeeze Score."""
-    bubble_size = (df["Squeeze Score"] / df["Squeeze Score"].max() * 40 + 10).tolist()
-    colors      = [
-        "#EF4444" if r >= 80 else "#F97316" if r >= 70 else "#FACC15"
-        for r in df["RSI"]
-    ]
-    fig = go.Figure(go.Scatter(
-        x=df["Short % Float"],
-        y=df["RSI"],
-        mode="markers+text",
-        text=df["Ticker"],
-        textposition="top center",
-        textfont=dict(size=9),
-        marker=dict(size=bubble_size, color=colors, opacity=0.85,
-                    line=dict(color="#FFFFFF", width=0.5)),
-        hovertemplate=(
-            "<b>%{text}</b><br>"
-            "Short Float: %{x:.1f}%<br>"
-            "RSI: %{y:.1f}<br>"
-            "<extra></extra>"
-        ),
-    ))
-    # Overbought / oversold reference lines
-    fig.add_hline(y=80, line_dash="dot", line_color="#EF4444",
-                  annotation_text="Extreme OB 80", annotation_font_size=9)
-    fig.add_hline(y=70, line_dash="dot", line_color="#F97316",
-                  annotation_text="Overbought 70", annotation_font_size=9)
-    # Quadrant labels
-    fig.add_annotation(x=df["Short % Float"].max() * 0.8, y=85,
-                       text="⚡ High-risk zone", showarrow=False,
-                       font=dict(color="#EF4444", size=11))
-    fig.update_layout(
-        template="plotly_dark",
-        height=380,
-        margin=dict(l=40, r=120, t=20, b=40),
-        xaxis=dict(title="Short % of Float"),
-        yaxis=dict(title="RSI (14)", range=[55, 100]),
-    )
-    return fig
-
-
-def _days_to_cover_chart(df) -> go.Figure:
-    sorted_df = df.sort_values("Days to Cover", ascending=False)
-    colors = [
-        "#EF4444" if d >= 10 else "#F97316" if d >= 5 else "#64748B"
-        for d in sorted_df["Days to Cover"]
-    ]
-    fig = go.Figure(go.Bar(
-        x=sorted_df["Ticker"],
-        y=sorted_df["Days to Cover"],
-        marker_color=colors,
-        text=sorted_df["Days to Cover"].apply(lambda v: f"{v:.1f}d"),
-        textposition="outside",
-        hovertemplate="<b>%{x}</b><br>Days to Cover: %{y:.1f}<extra></extra>",
-    ))
-    fig.add_hline(y=10, line_dash="dot", line_color="#EF4444",
-                  annotation_text="≥10 days (high pressure)", annotation_font_size=9)
-    fig.add_hline(y=5, line_dash="dot", line_color="#F97316",
-                  annotation_text="≥5 days", annotation_font_size=9)
-    fig.update_layout(
-        template="plotly_dark",
-        height=300,
-        margin=dict(l=20, r=120, t=10, b=40),
-        yaxis=dict(title="Days to Cover"),
-        xaxis=dict(title=""),
-        showlegend=False,
-    )
-    return fig
 
 
 def _render_legend() -> None:

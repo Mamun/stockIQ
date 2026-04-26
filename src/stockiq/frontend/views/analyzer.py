@@ -1,3 +1,5 @@
+"""Stock Analyzer page — thin orchestrator that composes panels."""
+
 import pandas as pd
 import streamlit as st
 
@@ -12,204 +14,22 @@ from stockiq.backend.services.analyzer_service import (
     get_ticker_fundamentals,
     search_stocks,
 )
+from stockiq.frontend.theme import BG, DN, MUT, NEU, SEP, UP, VAL
 from stockiq.frontend.views.components.charts import build_chart
 from stockiq.frontend.views.components.gap_table import render_gap_table
+from stockiq.frontend.views.panels.analyzer_fundamentals import render_fundamentals_panel
+from stockiq.frontend.views.panels.analyzer_signals import (
+    render_buying_pressure,
+    render_signal_analysis,
+)
 
-_PERIODS = {
-    "1M":  30,
-    "3M":  90,
-    "6M":  180,
-    "1Y":  365,
-    "2Y":  730,
-    "5Y":  1825,
-}
+_PERIODS = {"1M": 30, "3M": 90, "6M": 180, "1Y": 365, "2Y": 730, "5Y": 1825}
 _DEFAULT_PERIOD = "1Y"
-
-_UP  = "#22C55E"
-_DN  = "#EF4444"
-_NEU = "#F59E0B"
-_MUT = "#64748B"
-_VAL = "#F1F5F9"
-_BG  = "#0F172A"
-_SEP = "#1E293B"
-
-
-def _stat_card(label: str, value: str, sub: str = "", sub_color: str | None = None) -> str:
-    sub_html = (
-        f'<div style="font-size:11px;color:{sub_color or _MUT};margin-top:3px">{sub}</div>'
-        if sub else ""
-    )
-    return (
-        f'<div style="background:{_BG};border:1px solid {_SEP};border-radius:8px;'
-        f'padding:14px 16px">'
-        f'<div style="font-size:11px;color:{_MUT};text-transform:uppercase;'
-        f'letter-spacing:.05em;margin-bottom:4px">{label}</div>'
-        f'<div style="font-size:19px;font-weight:700;color:{_VAL}">{value}</div>'
-        f'{sub_html}'
-        f'</div>'
-    )
-
-
-def _reason_icon(text: str) -> str:
-    """Prefix a signal reason with a coloured bullet based on its sentiment."""
-    lc = text.lower()
-    if any(w in lc for w in ("above", "golden cross", "positive", "uptrend", "oversold")):
-        return f"🟢 {text}"
-    if any(w in lc for w in ("below", "death cross", "negative", "downtrend", "overbought")):
-        return f"🔴 {text}"
-    return f"⚪ {text}"
-
-
-def _render_bx_panel(bx: dict, label: str) -> None:
-    strength = bx["strength"]
-    if bx["signal"] and strength == 3:
-        badge_bg, badge_txt = "#16A34A", "BX TRIGGERED ✓✓✓"
-    elif bx["signal"]:
-        badge_bg, badge_txt = "#22C55E", "BX TRIGGERED ✓✓"
-    else:
-        badge_bg, badge_txt = "#475569", "WAITING FOR BX"
-
-    bar_label = bx.get("bar_label", "")
-    st.markdown(
-        f'<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'
-        f'<span style="font-weight:600">{label}</span>'
-        f'<span style="background:{badge_bg};color:#fff;padding:2px 10px;'
-        f'border-radius:4px;font-size:0.78rem">{badge_txt}</span>'
-        f'<span style="color:{_MUT};font-size:0.72rem">{bar_label}</span>'
-        f'</div>',
-        unsafe_allow_html=True,
-    )
-    for cond in bx["conditions_met"]:
-        st.markdown(f"&nbsp;&nbsp;✅ {cond}")
-    for cond in bx["conditions_missing"]:
-        st.markdown(f"&nbsp;&nbsp;❌ {cond}")
-
-
-def _fmt_mcap(v: float | None) -> tuple[str, str]:
-    """Return (formatted value, size label) for a market cap number."""
-    if v is None:
-        return "—", ""
-    if v >= 1e12:
-        return f"${v/1e12:.2f}T", "Mega Cap"
-    if v >= 2e11:
-        return f"${v/1e9:.0f}B", "Large Cap"
-    if v >= 1e10:
-        return f"${v/1e9:.1f}B", "Mid Cap"
-    return f"${v/1e9:.1f}B", "Small Cap"
-
-
-def _consensus_label(rating: float | None) -> tuple[str, str]:
-    """Return (label, color) for a yfinance recommendationMean value."""
-    if rating is None:
-        return "—", _MUT
-    if rating <= 1.5:
-        return "Strong Buy", _UP
-    if rating <= 2.0:
-        return "Buy", _UP
-    if rating <= 2.5:
-        return "Mod. Buy", "#86EFAC"
-    if rating <= 3.5:
-        return "Hold", _NEU
-    if rating <= 4.0:
-        return "Mod. Sell", _DN
-    return "Sell", _DN
-
-
-def _render_fundamentals_panel(fund: dict, price: float) -> None:
-    """Render the Fundamentals & Analyst two-row panel."""
-    if not fund:
-        return
-
-    # ── Row 1: Valuation ─────────────────────────────────────────────────────
-    st.markdown(
-        '<div style="font-size:0.78rem;color:#64748B;text-transform:uppercase;'
-        'letter-spacing:.08em;margin-bottom:8px">Fundamentals</div>',
-        unsafe_allow_html=True,
-    )
-
-    v1, v2, v3, v4, v5 = st.columns(5)
-
-    mcap_val, mcap_lbl = _fmt_mcap(fund.get("market_cap"))
-    v1.markdown(_stat_card("Market Cap", mcap_val, mcap_lbl), unsafe_allow_html=True)
-
-    fpe = fund.get("forward_pe")
-    med = fund.get("sector_median_pe")
-    if fpe:
-        sub = f"Sector avg {med}" if med else ""
-        pe_clr = _UP if (med and fpe < med) else _DN if (med and fpe > med * 1.15) else None
-        v2.markdown(_stat_card("Forward P/E", f"{fpe:.1f}", sub, pe_clr), unsafe_allow_html=True)
-    else:
-        v2.markdown(_stat_card("Forward P/E", "—", ""), unsafe_allow_html=True)
-
-    tpe = fund.get("trailing_pe")
-    v3.markdown(
-        _stat_card("Trailing P/E", f"{tpe:.1f}" if tpe and tpe > 0 else "—"),
-        unsafe_allow_html=True,
-    )
-
-    eg = fund.get("eps_growth")
-    if eg is not None:
-        eg_pct = eg * 100
-        eg_clr = _UP if eg_pct >= 10 else _DN if eg_pct < 0 else _NEU
-        v4.markdown(_stat_card("EPS Growth", f"{eg_pct:+.1f}%", "YoY est.", eg_clr), unsafe_allow_html=True)
-    else:
-        v4.markdown(_stat_card("EPS Growth", "—", "YoY est."), unsafe_allow_html=True)
-
-    peg = fund.get("peg")
-    if peg and peg > 0:
-        peg_clr = _UP if peg < 1 else _NEU if peg < 2 else _DN
-        peg_sub = "Undervalued" if peg < 1 else "Fair" if peg < 2 else "Expensive"
-        v5.markdown(_stat_card("PEG Ratio", f"{peg:.2f}", peg_sub, peg_clr), unsafe_allow_html=True)
-    else:
-        v5.markdown(_stat_card("PEG Ratio", "—"), unsafe_allow_html=True)
-
-    st.markdown("<div style='margin-top:10px'></div>", unsafe_allow_html=True)
-
-    # ── Row 2: Analyst ───────────────────────────────────────────────────────
-    st.markdown(
-        '<div style="font-size:0.78rem;color:#64748B;text-transform:uppercase;'
-        'letter-spacing:.08em;margin-bottom:8px">Analyst Consensus</div>',
-        unsafe_allow_html=True,
-    )
-
-    a1, a2, a3, a4, a5 = st.columns(5)
-
-    cons_lbl, cons_clr = _consensus_label(fund.get("rating"))
-    rating = fund.get("rating")
-    rating_sub = f"{rating:.1f} / 5.0" if rating else ""
-    a1.markdown(_stat_card("Consensus", cons_lbl, rating_sub, cons_clr), unsafe_allow_html=True)
-
-    n_analysts = fund.get("num_analysts")
-    a2.markdown(
-        _stat_card("# Analysts", str(n_analysts) if n_analysts else "—", "covering"),
-        unsafe_allow_html=True,
-    )
-
-    target = fund.get("target_mean")
-    if target and price:
-        a3.markdown(_stat_card("Price Target", f"${target:,.2f}", "mean"), unsafe_allow_html=True)
-        upside = (target - price) / price * 100
-        up_clr = _UP if upside >= 10 else _DN if upside < 0 else _NEU
-        a4.markdown(_stat_card("Upside", f"{upside:+.1f}%", "to mean target", up_clr), unsafe_allow_html=True)
-    else:
-        a3.markdown(_stat_card("Price Target", "—", "mean"), unsafe_allow_html=True)
-        a4.markdown(_stat_card("Upside", "—"), unsafe_allow_html=True)
-
-    lo = fund.get("target_low")
-    hi = fund.get("target_high")
-    if lo and hi:
-        a5.markdown(
-            _stat_card("Target Range", f"${lo:,.0f} – ${hi:,.0f}", "low / high"),
-            unsafe_allow_html=True,
-        )
-    else:
-        a5.markdown(_stat_card("Target Range", "—"), unsafe_allow_html=True)
 
 
 def render_analyzer_tab() -> None:
     st.title("🔬 Stock Analyzer")
 
-    # ── URL params ────────────────────────────────────────────────────────────
     params     = st.query_params
     url_ticker = params.get("tic", "").upper().strip()
     url_period = params.get("period", _DEFAULT_PERIOD)
@@ -238,8 +58,7 @@ def render_analyzer_tab() -> None:
             for r in st.session_state.search_results
         ]
         choice_idx = st.selectbox(
-            "Select a company", range(len(labels)),
-            format_func=lambda i: labels[i],
+            "Select a company", range(len(labels)), format_func=lambda i: labels[i]
         )
         st.session_state.ticker_val = st.session_state.search_results[choice_idx]["symbol"]
     elif search_query and not st.session_state.search_results:
@@ -253,7 +72,6 @@ def render_analyzer_tab() -> None:
         "Ticker Symbol", value=st.session_state.ticker_val, max_chars=10,
     ).upper().strip()
     analyze_btn = col_btn2.button("Analyze", width="stretch", type="primary")
-
     auto_analyze = bool(url_ticker) and url_ticker != st.session_state.get("analyzer_ticker")
 
     if not (analyze_btn or auto_analyze or ticker):
@@ -274,8 +92,7 @@ def render_analyzer_tab() -> None:
         if raw.empty:
             st.error(
                 f"No data found for **{ticker}**. "
-                "Use the Search box above to find the correct symbol, "
-                "or check that it's a valid ticker (e.g. AAPL, MSFT, GOOGL)."
+                "Use the Search box above to find the correct symbol."
             )
             return
         if len(raw) < 2:
@@ -294,56 +111,44 @@ def render_analyzer_tab() -> None:
     latest, prev = sig["latest"], sig["prev"]
     score, signal_label, signal_color = sig["score"], sig["label"], sig["color"]
 
-    # ── Pre-compute values used across sections ───────────────────────────────
     price      = float(latest["Close"])
     prev_close = float(prev["Close"])
     chg        = price - prev_close
     chg_pct    = chg / prev_close * 100
-    chg_clr    = _UP if chg >= 0 else _DN
+    chg_clr    = UP if chg >= 0 else DN
     arrow      = "▲" if chg >= 0 else "▼"
 
     last_252 = df.tail(252)
     w52_high = float(last_252["High"].max())
     w52_low  = float(last_252["Low"].min())
 
-    rsi_val  = float(latest.get("RSI",   0) or 0)
-    ma5      = float(latest.get("MA5",   0) or 0)
-    ma20     = float(latest.get("MA20",  0) or 0)
-    ma50     = float(latest.get("MA50",  0) or 0)
-    ma100    = float(latest.get("MA100", 0) or 0)
-    ma200    = float(latest.get("MA200", 0) or 0)
-    ma200w   = float(latest.get("MA200W",0) or 0)
-    vol_now  = float(latest.get("Volume",0) or 0)
-    vol_avg  = (
+    rsi_val = float(latest.get("RSI",   0) or 0)
+    ma200   = float(latest.get("MA200", 0) or 0)
+    vol_now = float(latest.get("Volume", 0) or 0)
+    vol_avg = (
         float(df["Volume"].rolling(20).mean().iloc[-1])
         if "Volume" in df.columns else 0.0
     )
 
-    # ═════════════════════════════════════════════════════════════════════════
-    # SECTION 1 — Header: company name · price · signal badge
-    # ═════════════════════════════════════════════════════════════════════════
+    # ── Section 1: Header ────────────────────────────────────────────────────
     h_name, h_price, h_signal = st.columns([3, 3, 1])
-
     with h_name:
         st.markdown(
             f'<div style="padding-top:6px">'
-            f'<div style="font-size:1.4rem;font-weight:700;color:{_VAL}">{company_name}</div>'
-            f'<div style="font-size:0.9rem;color:{_MUT};margin-top:2px">{ticker}</div>'
+            f'<div style="font-size:1.4rem;font-weight:700;color:{VAL}">{company_name}</div>'
+            f'<div style="font-size:0.9rem;color:{MUT};margin-top:2px">{ticker}</div>'
             f'</div>',
             unsafe_allow_html=True,
         )
-
     with h_price:
         st.markdown(
             f'<div style="padding-top:4px">'
-            f'<div style="font-size:2rem;font-weight:800;color:{_VAL}">${price:,.2f}</div>'
+            f'<div style="font-size:2rem;font-weight:800;color:{VAL}">${price:,.2f}</div>'
             f'<div style="font-size:0.95rem;color:{chg_clr};margin-top:2px">'
             f'{arrow} {abs(chg):.2f} &nbsp;({chg_pct:+.2f}%)'
-            f'</div>'
-            f'</div>',
+            f'</div></div>',
             unsafe_allow_html=True,
         )
-
     with h_signal:
         st.markdown(
             f'<div style="background:{signal_color};border-radius:8px;padding:12px 8px;'
@@ -355,73 +160,56 @@ def render_analyzer_tab() -> None:
             f'</div>',
             unsafe_allow_html=True,
         )
-
     st.markdown("<div style='margin-top:12px'></div>", unsafe_allow_html=True)
 
-    # ═════════════════════════════════════════════════════════════════════════
-    # SECTION 2 — Quick stats: 52W range · RSI · vs MA200 · volume
-    # ═════════════════════════════════════════════════════════════════════════
+    # ── Section 2: Quick stats ────────────────────────────────────────────────
     qs1, qs2, qs3, qs4 = st.columns(4)
+    _stat = _stat_card   # local alias for brevity
 
     with qs1:
         if w52_high > w52_low:
-            pos_pct  = (price - w52_low) / (w52_high - w52_low) * 100
-            range_clr = _UP if pos_pct >= 50 else _DN
-            st.markdown(
-                _stat_card("52W Range", f"{pos_pct:.1f}% of range",
-                           f"${w52_low:,.2f} — ${w52_high:,.2f}", range_clr),
+            pos_pct   = (price - w52_low) / (w52_high - w52_low) * 100
+            range_clr = UP if pos_pct >= 50 else DN
+            qs1.markdown(
+                _stat("52W Range", f"{pos_pct:.1f}% of range",
+                      f"${w52_low:,.2f} — ${w52_high:,.2f}", range_clr),
                 unsafe_allow_html=True,
             )
-
     with qs2:
         if rsi_val:
-            rsi_clr = _DN if rsi_val >= 70 else _UP if rsi_val <= 30 else _NEU
+            rsi_clr = DN if rsi_val >= 70 else UP if rsi_val <= 30 else NEU
             rsi_lbl = "Overbought" if rsi_val >= 70 else "Oversold" if rsi_val <= 30 else "Neutral"
-            st.markdown(
-                _stat_card("RSI (14)", f"{rsi_val:.1f}", rsi_lbl, rsi_clr),
-                unsafe_allow_html=True,
-            )
-
+            qs2.markdown(_stat("RSI (14)", f"{rsi_val:.1f}", rsi_lbl, rsi_clr), unsafe_allow_html=True)
     with qs3:
         if ma200:
-            diff200    = (price - ma200) / ma200 * 100
-            ma200_clr  = _UP if diff200 >= 0 else _DN
-            st.markdown(
-                _stat_card("vs MA 200", f"{diff200:+.1f}%",
-                           f"MA200 at ${ma200:,.2f}", ma200_clr),
+            diff200   = (price - ma200) / ma200 * 100
+            ma200_clr = UP if diff200 >= 0 else DN
+            qs3.markdown(
+                _stat("vs MA 200", f"{diff200:+.1f}%", f"MA200 at ${ma200:,.2f}", ma200_clr),
                 unsafe_allow_html=True,
             )
-
     with qs4:
         if vol_now and vol_avg:
-            vol_vs   = (vol_now / vol_avg - 1) * 100
-            vol_clr  = _UP if vol_vs >= 20 else _DN if vol_vs <= -20 else _MUT
-            st.markdown(
-                _stat_card("Volume", f"{vol_now/1e6:.1f}M",
-                           f"{vol_vs:+.0f}% vs 20D avg", vol_clr),
+            vol_vs  = (vol_now / vol_avg - 1) * 100
+            vol_clr = UP if vol_vs >= 20 else DN if vol_vs <= -20 else MUT
+            qs4.markdown(
+                _stat("Volume", f"{vol_now/1e6:.1f}M", f"{vol_vs:+.0f}% vs 20D avg", vol_clr),
                 unsafe_allow_html=True,
             )
 
     st.markdown("---")
 
-    # ═════════════════════════════════════════════════════════════════════════
-    # SECTION 3 — Fundamentals & Analyst Panel
-    # ═════════════════════════════════════════════════════════════════════════
-    _render_fundamentals_panel(st.session_state.analyzer_fundamentals, price)
-
+    # ── Section 3: Fundamentals ───────────────────────────────────────────────
+    render_fundamentals_panel(st.session_state.analyzer_fundamentals, price)
     st.markdown("---")
 
-    # ═════════════════════════════════════════════════════════════════════════
-    # SECTION 4 — Chart
-    # ═════════════════════════════════════════════════════════════════════════
+    # ── Section 4: Chart ──────────────────────────────────────────────────────
     valid_period = url_period if url_period in _PERIODS else _DEFAULT_PERIOD
-
     period_col, rsi_col = st.columns([6, 1])
     with period_col:
         selected_period = st.radio(
             "period_selector", list(_PERIODS), horizontal=True,
-            index=list(_PERIODS).index(valid_period),
-            label_visibility="collapsed",
+            index=list(_PERIODS).index(valid_period), label_visibility="collapsed",
         )
     show_rsi = rsi_col.checkbox("RSI", value=url_rsi)
 
@@ -431,7 +219,6 @@ def render_analyzer_tab() -> None:
 
     cutoff     = pd.Timestamp.today() - pd.Timedelta(days=_PERIODS[selected_period])
     display_df = df[df.index >= cutoff].copy()
-
     if len(display_df) < 2:
         st.warning(f"Not enough data for the **{selected_period}** window. Try a longer period.")
         return
@@ -443,63 +230,33 @@ def render_analyzer_tab() -> None:
                       show_patterns=True, show_rsi=show_rsi,
                       golden_dates=golden, death_dates=death)
     st.plotly_chart(fig, width="stretch")
-
     st.markdown("---")
 
-    # ═════════════════════════════════════════════════════════════════════════
-    # SECTION 5 — Signal analysis (left) + BX signal (right)
-    # ═════════════════════════════════════════════════════════════════════════
+    # ── Section 5: Signals + BX ───────────────────────────────────────────────
     sig_col, bx_col = st.columns([3, 2])
-
     with sig_col:
-        st.markdown("**Signal Analysis**")
-        score_bar_pct = min(100, max(0, (score + 8) / 16 * 100))
-        score_clr     = signal_color
-        st.markdown(
-            f'<div style="background:{_SEP};border-radius:6px;height:6px;margin-bottom:10px">'
-            f'<div style="width:{score_bar_pct:.0f}%;height:100%;background:{score_clr};'
-            f'border-radius:6px"></div></div>',
-            unsafe_allow_html=True,
-        )
-        for reason in sig["reasons"]:
-            st.markdown(_reason_icon(reason))
-
+        render_signal_analysis(sig)
     with bx_col:
-        st.markdown("**Buying Pressure (BX)**")
-        st.caption("2/3 conditions = signal · 3/3 = strong · based on completed bars only")
-
-        bx_monthly = get_buying_pressure(df, "monthly")
-        bx_weekly  = get_buying_pressure(df, "weekly")
-
-        _render_bx_panel(bx_monthly, "Monthly")
-        st.markdown("<div style='margin-top:10px'></div>", unsafe_allow_html=True)
-        _render_bx_panel(bx_weekly, "Weekly")
+        render_buying_pressure(df)
 
     st.markdown("---")
 
-    # ═════════════════════════════════════════════════════════════════════════
-    # SECTION 5 — Key price levels (collapsible)
-    # ═════════════════════════════════════════════════════════════════════════
+    # ── Section 6: Key price levels ───────────────────────────────────────────
     with st.expander("Key Price Levels", expanded=False):
         ma_col, fib_col = st.columns(2)
 
         with ma_col:
             st.markdown("**Moving Averages**")
-            for name, val in [
-                ("MA 5",    ma5),
-                ("MA 20",   ma20),
-                ("MA 50",   ma50),
-                ("MA 100",  ma100),
-                ("MA 200",  ma200),
-                ("MA 200W", ma200w),
-            ]:
+            for name, key in [("MA 5", "MA5"), ("MA 20", "MA20"), ("MA 50", "MA50"),
+                               ("MA 100", "MA100"), ("MA 200", "MA200"), ("MA 200W", "MA200W")]:
+                val = float(latest.get(key, 0) or 0)
                 if val:
                     diff = (price - val) / val * 100
-                    clr  = _UP if diff >= 0 else _DN
+                    clr  = UP if diff >= 0 else DN
                     st.markdown(
                         f'<div style="display:flex;justify-content:space-between;'
-                        f'padding:4px 0;border-bottom:1px solid {_SEP}">'
-                        f'<span style="color:{_MUT}">{name}</span>'
+                        f'padding:4px 0;border-bottom:1px solid {SEP}">'
+                        f'<span style="color:{MUT}">{name}</span>'
                         f'<span>${val:,.2f} &nbsp;'
                         f'<span style="color:{clr};font-size:0.85rem">{diff:+.1f}%</span>'
                         f'</span></div>',
@@ -509,50 +266,59 @@ def render_analyzer_tab() -> None:
         with fib_col:
             st.markdown("**Fibonacci Levels**")
             for name, val in sorted(fib.items(), key=lambda x: x[1], reverse=True):
-                above = price >= val
-                clr   = _MUT
-                marker = "▲ above" if above else "▼ below"
-                marker_clr = _UP if above else _DN
+                above      = price >= val
+                marker_clr = UP if above else DN
+                marker     = "▲ above" if above else "▼ below"
                 st.markdown(
                     f'<div style="display:flex;justify-content:space-between;'
-                    f'padding:4px 0;border-bottom:1px solid {_SEP}">'
-                    f'<span style="color:{_MUT}">Fib {name}</span>'
+                    f'padding:4px 0;border-bottom:1px solid {SEP}">'
+                    f'<span style="color:{MUT}">Fib {name}</span>'
                     f'<span>${val:,.2f} &nbsp;'
                     f'<span style="color:{marker_clr};font-size:0.85rem">{marker}</span>'
                     f'</span></div>',
                     unsafe_allow_html=True,
                 )
 
-    # ═════════════════════════════════════════════════════════════════════════
-    # SECTION 6 — Gap history
-    # ═════════════════════════════════════════════════════════════════════════
+    # ── Section 7: Gap history ────────────────────────────────────────────────
     st.markdown("#### Gap History")
-
-    last      = display_df.iloc[-1]
-    gaps_df   = get_stock_gaps(
-        display_df,
-        {"day_high": float(last["High"]), "day_low": float(last["Low"])},
+    last    = display_df.iloc[-1]
+    gaps_df = get_stock_gaps(
+        display_df, {"day_high": float(last["High"]), "day_low": float(last["Low"])}
     )
     if "RSI" in display_df.columns:
         gaps_df = gaps_df.copy()
-        rsi_dedup = display_df["RSI"][~display_df.index.duplicated(keep="last")]
-        gaps_df["RSI"] = rsi_dedup.reindex(gaps_df.index)
-
+        rsi_dedup         = display_df["RSI"][~display_df.index.duplicated(keep="last")]
+        gaps_df["RSI"]    = rsi_dedup.reindex(gaps_df.index)
     render_gap_table(gaps_df, show_rsi=True)
 
 
-# ── Session state & page entry point ──────────────────────────────────────────
-if "search_results" not in st.session_state:
-    st.session_state.search_results = []
-if "ticker_val" not in st.session_state:
-    st.session_state.ticker_val = "MSFT"
-if "analyzer_df" not in st.session_state:
-    st.session_state.analyzer_df = None
-if "analyzer_ticker" not in st.session_state:
-    st.session_state.analyzer_ticker = None
-if "analyzer_company" not in st.session_state:
-    st.session_state.analyzer_company = None
-if "analyzer_fundamentals" not in st.session_state:
-    st.session_state.analyzer_fundamentals = {}
+# ── HTML helper (local, identical pattern to analyzer_fundamentals._stat_card) ─
+
+def _stat_card(label: str, value: str, sub: str = "", sub_color: str | None = None) -> str:
+    sub_html = (
+        f'<div style="font-size:11px;color:{sub_color or MUT};margin-top:3px">{sub}</div>'
+        if sub else ""
+    )
+    return (
+        f'<div style="background:{BG};border:1px solid {SEP};border-radius:8px;padding:14px 16px">'
+        f'<div style="font-size:11px;color:{MUT};text-transform:uppercase;'
+        f'letter-spacing:.05em;margin-bottom:4px">{label}</div>'
+        f'<div style="font-size:19px;font-weight:700;color:{VAL}">{value}</div>'
+        f'{sub_html}'
+        f'</div>'
+    )
+
+
+# ── Session state init & entry point ──────────────────────────────────────────
+for _k, _v in [
+    ("search_results", []),
+    ("ticker_val", "MSFT"),
+    ("analyzer_df", None),
+    ("analyzer_ticker", None),
+    ("analyzer_company", None),
+    ("analyzer_fundamentals", {}),
+]:
+    if _k not in st.session_state:
+        st.session_state[_k] = _v
 
 render_analyzer_tab()

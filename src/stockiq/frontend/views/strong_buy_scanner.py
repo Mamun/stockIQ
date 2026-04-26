@@ -1,7 +1,12 @@
-import plotly.graph_objects as go
 import streamlit as st
 
 from stockiq.backend.services.scanners import get_strong_buy_scan
+from stockiq.frontend.theme import DN, UP
+from stockiq.frontend.views.components.scanner_charts import (
+    analyst_buy_scatter,
+    analyst_sector_bar,
+    analyst_upside_bar,
+)
 
 
 def render_strong_buy_tab() -> None:
@@ -126,20 +131,21 @@ def render_strong_buy_tab() -> None:
 
     col1, col2 = st.columns(2)
     with col1:
-        # ── Upside % bar chart ─────────────────────────────────────────────
         st.markdown("#### Price Target Upside %")
         st.caption("Mean analyst price target vs current price")
-        st.plotly_chart(_upside_bar_chart(df), width="stretch")
+        st.plotly_chart(analyst_upside_bar(df), width="stretch")
 
     with col2:
-        # ── Rating vs Upside scatter ───────────────────────────────────────
         st.markdown("#### Rating vs Upside — bubble = analyst count")
-        st.plotly_chart(_scatter_chart(df), width="stretch")
+        st.plotly_chart(analyst_buy_scatter(df), width="stretch")
 
     # ── Sector breakdown ──────────────────────────────────────────────────────
     st.markdown("---")
     st.markdown("#### Sector Distribution")
-    st.plotly_chart(_sector_chart(df), width="stretch")
+    st.plotly_chart(
+        analyst_sector_bar(df, "SB Score", "Upside %", "upside", "#3B82F6", "Avg Strong Buy Score"),
+        width="stretch",
+    )
 
 
 # ── Private helpers ────────────────────────────────────────────────────────────
@@ -149,36 +155,32 @@ def _style_table(df):
         styles = [""] * len(row)
         cols   = list(df.columns)
 
-        # Consensus
         cons_i = cols.index("Consensus")
         if "Strong Buy" in str(row["Consensus"]):
             styles[cons_i] = "color:#FACC15;font-weight:700"
         elif "Buy" in str(row["Consensus"]):
-            styles[cons_i] = "color:#22C55E;font-weight:600"
+            styles[cons_i] = f"color:{UP};font-weight:600"
         else:
             styles[cons_i] = "color:#F59E0B;font-weight:600"
 
-        # Upside %
         up_i = cols.index("Upside %")
         if row["Upside %"] >= 20:
-            styles[up_i] = "color:#22C55E;font-weight:700"
+            styles[up_i] = f"color:{UP};font-weight:700"
         elif row["Upside %"] >= 10:
             styles[up_i] = "color:#86EFAC;font-weight:600"
 
-        # RSI — flag if overbought
         if "RSI" in cols and row["RSI"] is not None:
             rsi_i = cols.index("RSI")
             if row["RSI"] >= 70:
-                styles[rsi_i] = "color:#EF4444;font-weight:700"
+                styles[rsi_i] = f"color:{DN};font-weight:700"
             elif row["RSI"] <= 40:
-                styles[rsi_i] = "color:#22C55E;font-weight:600"
+                styles[rsi_i] = f"color:{UP};font-weight:600"
 
-        # SB Score
         sb_i = cols.index("SB Score")
         if row["SB Score"] >= 75:
             styles[sb_i] = "color:#FACC15;font-weight:700"
         elif row["SB Score"] >= 60:
-            styles[sb_i] = "color:#22C55E;font-weight:600"
+            styles[sb_i] = f"color:{UP};font-weight:600"
 
         return styles
 
@@ -195,111 +197,6 @@ def _style_table(df):
         fmt["RSI"] = "{:.1f}"
 
     return df.style.apply(_row, axis=1).format(fmt, na_rep="—")
-
-
-def _upside_bar_chart(df) -> go.Figure:
-    sorted_df = df.sort_values("Upside %", ascending=False)
-    colors = [
-        "#22C55E" if u >= 20 else "#86EFAC" if u >= 10 else "#64748B"
-        for u in sorted_df["Upside %"]
-    ]
-    fig = go.Figure(go.Bar(
-        x=sorted_df["Ticker"],
-        y=sorted_df["Upside %"],
-        marker_color=colors,
-        text=sorted_df["Upside %"].apply(lambda v: f"+{v:.1f}%"),
-        textposition="outside",
-        hovertemplate=(
-            "<b>%{x}</b><br>"
-            "Current: $%{customdata[0]:.2f}<br>"
-            "Target:  $%{customdata[1]:.2f}<br>"
-            "Upside:  +%{y:.1f}%<extra></extra>"
-        ),
-        customdata=sorted_df[["Price", "Target"]].values,
-    ))
-    fig.add_hline(y=20, line_dash="dot", line_color="#22C55E",
-                  annotation_text="≥20% upside", annotation_font_size=9)
-    fig.add_hline(y=10, line_dash="dot", line_color="#86EFAC",
-                  annotation_text="≥10% upside", annotation_font_size=9)
-    fig.update_layout(
-        template="plotly_dark",
-        height=320,
-        margin=dict(l=20, r=80, t=10, b=40),
-        yaxis=dict(title="Upside %", ticksuffix="%"),
-        xaxis=dict(title=""),
-        showlegend=False,
-    )
-    return fig
-
-
-def _scatter_chart(df) -> go.Figure:
-    bubble_size = (df["Analysts"] / df["Analysts"].max() * 35 + 10).tolist()
-    colors = [
-        "#FACC15" if r <= 1.5 else "#22C55E" if r <= 2.0 else "#F59E0B"
-        for r in df["Rating"]
-    ]
-    fig = go.Figure(go.Scatter(
-        x=df["Rating"],
-        y=df["Upside %"],
-        mode="markers+text",
-        text=df["Ticker"],
-        textposition="top center",
-        textfont=dict(size=9),
-        marker=dict(size=bubble_size, color=colors, opacity=0.85,
-                    line=dict(color="#FFFFFF", width=0.5)),
-        hovertemplate=(
-            "<b>%{text}</b><br>"
-            "Rating: %{x:.2f}<br>"
-            "Upside: +%{y:.1f}%<br>"
-            "<extra></extra>"
-        ),
-    ))
-    fig.add_vline(x=1.5, line_dash="dot", line_color="#FACC15",
-                  annotation_text="Strong Buy", annotation_font_size=9)
-    fig.add_vline(x=2.0, line_dash="dot", line_color="#22C55E",
-                  annotation_text="Buy", annotation_font_size=9)
-    fig.update_layout(
-        template="plotly_dark",
-        height=320,
-        margin=dict(l=40, r=40, t=20, b=40),
-        xaxis=dict(title="Analyst Rating (lower = more bullish)", autorange="reversed"),
-        yaxis=dict(title="Upside %", ticksuffix="%"),
-        showlegend=False,
-    )
-    return fig
-
-
-def _sector_chart(df) -> go.Figure:
-    sector_counts = df.groupby("Sector").agg(
-        Count=("Ticker", "count"),
-        Avg_Upside=("Upside %", "mean"),
-        Avg_Score=("SB Score", "mean"),
-    ).reset_index().sort_values("Avg_Score", ascending=True)
-
-    fig = go.Figure(go.Bar(
-        x=sector_counts["Avg_Score"],
-        y=sector_counts["Sector"],
-        orientation="h",
-        marker_color="#3B82F6",
-        text=sector_counts.apply(
-            lambda r: f"{r['Count']} stocks · avg +{r['Avg_Upside']:.1f}% upside", axis=1
-        ),
-        textposition="inside",
-        hovertemplate=(
-            "<b>%{y}</b><br>"
-            "Avg SB Score: %{x:.1f}<br>"
-            "<extra></extra>"
-        ),
-    ))
-    fig.update_layout(
-        template="plotly_dark",
-        height=max(200, len(sector_counts) * 40),
-        margin=dict(l=20, r=40, t=10, b=40),
-        xaxis=dict(title="Avg Strong Buy Score"),
-        yaxis=dict(title=""),
-        showlegend=False,
-    )
-    return fig
 
 
 def _render_legend() -> None:
@@ -329,4 +226,3 @@ def _render_legend() -> None:
 
 
 render_strong_buy_tab()
-

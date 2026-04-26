@@ -10,14 +10,13 @@ spy_dashboard.py. Provides:
 import pandas as pd
 import streamlit as st
 
-# ── Shared colour palette ──────────────────────────────────────────────────────
-_UP  = "#22C55E"
-_DN  = "#EF4444"
-_NEU = "#F59E0B"
-_MUT = "#64748B"
-_VAL = "#F1F5F9"
-_BG  = "#0F172A"
-_SEP = "#1E293B"
+from stockiq.frontend.theme import BG as _BG
+from stockiq.frontend.theme import DN as _DN
+from stockiq.frontend.theme import MUT as _MUT
+from stockiq.frontend.theme import NEU as _NEU
+from stockiq.frontend.theme import SEP as _SEP
+from stockiq.frontend.theme import UP as _UP
+from stockiq.frontend.theme import VAL as _VAL
 
 
 def _cell(label: str, value: str, sub: str = "", sub_clr: str | None = None) -> str:

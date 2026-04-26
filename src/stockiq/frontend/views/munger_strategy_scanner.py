@@ -1,7 +1,8 @@
-import plotly.graph_objects as go
 import streamlit as st
 
 from stockiq.backend.services.scanners import get_munger_strategy_scan
+from stockiq.frontend.theme import DN, UP
+from stockiq.frontend.views.components.scanner_charts import munger_scatter, quality_bar
 
 
 def render_munger_tab() -> None:
@@ -40,7 +41,7 @@ def render_munger_tab() -> None:
         "Max results",
         min_value=10, max_value=50, value=_url_top, step=5,
     )
-    scan_btn = c4.button("🔍 Scan", width='stretch', type="primary")
+    scan_btn = c4.button("🔍 Scan", width="stretch", type="primary")
 
     st.markdown("---")
 
@@ -48,7 +49,6 @@ def render_munger_tab() -> None:
         _render_legend()
         return
 
-    # Sync current filter state into URL so the page is shareable
     st.query_params["dist"]    = str(threshold)
     st.query_params["quality"] = str(min_quality)
     st.query_params["top"]     = str(top_n)
@@ -73,11 +73,11 @@ def render_munger_tab() -> None:
 
     # ── Summary metrics ───────────────────────────────────────────────────────
     m1, m2, m3, m4, m5 = st.columns(5)
-    m1.metric("Candidates",           len(df))
-    m2.metric("Below MA 200W",        int((df["Distance %"] < 0).sum()))
-    m3.metric("Avg Quality Score",    f"{df['Quality Score'].mean():.1f}")
-    m4.metric("Avg Munger Score",     f"{df['Munger Score'].mean():.1f}")
-    m5.metric("Score ≥ 70",           int((df["Munger Score"] >= 70).sum()))
+    m1.metric("Candidates",        len(df))
+    m2.metric("Below MA 200W",     int((df["Distance %"] < 0).sum()))
+    m3.metric("Avg Quality Score", f"{df['Quality Score'].mean():.1f}")
+    m4.metric("Avg Munger Score",  f"{df['Munger Score'].mean():.1f}")
+    m5.metric("Score ≥ 70",        int((df["Munger Score"] >= 70).sum()))
 
     st.markdown("---")
 
@@ -116,56 +116,49 @@ def render_munger_tab() -> None:
         "Ticker", "Company", "Sector", "Price", "MA 200W",
         "Distance %", "RSI", "Quality Score", "Prox Score", "Munger Score",
     ]
-    st.dataframe(_style_table(df[display_cols]), width='stretch', hide_index=True, height=(len(df) + 1) * 35 + 4)
+    st.dataframe(_style_table(df[display_cols]), width="stretch", hide_index=True, height=(len(df) + 1) * 35 + 4)
 
-    # ── Quality breakdown expander per ticker ─────────────────────────────────
     with st.expander("🔬 Fundamental breakdown per stock", expanded=False):
         bd_df = df[["Ticker", "Company", "Quality Score", "Breakdown"]].copy()
-        st.dataframe(bd_df, width='stretch', hide_index=True, height=(len(bd_df) + 1) * 35 + 4)
+        st.dataframe(bd_df, width="stretch", hide_index=True, height=(len(bd_df) + 1) * 35 + 4)
 
-    # ── Scatter: Distance % vs Quality Score ──────────────────────────────────
+    # ── Charts ────────────────────────────────────────────────────────────────
     st.markdown("#### Distance from MA 200W vs Quality Score — bubble size = Munger Score")
-    st.plotly_chart(_scatter_chart(df), width='stretch')
+    st.plotly_chart(munger_scatter(df), width="stretch")
 
-    # ── Quality score bar chart ───────────────────────────────────────────────
     st.markdown("#### Quality Score by Company")
-    st.plotly_chart(_quality_bar_chart(df), width='stretch')
+    st.plotly_chart(quality_bar(df), width="stretch")
 
 
 # ── Private helpers ────────────────────────────────────────────────────────────
 
 def _style_table(df):
     def _row(row):
-        n = len(row)
-        styles = [""] * n
-        cols = list(df.columns)
+        styles = [""] * len(row)
+        cols   = list(df.columns)
 
-        # Distance %: green = below MA200W, amber = above
         dist_i = cols.index("Distance %")
         if row["Distance %"] < 0:
-            styles[dist_i] = "color:#22C55E;font-weight:600"
+            styles[dist_i] = f"color:{UP};font-weight:600"
         else:
             styles[dist_i] = "color:#F59E0B;font-weight:600"
 
-        # RSI
         rsi_i = cols.index("RSI")
-        rsi = row["RSI"]
+        rsi   = row["RSI"]
         if rsi <= 30:
-            styles[rsi_i] = "color:#22C55E;font-weight:700"
+            styles[rsi_i] = f"color:{UP};font-weight:700"
         elif rsi >= 70:
-            styles[rsi_i] = "color:#EF4444;font-weight:700"
+            styles[rsi_i] = f"color:{DN};font-weight:700"
 
-        # Quality Score
         qs_i = cols.index("Quality Score")
         if row["Quality Score"] >= 60:
-            styles[qs_i] = "color:#22C55E;font-weight:700"
+            styles[qs_i] = f"color:{UP};font-weight:700"
         elif row["Quality Score"] >= 40:
             styles[qs_i] = "color:#F59E0B;font-weight:600"
 
-        # Munger Score
         ms_i = cols.index("Munger Score")
         if row["Munger Score"] >= 70:
-            styles[ms_i] = "color:#22C55E;font-weight:700"
+            styles[ms_i] = f"color:{UP};font-weight:700"
         elif row["Munger Score"] >= 50:
             styles[ms_i] = "color:#F59E0B;font-weight:600"
 
@@ -179,72 +172,6 @@ def _style_table(df):
         "Quality Score": "{:.1f}",
         "Munger Score":  "{:.1f}",
     })
-
-
-def _scatter_chart(df) -> go.Figure:
-    bubble_size = (df["Munger Score"] / df["Munger Score"].max() * 40 + 10).tolist()
-    colors = [
-        "#22C55E" if d < 0 else "#F59E0B"
-        for d in df["Distance %"]
-    ]
-    fig = go.Figure(go.Scatter(
-        x=df["Distance %"],
-        y=df["Quality Score"],
-        mode="markers+text",
-        text=df["Ticker"],
-        textposition="top center",
-        textfont=dict(size=9),
-        marker=dict(size=bubble_size, color=colors, opacity=0.85,
-                    line=dict(color="#FFFFFF", width=0.5)),
-        hovertemplate=(
-            "<b>%{text}</b><br>"
-            "Distance from MA200W: %{x:+.2f}%<br>"
-            "Quality Score: %{y:.1f}<br>"
-            "<extra></extra>"
-        ),
-    ))
-    fig.add_vline(x=0, line_dash="dot", line_color="#64748B",
-                  annotation_text="At MA 200W", annotation_font_size=9)
-    fig.add_annotation(x=-12, y=df["Quality Score"].max() * 0.95,
-                       text="🟢 Sweet spot", showarrow=False,
-                       font=dict(color="#22C55E", size=11))
-    fig.update_layout(
-        template="plotly_dark",
-        height=380,
-        margin=dict(l=40, r=80, t=20, b=40),
-        xaxis=dict(title="Distance from 200-Week MA (%)"),
-        yaxis=dict(title="Quality Score"),
-    )
-    return fig
-
-
-def _quality_bar_chart(df) -> go.Figure:
-    sorted_df = df.sort_values("Quality Score", ascending=False)
-    colors = [
-        "#22C55E" if q >= 60 else "#F59E0B" if q >= 40 else "#64748B"
-        for q in sorted_df["Quality Score"]
-    ]
-    fig = go.Figure(go.Bar(
-        x=sorted_df["Ticker"],
-        y=sorted_df["Quality Score"],
-        marker_color=colors,
-        text=sorted_df["Quality Score"].apply(lambda v: f"{v:.0f}"),
-        textposition="outside",
-        hovertemplate="<b>%{x}</b><br>Quality Score: %{y:.1f}<extra></extra>",
-    ))
-    fig.add_hline(y=60, line_dash="dot", line_color="#22C55E",
-                  annotation_text="≥60 excellent", annotation_font_size=9)
-    fig.add_hline(y=40, line_dash="dot", line_color="#F59E0B",
-                  annotation_text="≥40 good", annotation_font_size=9)
-    fig.update_layout(
-        template="plotly_dark",
-        height=300,
-        margin=dict(l=20, r=120, t=10, b=40),
-        yaxis=dict(title="Quality Score", range=[0, 100]),
-        xaxis=dict(title=""),
-        showlegend=False,
-    )
-    return fig
 
 
 def _render_legend() -> None:
@@ -273,4 +200,3 @@ def _render_legend() -> None:
 
 
 render_munger_tab()
-

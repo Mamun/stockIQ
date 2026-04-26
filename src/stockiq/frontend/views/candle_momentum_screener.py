@@ -1,7 +1,7 @@
-import plotly.graph_objects as go
 import streamlit as st
 
 from stockiq.backend.services.scanners import get_candle_momentum_scan, get_screener_info
+from stockiq.frontend.views.components.scanner_charts import candle_momentum_sector_chart
 
 _SIGNAL_TIERS = [
     "🟢 Strong Buy",
@@ -21,7 +21,7 @@ _TIER_COLORS = {
 
 
 def render_candle_momentum_screener_tab() -> None:
-    _info = get_screener_info()
+    _info         = get_screener_info()
     _ticker_count = _info["ticker_count"]
 
     st.title("📊 Weekly/Monthly Screener")
@@ -52,12 +52,12 @@ def render_candle_momentum_screener_tab() -> None:
     # ── Summary metrics ───────────────────────────────────────────────────────
     counts = {t: int((df["Signal"] == t).sum()) for t in _SIGNAL_TIERS}
     m1, m2, m3, m4, m5, m6 = st.columns(6)
-    m1.metric("Total",          len(df))
-    m2.metric("🟢 Strong Buy",  counts["🟢 Strong Buy"])
-    m3.metric("🟢 Buy",         counts["🟢 Buy"])
-    m4.metric("🟡 Accumulate",  counts["🟡 Accumulate"])
-    m5.metric("🟠 Caution",     counts["🟠 Caution"])
-    m6.metric("🔴 Sell",        counts["🔴 Sell"])
+    m1.metric("Total",         len(df))
+    m2.metric("🟢 Strong Buy", counts["🟢 Strong Buy"])
+    m3.metric("🟢 Buy",        counts["🟢 Buy"])
+    m4.metric("🟡 Accumulate", counts["🟡 Accumulate"])
+    m5.metric("🟠 Caution",    counts["🟠 Caution"])
+    m6.metric("🔴 Sell",       counts["🔴 Sell"])
 
     st.markdown("---")
 
@@ -75,7 +75,7 @@ def render_candle_momentum_screener_tab() -> None:
     st.markdown("---")
     st.markdown("#### Sector Momentum Overview")
     st.caption("Stacked signal distribution per sector — more green = stronger sector momentum")
-    st.plotly_chart(_sector_chart(df), width="stretch")
+    st.plotly_chart(candle_momentum_sector_chart(df), width="stretch")
 
 
 # ── Private helpers ────────────────────────────────────────────────────────────
@@ -92,8 +92,10 @@ def _render_signal_sections(df) -> None:
         tier_df = df[df["Signal"] == signal].copy()
         if tier_df.empty:
             continue
-        st.markdown(f"### {signal} &nbsp; <span style='font-size:14px;color:#94A3B8'>({len(tier_df)} stocks)</span>",
-                    unsafe_allow_html=True)
+        st.markdown(
+            f"### {signal} &nbsp; <span style='font-size:14px;color:#94A3B8'>({len(tier_df)} stocks)</span>",
+            unsafe_allow_html=True,
+        )
         cols = [c for c in display_cols if c in tier_df.columns]
         st.dataframe(
             _style_table(tier_df[cols]),
@@ -141,39 +143,6 @@ def _style_table(df):
     return df.style.apply(_row, axis=1).format(fmt, na_rep="—")
 
 
-def _sector_chart(df) -> go.Figure:
-    sector_signal = (
-        df[df["Sector"] != "—"]
-        .groupby(["Sector", "Signal"])
-        .size()
-        .reset_index(name="Count")
-    )
-
-    fig = go.Figure()
-    for signal in reversed(_SIGNAL_TIERS):   # reversed so Strong Buy is on top
-        sub = sector_signal[sector_signal["Signal"] == signal]
-        if sub.empty:
-            continue
-        fig.add_trace(go.Bar(
-            name=signal,
-            x=sub["Sector"],
-            y=sub["Count"],
-            marker_color=_TIER_COLORS[signal],
-            hovertemplate=f"<b>%{{x}}</b><br>{signal}: %{{y}}<extra></extra>",
-        ))
-
-    fig.update_layout(
-        barmode="stack",
-        template="plotly_dark",
-        height=360,
-        margin=dict(l=20, r=20, t=20, b=80),
-        legend=dict(orientation="h", y=1.08, x=0),
-        xaxis=dict(title="", tickangle=-30),
-        yaxis=dict(title="# Stocks"),
-    )
-    return fig
-
-
 def _render_legend() -> None:
     col1, col2 = st.columns(2)
     with col1:
@@ -204,4 +173,3 @@ def _render_legend() -> None:
 
 
 render_candle_momentum_screener_tab()
-

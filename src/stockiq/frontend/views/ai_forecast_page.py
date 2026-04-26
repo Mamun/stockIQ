@@ -1,7 +1,7 @@
 import streamlit as st
 
 from stockiq.backend.services.spy_service import get_spy_gap_table_data
-from stockiq.frontend.views.ai_forecast import render_ai_forecast
+from stockiq.frontend.views.panels.ai_forecast import render_ai_forecast
 
 
 def render_ai_forecast_page() -> None:

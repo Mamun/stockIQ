@@ -1,7 +1,14 @@
-import plotly.graph_objects as go
+import math
+
 import streamlit as st
 
 from stockiq.backend.services.scanners import get_forward_pe_scan
+from stockiq.frontend.theme import DN, UP
+from stockiq.frontend.views.components.scanner_charts import (
+    forward_pe_bar,
+    forward_pe_scatter,
+    forward_pe_sector_bar,
+)
 
 
 def render_forward_pe_tab() -> None:
@@ -139,11 +146,11 @@ historically one of the strongest value signals. PEG < 1 = +20 pts bonus.
     avg_score  = df["VG Score"].mean()
 
     m1, m2, m3, m4, m5 = st.columns(5)
-    m1.metric("Candidates",      len(df))
-    m2.metric("Avg Fwd P/E",     f"{avg_fpe:.1f}")
-    m3.metric("Avg EPS Growth",  f"{avg_growth:.1f}%" if not __import__('math').isnan(avg_growth) else "—")
-    m4.metric("PEG < 1",         peg_lt1)
-    m5.metric("Avg VG Score",    f"{avg_score:.1f}")
+    m1.metric("Candidates",     len(df))
+    m2.metric("Avg Fwd P/E",    f"{avg_fpe:.1f}")
+    m3.metric("Avg EPS Growth", f"{avg_growth:.1f}%" if not math.isnan(avg_growth) else "—")
+    m4.metric("PEG < 1",        peg_lt1)
+    m5.metric("Avg VG Score",   f"{avg_score:.1f}")
 
     st.markdown("---")
 
@@ -181,16 +188,16 @@ historically one of the strongest value signals. PEG < 1 = +20 pts bonus.
     with col1:
         st.markdown("#### Forward P/E vs Sector Median")
         st.caption("Bar = stock P/E · Line = sector median · Lower bar = cheaper")
-        st.plotly_chart(_pe_bar_chart(df), width="stretch")
+        st.plotly_chart(forward_pe_bar(df), width="stretch")
 
     with col2:
         st.markdown("#### Forward P/E vs EPS Growth")
         st.caption("Bottom-right quadrant = cheap + fast-growing (ideal)")
-        st.plotly_chart(_scatter_chart(df), width="stretch")
+        st.plotly_chart(forward_pe_scatter(df), width="stretch")
 
     st.markdown("---")
     st.markdown("#### Sector Distribution")
-    st.plotly_chart(_sector_chart(df), width="stretch")
+    st.plotly_chart(forward_pe_sector_bar(df), width="stretch")
 
 
 # ── Private helpers ────────────────────────────────────────────────────────────
@@ -200,50 +207,45 @@ def _style_table(df):
         styles = [""] * len(row)
         cols   = list(df.columns)
 
-        # Fwd P/E — highlight if below sector median
         fpe_i = cols.index("Fwd P/E")
         med_i = cols.index("Sector Med P/E")
         if row["Fwd P/E"] and row["Sector Med P/E"]:
             discount = (row["Sector Med P/E"] - row["Fwd P/E"]) / row["Sector Med P/E"]
             if discount >= 0.20:
-                styles[fpe_i] = "color:#22C55E;font-weight:700"
+                styles[fpe_i] = f"color:{UP};font-weight:700"
             elif discount >= 0.05:
                 styles[fpe_i] = "color:#86EFAC;font-weight:600"
             elif discount < 0:
                 styles[fpe_i] = "color:#F59E0B"
 
-        # EPS Growth
         if "EPS Gr %" in cols and row["EPS Gr %"] is not None:
             eg_i = cols.index("EPS Gr %")
             if row["EPS Gr %"] >= 20:
-                styles[eg_i] = "color:#22C55E;font-weight:700"
+                styles[eg_i] = f"color:{UP};font-weight:700"
             elif row["EPS Gr %"] >= 10:
                 styles[eg_i] = "color:#86EFAC"
             elif row["EPS Gr %"] < 0:
-                styles[eg_i] = "color:#EF4444"
+                styles[eg_i] = f"color:{DN}"
 
-        # PEG
         if "PEG" in cols and row["PEG"] is not None:
             peg_i = cols.index("PEG")
             if row["PEG"] < 1:
                 styles[peg_i] = "color:#FACC15;font-weight:700"
             elif row["PEG"] < 2:
-                styles[peg_i] = "color:#22C55E"
+                styles[peg_i] = f"color:{UP}"
 
-        # RSI
         if "RSI" in cols and row["RSI"] is not None:
             rsi_i = cols.index("RSI")
             if row["RSI"] >= 70:
-                styles[rsi_i] = "color:#EF4444;font-weight:700"
+                styles[rsi_i] = f"color:{DN};font-weight:700"
             elif row["RSI"] <= 40:
-                styles[rsi_i] = "color:#22C55E;font-weight:600"
+                styles[rsi_i] = f"color:{UP};font-weight:600"
 
-        # VG Score
         vg_i = cols.index("VG Score")
         if row["VG Score"] >= 70:
             styles[vg_i] = "color:#FACC15;font-weight:700"
         elif row["VG Score"] >= 50:
-            styles[vg_i] = "color:#22C55E;font-weight:600"
+            styles[vg_i] = f"color:{UP};font-weight:600"
 
         return styles
 
@@ -260,110 +262,6 @@ def _style_table(df):
         "VG Score":       "{:.1f}",
     }
     return df.style.apply(_row, axis=1).format(fmt, na_rep="—")
-
-
-def _pe_bar_chart(df) -> go.Figure:
-    top = df.head(20).sort_values("Fwd P/E")
-    colors = [
-        "#22C55E" if (r["Sector Med P/E"] and r["Fwd P/E"] < r["Sector Med P/E"] * 0.8)
-        else "#86EFAC" if (r["Sector Med P/E"] and r["Fwd P/E"] < r["Sector Med P/E"])
-        else "#F59E0B"
-        for _, r in top.iterrows()
-    ]
-    fig = go.Figure()
-    fig.add_trace(go.Bar(
-        x=top["Ticker"],
-        y=top["Fwd P/E"],
-        marker_color=colors,
-        name="Stock Fwd P/E",
-        hovertemplate="<b>%{x}</b><br>Fwd P/E: %{y:.1f}<extra></extra>",
-    ))
-    fig.add_trace(go.Scatter(
-        x=top["Ticker"],
-        y=top["Sector Med P/E"],
-        mode="markers",
-        marker=dict(symbol="line-ew", size=14, color="#F59E0B",
-                    line=dict(color="#F59E0B", width=2)),
-        name="Sector Median",
-        hovertemplate="<b>%{x}</b><br>Sector Median: %{y:.1f}<extra></extra>",
-    ))
-    fig.update_layout(
-        template="plotly_dark",
-        height=320,
-        margin=dict(l=20, r=20, t=10, b=40),
-        yaxis=dict(title="Forward P/E"),
-        xaxis=dict(title=""),
-        legend=dict(orientation="h", y=1.1),
-        showlegend=True,
-    )
-    return fig
-
-
-def _scatter_chart(df) -> go.Figure:
-    plot = df[df["EPS Gr %"].notna()].head(40)
-    colors = [
-        "#FACC15" if (r["PEG"] and r["PEG"] < 1) else
-        "#22C55E" if (r["PEG"] and r["PEG"] < 2) else "#64748B"
-        for _, r in plot.iterrows()
-    ]
-    fig = go.Figure(go.Scatter(
-        x=plot["Fwd P/E"],
-        y=plot["EPS Gr %"],
-        mode="markers+text",
-        text=plot["Ticker"],
-        textposition="top center",
-        textfont=dict(size=8),
-        marker=dict(
-            size=(plot["VG Score"] / plot["VG Score"].max() * 20 + 8).tolist(),
-            color=colors,
-            opacity=0.85,
-            line=dict(color="#FFFFFF", width=0.5),
-        ),
-        hovertemplate=(
-            "<b>%{text}</b><br>"
-            "Fwd P/E: %{x:.1f}<br>"
-            "EPS Growth: %{y:.1f}%<br>"
-            "<extra></extra>"
-        ),
-    ))
-    fig.update_layout(
-        template="plotly_dark",
-        height=320,
-        margin=dict(l=40, r=20, t=20, b=40),
-        xaxis=dict(title="Forward P/E (lower = cheaper)"),
-        yaxis=dict(title="EPS Growth % (higher = faster)", ticksuffix="%"),
-        showlegend=False,
-    )
-    return fig
-
-
-def _sector_chart(df) -> go.Figure:
-    sector_df = (
-        df.groupby("Sector")
-        .agg(Count=("Ticker", "count"), Avg_Score=("VG Score", "mean"), Avg_PE=("Fwd P/E", "mean"))
-        .reset_index()
-        .sort_values("Avg_Score", ascending=True)
-    )
-    fig = go.Figure(go.Bar(
-        x=sector_df["Avg_Score"],
-        y=sector_df["Sector"],
-        orientation="h",
-        marker_color="#3B82F6",
-        text=sector_df.apply(
-            lambda r: f"{r['Count']} stocks · avg P/E {r['Avg_PE']:.1f}", axis=1
-        ),
-        textposition="inside",
-        hovertemplate="<b>%{y}</b><br>Avg VG Score: %{x:.1f}<extra></extra>",
-    ))
-    fig.update_layout(
-        template="plotly_dark",
-        height=max(200, len(sector_df) * 40),
-        margin=dict(l=20, r=40, t=10, b=40),
-        xaxis=dict(title="Avg Value Growth Score"),
-        yaxis=dict(title=""),
-        showlegend=False,
-    )
-    return fig
 
 
 def _render_legend() -> None:
