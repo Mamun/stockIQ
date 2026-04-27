@@ -20,9 +20,9 @@ def render_dte_conditions(
 ) -> None:
     try:
         seed      = get_spy_options_analysis(expiration="", current_price=current_price)
-        max_pain  = seed["max_pain"]               if seed else None
+        max_pain  = seed["max_pain"]                    if seed else None
         gex_df    = seed.get("gex_df", pd.DataFrame()) if seed else pd.DataFrame()
-        total_gex = gex_df["gex"].sum()            if not gex_df.empty else None
+        total_gex = gex_df["gex"].sum()                if not gex_df.empty else None
     except Exception:
         seed = None
         max_pain = total_gex = None
@@ -37,40 +37,24 @@ def render_dte_conditions(
     neutral_pts = len(signals) - scored
     v_label, v_color, v_icon, v_note = _verdict(net)
     trade_html  = _trade_suggestion(net, seed, current_price, max_pain) if net != 0 and seed else ""
-    right_panel = trade_html or _neutral_panel()
 
+    trade_content = trade_html or _neutral_panel()
     st.html(
-        # ── section header ──────────────────────────────────────────────────
-        f'<div style="display:flex;align-items:baseline;justify-content:space-between;'
-        f'margin-bottom:10px">'
-        f'<span style="font-size:13px;font-weight:700;color:#94A3B8;letter-spacing:.06em;'
-        f'text-transform:uppercase">0DTE Conditions</span>'
-        f'<span style="font-size:11px;color:#475569">not financial advice</span>'
-        f'</div>'
-
-        # ── verdict + trade card ─────────────────────────────────────────────
-        f'<div style="background:rgba(255,255,255,0.03);border:1px solid #1E293B;'
-        f'border-radius:12px;padding:16px 20px;margin-bottom:10px">'
-        f'<div style="display:flex;align-items:flex-start;gap:24px">'
-
-        f'<div style="flex:1;min-width:0">'
-        f'<div style="font-size:22px;font-weight:900;color:{v_color};line-height:1;'
-        f'letter-spacing:-.3px">{v_icon} {v_label}</div>'
-        f'<div style="font-size:13px;color:{v_color};font-weight:600;margin-top:7px">'
-        f'{call_pts} call &nbsp;·&nbsp; {put_pts} put &nbsp;·&nbsp; {neutral_pts} neutral'
-        f'</div>'
-        f'<div style="font-size:12px;color:#94A3B8;margin-top:5px;line-height:1.5">{v_note}</div>'
-        f'</div>'
-
-        f'<div style="width:1px;background:#1E293B;align-self:stretch;flex-shrink:0"></div>'
-
-        f'<div style="flex:1;min-width:0">{right_panel}</div>'
-        f'</div>'
-        f'</div>'
-
-        # ── signal table ────────────────────────────────────────────────────
-        + _signal_table(signals)
+        _section_header() +
+        '<div style="background:rgba(255,255,255,0.03);border:1px solid #1E293B;'
+        'border-radius:12px;padding:18px 20px;margin-bottom:14px">' +
+        _verdict_card(v_label, v_color, v_icon, v_note, call_pts, put_pts, neutral_pts, len(signals)) +
+        '<div style="border-top:1px solid #1E293B;margin:16px 0"></div>' +
+        trade_content +
+        '</div>'
     )
+
+    call_n    = sum(1 for s in signals if s[2] == "CALL")
+    put_n     = sum(1 for s in signals if s[2] == "PUT")
+    neutral_n = len(signals) - call_n - put_n
+    label     = f"Signals — {call_n} Call · {neutral_n} Neutral · {put_n} Put"
+    with st.expander(label, expanded=False):
+        st.html(_signal_table(signals))
 
 
 # ── Signal evaluation ──────────────────────────────────────────────────────────
@@ -210,37 +194,38 @@ def _trade_suggestion(net: int, seed: dict, current_price: float, max_pain: floa
         tgt_price, tgt_label = _best_target_call(current_price, em_move, call_wall, max_pain)
         reward    = tgt_price - current_price
         stp_price, stp_label = _best_stop_call(current_price, em_move, reward, put_wall)
-        risk = max(current_price - stp_price, 0.5)
-        clr, bg, direction = "#22C55E", "rgba(34,197,94,0.12)", "call"
+        risk      = max(current_price - stp_price, 0.5)
+        clr, direction = "#22C55E", "CALL"
     else:
         tgt_price, tgt_label = _best_target_put(current_price, em_move, put_wall, max_pain)
         reward    = current_price - tgt_price
         stp_price, stp_label = _best_stop_put(current_price, em_move, reward, call_wall)
-        risk = max(stp_price - current_price, 0.5)
-        clr, bg, direction = "#EF4444", "rgba(239,68,68,0.12)", "put"
+        risk      = max(stp_price - current_price, 0.5)
+        clr, direction = "#EF4444", "PUT"
 
-    rr      = reward / risk
-    rr_clr  = "#22C55E" if rr >= 2.0 else "#F59E0B" if rr >= 1.2 else "#EF4444"
-    stp_clr = "#F59E0B"
+    rr     = reward / risk
+    rr_clr = "#22C55E" if rr >= 2.0 else "#F59E0B" if rr >= 1.2 else "#EF4444"
 
+    metrics = [
+        ("Entry",  f"${atm:,} {direction}", clr),
+        ("Target", f"${tgt_price:,}",       clr),
+        ("Stop",   f"${stp_price:,}",       "#F59E0B"),
+        ("R / R",  f"1 : {rr:.1f}",         rr_clr),
+    ]
+    grid = "".join(
+        f'<div style="background:rgba(255,255,255,0.04);border-radius:8px;padding:10px 12px">'
+        f'<div style="font-size:10px;color:#64748B;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">{lbl}</div>'
+        f'<div style="font-size:17px;font-weight:800;color:{c};line-height:1">{val}</div>'
+        f'</div>'
+        for lbl, val, c in metrics
+    )
     return (
-        f'<div style="font-size:11px;color:#64748B;font-weight:700;letter-spacing:.06em;'
-        f'text-transform:uppercase;margin-bottom:10px">Suggested Trade</div>'
-        f'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 16px">'
-        f'<div><div style="font-size:10px;color:#64748B;text-transform:uppercase;letter-spacing:.05em">Entry</div>'
-        f'<div style="font-size:16px;font-weight:800;color:{clr}">${atm:,} {direction}</div></div>'
-        f'<div><div style="font-size:10px;color:#64748B;text-transform:uppercase;letter-spacing:.05em">Stop</div>'
-        f'<div style="font-size:16px;font-weight:800;color:{stp_clr}">${stp_price:,}</div></div>'
-        f'<div><div style="font-size:10px;color:#64748B;text-transform:uppercase;letter-spacing:.05em">Target</div>'
-        f'<div style="font-size:16px;font-weight:800;color:{clr}">${tgt_price:,}</div></div>'
-        f'<div><div style="font-size:10px;color:#64748B;text-transform:uppercase;letter-spacing:.05em">R / R</div>'
-        f'<div style="font-size:16px;font-weight:800;color:{rr_clr}">1 : {rr:.1f}</div></div>'
-        f'</div>'
-        f'<div style="font-size:11px;color:#475569;margin-top:8px;line-height:1.5">'
-        f'Target: {tgt_label} &nbsp;·&nbsp; Stop: {stp_label}'
-        f'</div>'
-        f'<div style="font-size:11px;color:#475569;margin-top:8px;padding-top:8px;'
-        f'border-top:1px solid #1E293B;line-height:1.5">'
+        f'<div style="font-size:10px;color:#64748B;font-weight:700;letter-spacing:.07em;'
+        f'text-transform:uppercase;margin-bottom:10px">&#127919; Suggested Trade</div>'
+        f'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px">'
+        f'{grid}</div>'
+        f'<div style="font-size:11px;color:#475569;line-height:1.6">'
+        f'Target: {tgt_label} &nbsp;·&nbsp; Stop: {stp_label}<br>'
         f'&#9200; Enter 9:45 AM–12:00 PM &nbsp;·&nbsp; Close all by 3:45 PM'
         f'</div>'
     )
@@ -288,21 +273,90 @@ def _best_stop_put(price, em, reward, call_wall):
     return round(val), label
 
 
-# ── HTML helpers ───────────────────────────────────────────────────────────────
+# ── HTML components ────────────────────────────────────────────────────────────
 
-_BIAS_ICON = {"CALL": "▲", "PUT": "▼", "NEUTRAL": "→"}
+def _section_header() -> str:
+    return (
+        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">'
+        '<span style="font-size:13px;font-weight:700;color:#94A3B8;letter-spacing:.06em;text-transform:uppercase">'
+        '0DTE Conditions</span>'
+        '<span style="font-size:11px;color:#475569">not financial advice</span>'
+        '</div>'
+    )
+
+
+def _verdict_card(label, color, icon, note, call_pts, put_pts, neutral_pts, total) -> str:
+    # Score bar segments: call (green) | neutral (slate) | put (red)
+    bar_segments = ""
+    for n, bg in ((call_pts, "#22C55E"), (neutral_pts, "#334155"), (put_pts, "#EF4444")):
+        if n > 0:
+            bar_segments += (
+                f'<div style="flex:{n};background:{bg};height:6px;'
+                f'border-radius:3px;transition:flex .3s"></div>'
+            )
+
+    pills = (
+        f'<span style="font-size:11px;font-weight:700;color:#22C55E;'
+        f'background:rgba(34,197,94,.15);border-radius:5px;padding:3px 8px">'
+        f'▲ {call_pts} CALL</span>'
+        f'<span style="font-size:11px;font-weight:700;color:#94A3B8;'
+        f'background:rgba(148,163,184,.12);border-radius:5px;padding:3px 8px">'
+        f'→ {neutral_pts} NEUT</span>'
+        f'<span style="font-size:11px;font-weight:700;color:#EF4444;'
+        f'background:rgba(239,68,68,.15);border-radius:5px;padding:3px 8px">'
+        f'▼ {put_pts} PUT</span>'
+    )
+
+    return (
+        f'<div style="display:flex;align-items:center;justify-content:space-between;'
+        f'gap:16px;flex-wrap:wrap;margin-bottom:12px">'
+        f'<div>'
+        f'<div style="font-size:26px;font-weight:900;color:{color};line-height:1;'
+        f'letter-spacing:-.5px">{icon} {label}</div>'
+        f'<div style="font-size:12px;color:#64748B;margin-top:5px">{note}</div>'
+        f'</div>'
+        f'<div style="display:flex;gap:6px;flex-wrap:wrap">{pills}</div>'
+        f'</div>'
+        f'<div style="display:flex;gap:3px;border-radius:4px;overflow:hidden">'
+        f'{bar_segments}'
+        f'</div>'
+    )
+
+
+def _neutral_panel() -> str:
+    return (
+        '<div style="font-size:10px;color:#64748B;font-weight:700;letter-spacing:.07em;'
+        'text-transform:uppercase;margin-bottom:10px">&#129300; No Directional Edge</div>'
+        '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:10px">'
+        '<div style="background:rgba(255,255,255,0.04);border-radius:8px;padding:10px 12px">'
+        '<div style="font-size:10px;color:#64748B;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Strategy</div>'
+        '<div style="font-size:15px;font-weight:700;color:#F59E0B">Iron Condor / Fly</div>'
+        '</div>'
+        '<div style="background:rgba(255,255,255,0.04);border-radius:8px;padding:10px 12px">'
+        '<div style="font-size:10px;color:#64748B;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Edge</div>'
+        '<div style="font-size:15px;font-weight:700;color:#F59E0B">Theta Decay</div>'
+        '</div>'
+        '</div>'
+        '<div style="font-size:11px;color:#475569;line-height:1.6">'
+        'Sell premium, let theta work for you<br>'
+        '&#9200; No new entries after 12:00 PM &nbsp;·&nbsp; Close all by 3:45 PM'
+        '</div>'
+    )
+
+
+_BIAS_ICON = {"CALL": "▲", "PUT": "▼", "NEUTRAL": "→", "—": "·"}
 _ROW_BG    = ("rgba(255,255,255,0.025)", "transparent")
 
 
 def _signal_table(signals: list) -> str:
     header = (
-        f'<div style="display:grid;grid-template-columns:90px 90px 90px 1fr;'
-        f'gap:0 12px;padding:5px 12px 7px;border-bottom:1px solid #1E293B;margin-bottom:2px">'
-        f'<div style="font-size:10px;color:#475569;text-transform:uppercase;letter-spacing:.07em">Signal</div>'
-        f'<div style="font-size:10px;color:#475569;text-transform:uppercase;letter-spacing:.07em">Value</div>'
-        f'<div style="font-size:10px;color:#475569;text-transform:uppercase;letter-spacing:.07em">Bias</div>'
-        f'<div style="font-size:10px;color:#475569;text-transform:uppercase;letter-spacing:.07em">Reading</div>'
-        f'</div>'
+        '<div style="display:grid;grid-template-columns:90px 90px 90px 1fr;'
+        'gap:0 12px;padding:5px 12px 7px;border-bottom:1px solid #1E293B;margin-bottom:2px">'
+        '<div style="font-size:10px;color:#475569;text-transform:uppercase;letter-spacing:.07em">Signal</div>'
+        '<div style="font-size:10px;color:#475569;text-transform:uppercase;letter-spacing:.07em">Value</div>'
+        '<div style="font-size:10px;color:#475569;text-transform:uppercase;letter-spacing:.07em">Bias</div>'
+        '<div style="font-size:10px;color:#475569;text-transform:uppercase;letter-spacing:.07em">Reading</div>'
+        '</div>'
     )
     rows = ""
     for i, (label, value, bias, note, clr) in enumerate(signals):
@@ -311,29 +365,12 @@ def _signal_table(signals: list) -> str:
         val_clr  = clr if bias in ("CALL", "PUT") else "#E2E8F0"
         rows += (
             f'<div style="display:grid;grid-template-columns:90px 90px 90px 1fr;'
-            f'gap:0 12px;align-items:center;padding:7px 12px;'
+            f'gap:0 12px;align-items:start;padding:7px 12px;'
             f'background:{_ROW_BG[i % 2]};border-radius:6px">'
             f'<div style="font-size:11px;color:#94A3B8;font-weight:600">{label}</div>'
             f'<div style="font-size:13px;font-weight:700;color:{val_clr}">{value}</div>'
             f'<div style="font-size:12px;font-weight:700;color:{bias_clr}">{icon} {bias if bias != "—" else "—"}</div>'
-            f'<div style="font-size:11px;color:#64748B;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{note}</div>'
+            f'<div style="font-size:11px;color:#64748B;line-height:1.5">{note}</div>'
             f'</div>'
         )
-    return (
-        f'<div style="background:rgba(255,255,255,0.03);border:1px solid #1E293B;'
-        f'border-radius:12px;padding:10px 2px">'
-        + header + rows +
-        f'</div>'
-    )
-
-
-def _neutral_panel() -> str:
-    return (
-        '<div style="font-size:13px;color:#F59E0B;font-weight:700;margin-bottom:8px">'
-        'No directional edge today</div>'
-        '<div style="font-size:12px;color:#64748B;line-height:1.7">'
-        'Consider: iron condor or iron fly<br>'
-        'Sell premium, let theta work for you<br>'
-        '<span style="margin-top:6px;display:block">&#9200; No new entries after 12:00 PM &nbsp;·&nbsp; Close all by 3:45 PM</span>'
-        '</div>'
-    )
+    return header + rows

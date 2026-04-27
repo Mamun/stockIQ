@@ -101,13 +101,19 @@ def fetch_spx_quote_cboe() -> dict:
 def fetch_spx_intraday(period: str = "1d", interval: str = "5m") -> pd.DataFrame:
     """
     SPY price history for any period / interval combination.
-      period="1d",  interval="5m"   → today's intraday bars
-      period="5d",  interval="30m"  → 5-day half-hourly bars
+      period="1d",  interval="5m"   → today's intraday bars (incl. pre/post market)
+      period="5d",  interval="30m"  → 5-day half-hourly bars (incl. pre/post market)
       period="1y",  interval="1d"   → daily bars for MA/RSI analysis
-    Cached 120 s.
+    Cached 120 s. prepost=True for sub-day intervals extends coverage to
+    4am–8pm ET so the chart populates outside regular market hours.
     """
     try:
-        df = yf.download("SPY", period=period, interval=interval, progress=False, auto_adjust=False)
+        intraday = not interval.endswith("d")
+        df = yf.download(
+            "SPY", period=period, interval=interval,
+            progress=False, auto_adjust=False,
+            prepost=intraday,
+        )
         if isinstance(df.columns, pd.MultiIndex):
             df.columns = df.columns.get_level_values(0)
         return df.dropna(subset=["Close"])

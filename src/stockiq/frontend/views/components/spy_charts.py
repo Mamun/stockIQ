@@ -16,13 +16,13 @@ from plotly.subplots import make_subplots
 
 def spy_candle_chart(
     df: pd.DataFrame,
-    ma_periods: list[int],
     prev_close: float | None = None,
-    show_rsi: bool = False,
     vwap: pd.Series | None = None,
     max_pain: float | None = None,
     call_wall: float | None = None,
     put_wall: float | None = None,
+    em_upper: float | None = None,
+    em_lower: float | None = None,
     or_high: float | None = None,
     or_low: float | None = None,
     pdh: float | None = None,
@@ -35,17 +35,15 @@ def spy_candle_chart(
     vwap_u2: pd.Series | None = None,
     vwap_l2: pd.Series | None = None,
 ) -> go.Figure:
-    """Candlestick + volume + optional RSI + VWAP bands + key price levels."""
-    if show_rsi:
-        rows, row_heights = 3, [0.55, 0.2, 0.25]
-        vol_row, rsi_row  = 2, 3
-    else:
-        rows, row_heights = 2, [0.75, 0.25]
-        vol_row, rsi_row  = 2, None
+    """Intraday candlestick + volume + VWAP bands + options-derived key levels.
 
+    Options levels (Max Pain, Call/Put Wall, Expected Move band) are the primary
+    differentiator over TradingView — they are rendered more prominently than
+    standard price levels.
+    """
     fig = make_subplots(
-        rows=rows, cols=1, shared_xaxes=True,
-        row_heights=row_heights, vertical_spacing=0.03,
+        rows=2, cols=1, shared_xaxes=True,
+        row_heights=[0.80, 0.20], vertical_spacing=0.03,
     )
 
     fig.add_trace(go.Candlestick(
@@ -55,19 +53,11 @@ def spy_candle_chart(
         name="SPY", showlegend=False,
     ), row=1, col=1)
 
-    _MA_COLORS = {20: "#F59E0B", 50: "#3B82F6", 200: "#EF4444"}
-    for p in ma_periods:
-        if len(df) >= p:
-            fig.add_trace(go.Scatter(
-                x=df.index, y=df["Close"].rolling(p).mean(),
-                mode="lines", line=dict(color=_MA_COLORS[p], width=1.5),
-                name=f"MA{p}",
-            ), row=1, col=1)
-
     if vwap is not None:
         _add_vwap_bands(fig, df, vwap, vwap_u1, vwap_l1, vwap_u2, vwap_l2)
 
-    _add_hlines(fig, or_high, or_low, pdh, pdl, pivot, r1, s1, prev_close, max_pain, call_wall, put_wall)
+    _add_hlines(fig, or_high, or_low, pdh, pdl, pivot, r1, s1,
+                prev_close, max_pain, call_wall, put_wall, em_upper, em_lower)
 
     if "Volume" in df.columns:
         bar_colors = ["#22C55E" if c >= o else "#EF4444"
@@ -76,15 +66,12 @@ def spy_candle_chart(
             x=df.index, y=df["Volume"],
             marker_color=bar_colors, opacity=0.5,
             name="Volume", showlegend=False,
-        ), row=vol_row, col=1)
-
-    if show_rsi and rsi_row and "RSI" in df.columns:
-        _add_rsi_subplot(fig, df, rsi_row)
+        ), row=2, col=1)
 
     fig.update_layout(
         template="plotly_dark",
-        height=460 + (200 if show_rsi else 0),
-        margin=dict(l=60, r=80, t=10, b=40),
+        height=480,
+        margin=dict(l=60, r=90, t=10, b=40),
         xaxis_rangeslider_visible=False,
         legend=dict(orientation="h", y=1.04, x=0),
         yaxis=dict(title="Price", gridcolor="#1E293B"),
@@ -268,25 +255,24 @@ def _add_vwap_bands(
 
 def _add_hlines(
     fig: go.Figure,
-    or_high, or_low, pdh, pdl, pivot, r1, s1, prev_close, max_pain, call_wall, put_wall,
+    or_high, or_low, pdh, pdl, pivot, r1, s1, prev_close,
+    max_pain, call_wall, put_wall, em_upper=None, em_lower=None,
 ) -> None:
     _hl = fig.add_hline
-    if or_high is not None:
-        _hl(y=or_high, row=1, col=1, line_dash="solid", line_color="#FBBF24", line_width=1.2,
-            annotation_text=f"OR H {or_high:,.2f}", annotation_font_size=9,
-            annotation_font_color="#FBBF24", annotation_position="top left")
-    if or_low is not None:
-        _hl(y=or_low, row=1, col=1, line_dash="solid", line_color="#FBBF24", line_width=1.2,
-            annotation_text=f"OR L {or_low:,.2f}", annotation_font_size=9,
-            annotation_font_color="#FBBF24", annotation_position="bottom left")
+
+    # ── Standard price levels (dim, secondary) ─────────────────────────────────
+    if prev_close is not None:
+        _hl(y=prev_close, row=1, col=1, line_dash="dot", line_color="#475569", line_width=1,
+            annotation_text=f"Prev {prev_close:,.2f}", annotation_font_size=9,
+            annotation_font_color="#475569", annotation_position="top right")
     if pdh is not None:
-        _hl(y=pdh, row=1, col=1, line_dash="dash", line_color="#94A3B8", line_width=1,
+        _hl(y=pdh, row=1, col=1, line_dash="dash", line_color="#64748B", line_width=1,
             annotation_text=f"PDH {pdh:,.2f}", annotation_font_size=9,
-            annotation_font_color="#94A3B8", annotation_position="top right")
+            annotation_font_color="#64748B", annotation_position="top right")
     if pdl is not None:
-        _hl(y=pdl, row=1, col=1, line_dash="dash", line_color="#94A3B8", line_width=1,
+        _hl(y=pdl, row=1, col=1, line_dash="dash", line_color="#64748B", line_width=1,
             annotation_text=f"PDL {pdl:,.2f}", annotation_font_size=9,
-            annotation_font_color="#94A3B8", annotation_position="bottom right")
+            annotation_font_color="#64748B", annotation_position="bottom right")
     if pivot is not None:
         _hl(y=pivot, row=1, col=1, line_dash="dot", line_color="#38BDF8", line_width=1,
             annotation_text=f"P {pivot:,.2f}", annotation_font_size=9,
@@ -299,22 +285,74 @@ def _add_hlines(
         _hl(y=s1, row=1, col=1, line_dash="dot", line_color="#FDA4AF", line_width=1,
             annotation_text=f"S1 {s1:,.2f}", annotation_font_size=9,
             annotation_font_color="#FDA4AF", annotation_position="bottom left")
-    if prev_close is not None:
-        _hl(y=prev_close, row=1, col=1, line_dash="dot", line_color="#64748B", line_width=1,
-            annotation_text=f"Prev {prev_close:,.2f}", annotation_font_size=9,
-            annotation_position="top right")
-    if max_pain is not None:
-        _hl(y=max_pain, row=1, col=1, line_dash="dot", line_color="#F59E0B", line_width=1.2,
-            annotation_text=f"Max Pain {max_pain:,.0f}", annotation_font_size=9,
-            annotation_position="top left")
-    if call_wall is not None:
-        _hl(y=call_wall, row=1, col=1, line_dash="dash", line_color="#22C55E", line_width=1,
-            annotation_text=f"Call Wall {call_wall:,.0f}", annotation_font_size=9,
-            annotation_position="top right")
+    if or_high is not None:
+        _hl(y=or_high, row=1, col=1, line_dash="solid", line_color="#FBBF24", line_width=1.2,
+            annotation_text=f"OR H {or_high:,.2f}", annotation_font_size=9,
+            annotation_font_color="#FBBF24", annotation_position="top left")
+    if or_low is not None:
+        _hl(y=or_low, row=1, col=1, line_dash="solid", line_color="#FBBF24", line_width=1.2,
+            annotation_text=f"OR L {or_low:,.2f}", annotation_font_size=9,
+            annotation_font_color="#FBBF24", annotation_position="bottom left")
+
+    # ── Options-derived levels (bold, primary — unique vs TradingView) ─────────
+    if em_upper is not None and em_lower is not None:
+        # Shaded expected-move band drawn first so level lines render on top
+        fig.add_hrect(y0=em_lower, y1=em_upper,
+                      fillcolor="rgba(99,102,241,0.07)", line_width=0, row=1, col=1)
+        _hl(y=em_upper, row=1, col=1, line_dash="dot", line_color="#818CF8", line_width=1.5,
+            annotation_text=f"EM+ {em_upper:,.2f}", annotation_font_size=10,
+            annotation_font_color="#818CF8", annotation_position="top right")
+        _hl(y=em_lower, row=1, col=1, line_dash="dot", line_color="#818CF8", line_width=1.5,
+            annotation_text=f"EM− {em_lower:,.2f}", annotation_font_size=10,
+            annotation_font_color="#818CF8", annotation_position="bottom right")
     if put_wall is not None:
-        _hl(y=put_wall, row=1, col=1, line_dash="dash", line_color="#EF4444", line_width=1,
-            annotation_text=f"Put Wall {put_wall:,.0f}", annotation_font_size=9,
-            annotation_position="bottom right")
+        _hl(y=put_wall, row=1, col=1, line_dash="solid", line_color="#EF4444", line_width=2,
+            annotation_text=f"Put Wall  {put_wall:,.0f}", annotation_font_size=10,
+            annotation_font_color="#EF4444", annotation_position="bottom left")
+    if call_wall is not None:
+        _hl(y=call_wall, row=1, col=1, line_dash="solid", line_color="#22C55E", line_width=2,
+            annotation_text=f"Call Wall  {call_wall:,.0f}", annotation_font_size=10,
+            annotation_font_color="#22C55E", annotation_position="top left")
+    if max_pain is not None:
+        _hl(y=max_pain, row=1, col=1, line_dash="dash", line_color="#F59E0B", line_width=2,
+            annotation_text=f"Max Pain  {max_pain:,.0f}", annotation_font_size=10,
+            annotation_font_color="#F59E0B", annotation_position="top left")
+
+
+def spy_sparkline(
+    df: pd.DataFrame,
+    vwap: "pd.Series | None" = None,
+) -> go.Figure:
+    """Compact close-price sparkline with optional VWAP — trajectory context only."""
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(
+        x=df.index, y=df["Close"],
+        mode="lines",
+        line=dict(color="#3B82F6", width=1.5),
+        fill="tozeroy",
+        fillcolor="rgba(59,130,246,0.06)",
+        hovertemplate="%{x|%H:%M} &nbsp;<b>$%{y:,.2f}</b><extra></extra>",
+        showlegend=False,
+    ))
+    if vwap is not None:
+        fig.add_trace(go.Scatter(
+            x=df.index, y=vwap,
+            mode="lines",
+            line=dict(color="#E879F9", width=1, dash="dash"),
+            hovertemplate="VWAP $%{y:,.2f}<extra></extra>",
+            showlegend=False,
+        ))
+    fig.update_layout(
+        template="plotly_dark",
+        height=160,
+        margin=dict(l=50, r=10, t=6, b=30),
+        xaxis=dict(gridcolor="#1E293B", showgrid=True, tickformat="%H:%M"),
+        yaxis=dict(gridcolor="#1E293B", showgrid=True),
+        hovermode="x unified",
+        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="rgba(0,0,0,0)",
+    )
+    return fig
 
 
 def _add_rsi_subplot(fig: go.Figure, df: pd.DataFrame, rsi_row: int) -> None:
