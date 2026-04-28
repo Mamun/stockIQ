@@ -168,24 +168,53 @@ def oi_heatmap_chart(
     call_pivot: pd.DataFrame,
     put_pivot: pd.DataFrame,
     current_price: float,
+    window: float = 50.0,
+    bucket: int = 5,
 ) -> go.Figure:
-    """Diverging heatmap: green = call-heavy strikes, red = put-heavy strikes."""
-    net     = call_pivot.sub(put_pivot, fill_value=0)
-    strikes = net.index.tolist()
+    """Diverging heatmap: green = call-heavy strikes, red = put-heavy strikes.
+
+    Only shows strikes within `window` points of current price, bucketed to
+    the nearest `bucket` dollars, so zero-OI rows don't bloat the chart.
+    """
+    net = call_pivot.sub(put_pivot, fill_value=0)
+
+    # 1. Price-window filter — keep only near-the-money strikes
+    net = net[(net.index >= current_price - window) & (net.index <= current_price + window)]
+
+    # 2. $5-bucket aggregation — merge adjacent strikes, reduces noise
+    net.index = (net.index / bucket).round() * bucket
+    net = net.groupby(net.index).sum()
+
+    # 3. Drop rows where every expiration has zero net OI
+    net = net[net.abs().sum(axis=1) > 0]
+
+    if net.empty:
+        fig = go.Figure()
+        fig.update_layout(template="plotly_dark", height=200,
+                          annotations=[dict(text="No OI data in price window", showarrow=False,
+                                           font=dict(color="#94A3B8"))])
+        return fig
+
     exps    = net.columns.tolist()
     abs_max = float(net.abs().max().max()) or 1
 
     fig = go.Figure(go.Heatmap(
-        z=net.values.tolist(), x=exps, y=strikes,
+        z=net.values.tolist(), x=exps, y=net.index.tolist(),
         colorscale=[
-            [0.00, "#7F1D1D"], [0.25, "#DC2626"], [0.45, "#6B7280"],
-            [0.50, "#9CA3AF"], [0.55, "#6B7280"], [0.75, "#16A34A"],
-            [1.00, "#14532D"],
+            [0.00, "#7F1D1D"],  # deep red  — heavy put wall
+            [0.30, "#EF4444"],  # vivid red — moderate put concentration
+            [0.47, "#1E293B"],  # dark slate — fading toward neutral
+            [0.50, "#0F172A"],  # near-black — zero / neutral (blends with bg)
+            [0.53, "#1E293B"],  # dark slate — fading toward neutral
+            [0.70, "#22C55E"],  # vivid green — moderate call concentration
+            [1.00, "#14532D"],  # deep green — heavy call wall
         ],
         zmid=0, zmin=-abs_max, zmax=abs_max,
         colorbar=dict(
             title=dict(text="Net OI<br>(Calls−Puts)", font=dict(size=10, color="#94A3B8")),
             tickfont=dict(size=9, color="#94A3B8"), len=0.85,
+            tickvals=[-abs_max, -abs_max * 0.5, 0, abs_max * 0.5, abs_max],
+            ticktext=["Put wall", "Put heavy", "Neutral", "Call heavy", "Call wall"],
         ),
         hovertemplate=(
             "Expiry: <b>%{x}</b><br>Strike: <b>$%{y:,.0f}</b><br>"
@@ -196,15 +225,15 @@ def oi_heatmap_chart(
 
     fig.add_shape(type="line", xref="paper", yref="y",
                   x0=0, x1=1, y0=current_price, y1=current_price,
-                  line=dict(color="#3B82F6", width=2))
+                  line=dict(color="#3B82F6", width=2, dash="dot"))
     fig.add_annotation(xref="paper", yref="y", x=1.01, y=current_price,
                        text=f"<b>${current_price:,.0f}</b>",
                        showarrow=False, font=dict(color="#3B82F6", size=10), xanchor="left")
     fig.update_layout(
-        template="plotly_dark", height=480,
+        template="plotly_dark", height=420,
         margin=dict(l=70, r=130, t=10, b=60),
         xaxis=dict(title="Expiration", tickangle=-30, side="bottom", gridcolor="#1E293B"),
-        yaxis=dict(title="Strike ($)", dtick=5, gridcolor="#1E293B"),
+        yaxis=dict(title="Strike ($)", dtick=bucket, gridcolor="#1E293B"),
         hovermode="closest",
     )
     return fig
