@@ -10,33 +10,44 @@ from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import date as _date, datetime as _datetime
+import pytz
 
 import pandas as pd
 import streamlit as st
 
 from stockiq.backend.services.spy_service import get_spy_options_analysis, get_put_call_ratio
 from stockiq.frontend.views.components.spy_charts import (
-    gex_chart,
-    oi_butterfly_chart,
+    oi_gex_combined_chart,
     oi_heatmap_chart,
 )
 
 
-def render_options_intelligence(current_price: float) -> None:
-    st.markdown(
-        '<div style="font-size:11px;font-weight:700;color:#64748B;'
-        'letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px">'
-        'Options Intelligence — Max Pain · Open Interest · Put/Call</div>',
-        unsafe_allow_html=True,
-    )
+_ET = pytz.timezone("America/New_York")
 
+
+def render_options_intelligence(current_price: float) -> None:
     seed = get_spy_options_analysis(expiration="", current_price=current_price)
     if not seed:
+        st.markdown(
+            '<div style="font-size:11px;font-weight:700;color:#64748B;'
+            'letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px">'
+            'Options Intelligence — Max Pain · Open Interest · Put/Call</div>',
+            unsafe_allow_html=True,
+        )
         st.caption("Options intelligence is currently disabled.")
         return
 
     exp_map = dict(zip(seed["exp_labels"], seed["expirations"]))
-    _render_what_is_expander(seed, current_price)
+
+    # Prefer 0DTE data for the expander if today has an expiration in the chain
+    today_iso = _date.today().isoformat()
+    if today_iso in seed["expirations"] and seed.get("expiration") != today_iso:
+        seed_0dte = get_spy_options_analysis(expiration=today_iso, current_price=current_price)
+        expander_seed = seed_0dte if seed_0dte else seed
+    else:
+        expander_seed = seed
+
+    _render_what_is_expander(expander_seed, current_price)
 
     exp_col, _ = st.columns([2, 3])
     with exp_col:
@@ -46,11 +57,22 @@ def render_options_intelligence(current_price: float) -> None:
     selected_iso = exp_map[selected_label]
 
     pc_scope_key, pc_scope_note = _derive_pc_scope(selected_iso)
-    pc   = get_put_call_ratio(scope=pc_scope_key)
-    data = get_spy_options_analysis(expiration=selected_iso, current_price=current_price)
+    pc       = get_put_call_ratio(scope=pc_scope_key)
+    data     = get_spy_options_analysis(expiration=selected_iso, current_price=current_price)
+    fetched_at = _datetime.now(tz=_ET).strftime("%-I:%M %p ET · %b %-d")
     if not data:
         st.caption("Options data unavailable for this expiration.")
         return
+
+    st.markdown(
+        f'<div style="font-size:11px;font-weight:700;color:#64748B;letter-spacing:.08em;'
+        f'text-transform:uppercase;margin-bottom:10px">'
+        f'Options Intelligence — Max Pain · Open Interest · Put/Call'
+        f'<span style="font-weight:400;color:#475569;letter-spacing:0;'
+        f'text-transform:none"> &nbsp;·&nbsp; as of {fetched_at}</span>'
+        f'</div>',
+        unsafe_allow_html=True,
+    )
 
     max_pain = data["max_pain"]
     oi_df    = data["oi_df"]
@@ -58,29 +80,30 @@ def render_options_intelligence(current_price: float) -> None:
     mp_color, mp_signal = _max_pain_style(dist_pct)
     dist_arrow = "▲" if dist_pct >= 0 else "▼"
 
-    pc_col, mp_col, chart_col = st.columns([1, 1, 3])
-    with pc_col:
-        _render_pc_card(pc, pc_scope_note)
-    with mp_col:
-        _render_max_pain_card(max_pain, selected_label, current_price, dist_pct, dist_arrow, mp_color, mp_signal)
-    with chart_col:
-        if not oi_df.empty:
-            st.plotly_chart(oi_butterfly_chart(oi_df, current_price, max_pain), width="stretch")
-        else:
-            st.caption("No OI data for this expiration.")
-
     gex_df = data.get("gex_df", pd.DataFrame())
     em     = data.get("expected_move")
-    em_col, gex_col, gex_chart_col = st.columns([1, 1, 3])
-    with em_col:
-        _render_expected_move_card(em, selected_label)
-    with gex_col:
-        _render_gex_summary_card(gex_df)
-    with gex_chart_col:
-        if not gex_df.empty:
-            st.plotly_chart(gex_chart(gex_df, current_price), width="stretch")
+
+    cards_col, chart_col = st.columns([2, 5])
+    with cards_col:
+        r1c1, r1c2 = st.columns(2)
+        with r1c1:
+            _render_pc_card(pc, pc_scope_note)
+        with r1c2:
+            _render_max_pain_card(max_pain, selected_label, current_price, dist_pct, dist_arrow, mp_color, mp_signal)
+        st.markdown('<div style="height:8px"></div>', unsafe_allow_html=True)
+        r2c1, r2c2 = st.columns(2)
+        with r2c1:
+            _render_expected_move_card(em, selected_label)
+        with r2c2:
+            _render_gex_summary_card(gex_df)
+    with chart_col:
+        if not oi_df.empty or not gex_df.empty:
+            st.plotly_chart(
+                oi_gex_combined_chart(oi_df, gex_df, current_price, max_pain),
+                width="stretch",
+            )
         else:
-            st.caption("GEX chart unavailable.")
+            st.caption("No options data for this expiration.")
 
     st.markdown(
         '<div style="font-size:11px;font-weight:700;color:#64748B;'
@@ -147,7 +170,7 @@ def _render_pc_card(pc: dict | None, pc_scope_note: str) -> None:
     st.markdown(
         f"""
 <div style="background:rgba(255,255,255,0.03);border:1px solid #1E293B;border-radius:10px;
-            padding:16px;height:100%;box-sizing:border-box">
+            padding:16px;min-height:175px;box-sizing:border-box">
   <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
     <div style="font-size:10px;color:#94A3B8;font-weight:700;letter-spacing:.07em;
                 text-transform:uppercase">Put / Call</div>
@@ -170,7 +193,7 @@ def _render_max_pain_card(max_pain, label, current_price, dist_pct, arrow, mp_co
     st.markdown(
         f"""
 <div style="background:rgba(255,255,255,0.03);border:1px solid #1E293B;border-radius:10px;
-            padding:16px;height:100%;box-sizing:border-box">
+            padding:16px;min-height:175px;box-sizing:border-box">
   <div style="font-size:10px;color:#94A3B8;font-weight:700;letter-spacing:.07em;
               text-transform:uppercase;margin-bottom:4px">Max Pain · {label}</div>
   <div style="font-size:36px;font-weight:900;color:{mp_color};line-height:1;margin:4px 0">${max_pain:,.0f}</div>
@@ -198,7 +221,7 @@ def _render_expected_move_card(em: dict | None, exp_label: str) -> None:
     st.markdown(
         f"""
 <div style="background:rgba(255,255,255,0.03);border:1px solid #1E293B;border-radius:10px;
-            padding:16px;height:100%;box-sizing:border-box">
+            padding:16px;min-height:175px;box-sizing:border-box">
   <div style="font-size:10px;color:#94A3B8;font-weight:700;letter-spacing:.07em;
               text-transform:uppercase;margin-bottom:4px">Expected Move · {exp_label}</div>
   <div style="font-size:32px;font-weight:900;color:#A78BFA;line-height:1;margin:4px 0">
@@ -228,28 +251,32 @@ def _render_gex_summary_card(gex_df: pd.DataFrame) -> None:
     total_gex = gex_df["gex"].sum()
     total_b   = total_gex / 1e9
     if total_gex >= 0:
-        gex_color, gex_signal, gex_note = "#22C55E", "Positive GEX", "Dealers buy dips & sell rips — price tends to stay range-bound"
+        gex_color  = "#22C55E"
+        gex_gamma  = "Long Gamma"
+        gex_sign   = "Positive GEX"
+        gex_note   = "Dealers buy dips & sell rips — price tends to stay range-bound"
     else:
-        gex_color, gex_signal, gex_note = "#EF4444", "Negative GEX", "Dealers amplify moves — expect larger intraday swings"
+        gex_color  = "#EF4444"
+        gex_gamma  = "Short Gamma"
+        gex_sign   = "Negative GEX"
+        gex_note   = "Dealers amplify moves — expect larger intraday swings"
     peak_support = float(gex_df.loc[gex_df["gex"].idxmax(), "strike"])
     peak_resist  = float(gex_df.loc[gex_df["gex"].idxmin(), "strike"])
     st.markdown(
         f"""
 <div style="background:rgba(255,255,255,0.03);border:1px solid #1E293B;border-radius:10px;
-            padding:16px;height:100%;box-sizing:border-box">
+            padding:16px;min-height:175px;box-sizing:border-box">
   <div style="font-size:10px;color:#94A3B8;font-weight:700;letter-spacing:.07em;
               text-transform:uppercase;margin-bottom:4px">Gamma Exposure (GEX)</div>
   <div style="font-size:32px;font-weight:900;color:{gex_color};line-height:1;margin:4px 0">
     {total_b:+.1f}B
   </div>
-  <div style="font-size:12px;font-weight:700;color:{gex_color};margin-bottom:8px">{gex_signal}</div>
+  <div style="font-size:13px;font-weight:800;color:{gex_color};line-height:1.2">{gex_gamma}</div>
+  <div style="font-size:10px;color:#64748B;margin-bottom:6px">{gex_sign}</div>
   <div style="font-size:10px;color:#94A3B8;line-height:1.8">
     {gex_note}<br>
     Peak dealer support: <b style="color:#22C55E">${peak_support:,.0f}</b><br>
     Peak dealer flip: <b style="color:#EF4444">${peak_resist:,.0f}</b>
-  </div>
-  <div style="font-size:9px;color:#64748B;margin-top:8px;line-height:1.5">
-    Positive = stabilising · Negative = moves may accelerate through key levels.
   </div>
 </div>""",
         unsafe_allow_html=True,
@@ -264,8 +291,17 @@ def _render_what_is_expander(seed: dict, current_price: float) -> None:
     gex_df = seed.get("gex_df", pd.DataFrame())
     em     = seed.get("expected_move")
     mp     = seed["max_pain"]
-    lbl    = seed["exp_labels"][0] if seed["exp_labels"] else ""
     dist   = (current_price - mp) / mp * 100 if mp else 0
+
+    # Derive label from the expiration actually used, not blindly from index 0
+    exp_used = seed.get("expiration", "")
+    try:
+        exp_idx = seed["expirations"].index(exp_used)
+        lbl = seed["exp_labels"][exp_idx]
+    except (ValueError, IndexError):
+        lbl = seed["exp_labels"][0] if seed["exp_labels"] else ""
+    is_0dte = exp_used == _date.today().isoformat()
+    lbl_display = f"{lbl} · 0DTE" if is_0dte else lbl
 
     mp_sig = (
         "Pinned near max pain — low movement expected"   if abs(dist) <= 0.5 else
@@ -277,11 +313,11 @@ def _render_what_is_expander(seed: dict, current_price: float) -> None:
     pc       = get_put_call_ratio(scope="daily")
     total_gex = gex_df["gex"].sum() if not gex_df.empty else None
     gex_b    = f"{total_gex / 1e9:+.1f}B" if total_gex is not None else "N/A"
-    gex_sign = "positive" if (total_gex or 0) >= 0 else "negative"
+    gex_sign = "Long Gamma / Positive GEX" if (total_gex or 0) >= 0 else "Short Gamma / Negative GEX"
     gex_behav = (
-        "dealers are net long gamma — they buy dips and sell rips, keeping SPY range-bound"
+        "dealers are **long gamma** — they buy dips and sell rips, keeping SPY range-bound"
         if (total_gex or 0) >= 0
-        else "dealers are net short gamma — their hedging amplifies moves, so drops can accelerate"
+        else "dealers are **short gamma** — their hedging amplifies moves, so drops can accelerate"
     )
     peak_sup = f"${float(gex_df.loc[gex_df['gex'].idxmax(), 'strike']):,.0f}" if not gex_df.empty else "N/A"
     peak_res = f"${float(gex_df.loc[gex_df['gex'].idxmin(), 'strike']):,.0f}" if not gex_df.empty else "N/A"
@@ -309,11 +345,11 @@ def _render_what_is_expander(seed: dict, current_price: float) -> None:
     )
     em_txt = (
         f"±**${em['move']:,.2f}** (±{em['pct']:.1f}%) — "
-        f"implied range **${em['low']:,.2f} – ${em['high']:,.2f}** by {lbl}."
+        f"implied range **${em['low']:,.2f} – ${em['high']:,.2f}** by {lbl_display}."
         if em else "Expected move unavailable for this expiration."
     )
 
-    with st.expander("What is Options Intelligence?", expanded=False):
+    with st.expander(f"What is Options Intelligence?  ·  showing {lbl_display}", expanded=False):
         st.markdown(
             f"""
 **Options Intelligence** uses the SPY options chain to reveal where large market participants
@@ -365,9 +401,10 @@ Plots net OI (calls minus puts) across all near-term expirations simultaneously.
 The ATM straddle price — what the options market implies as the ±price range by expiration.
 > *Right now: {em_txt}*
 
-**Gamma Exposure (GEX)**
-Measures how aggressively dealers must hedge as SPY moves. Positive GEX = stabilising;
-negative GEX = amplifying.
+**Gamma Exposure (GEX) — Long vs Short Gamma**
+Measures how aggressively dealers must hedge as SPY moves.
+**Long Gamma (Positive GEX)** = dealers stabilise price — they buy dips and sell rips.
+**Short Gamma (Negative GEX)** = dealers amplify moves — drops and rips can accelerate.
 > *Right now: GEX is **{gex_b}** ({gex_sign}), meaning {gex_behav}.
 > Peak dealer support at **{peak_sup}** · peak amplification risk at **{peak_res}**.*
             """

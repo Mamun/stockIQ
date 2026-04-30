@@ -133,6 +133,121 @@ def oi_butterfly_chart(
     return fig
 
 
+def oi_gex_combined_chart(
+    oi_df: pd.DataFrame,
+    gex_df: pd.DataFrame,
+    current_price: float,
+    max_pain: float,
+    n_strikes: int = 30,
+) -> go.Figure:
+    """OI butterfly (left) + GEX (right) sharing a single strike Y-axis.
+
+    Replaces the two separate charts that looked identical at a glance.
+    The shared axis makes the OI→GEX relationship immediately readable:
+    a strike with massive OI but tiny GEX means low-gamma (deep ITM/OTM) contracts.
+    """
+    # Slice GEX to n_strikes around current price
+    if not gex_df.empty:
+        arr  = gex_df["strike"].values
+        idx  = int(np.searchsorted(arr, current_price))
+        half = n_strikes // 2
+        lo   = max(0, idx - half)
+        hi   = min(len(gex_df), lo + n_strikes)
+        lo   = max(0, hi - n_strikes)
+        gex_df = gex_df.iloc[lo:hi].copy()
+        y_min  = float(gex_df["strike"].min())
+        y_max  = float(gex_df["strike"].max())
+    else:
+        y_min, y_max = current_price - 15, current_price + 15
+
+    # Clip OI to the same window so both panels are aligned
+    if not oi_df.empty:
+        oi_df = oi_df[(oi_df["strike"] >= y_min) & (oi_df["strike"] <= y_max)].copy()
+
+    fig = make_subplots(
+        rows=1, cols=2,
+        shared_yaxes=True,
+        column_widths=[0.62, 0.38],
+        subplot_titles=["Open Interest by Strike", "Gamma Exposure (GEX)"],
+        horizontal_spacing=0.04,
+    )
+
+    # ── OI Butterfly (left panel) ────────────────────────────────────────────
+    if not oi_df.empty:
+        strikes = oi_df["strike"].values
+        call_oi = oi_df["call_oi"].values.astype(float)
+        put_oi  = oi_df["put_oi"].values.astype(float)
+
+        fig.add_trace(go.Bar(
+            y=strikes, x=-put_oi, orientation="h",
+            name="Put OI", marker_color="rgba(239,68,68,0.75)",
+            showlegend=False,
+            hovertemplate="Strike $%{y:,.0f}<br>Put OI: %{customdata:,}<extra></extra>",
+            customdata=put_oi,
+        ), row=1, col=1)
+        fig.add_trace(go.Bar(
+            y=strikes, x=call_oi, orientation="h",
+            name="Call OI", marker_color="rgba(34,197,94,0.75)",
+            showlegend=False,
+            hovertemplate="Strike $%{y:,.0f}<br>Call OI: %{x:,}<extra></extra>",
+        ), row=1, col=1)
+
+        x_max     = max(float(call_oi.max()), float(put_oi.max())) * 1.1 if len(call_oi) else 1
+        tick_step = max(1, int(x_max / 4))
+        fig.update_xaxes(
+            range=[-x_max, x_max],
+            tickvals=[-4*tick_step, -2*tick_step, 0, 2*tick_step, 4*tick_step],
+            ticktext=[f"{4*tick_step:,}", f"{2*tick_step:,}", "0",
+                      f"{2*tick_step:,}", f"{4*tick_step:,}"],
+            title_text="← Puts  ·  Open Interest  ·  Calls →",
+            gridcolor="#1E293B",
+            row=1, col=1,
+        )
+
+    # ── GEX (right panel) ────────────────────────────────────────────────────
+    if not gex_df.empty:
+        gex_colors = ["#22C55E" if v >= 0 else "#EF4444" for v in gex_df["gex"]]
+        fig.add_trace(go.Bar(
+            x=gex_df["gex"] / 1e6,
+            y=gex_df["strike"],
+            orientation="h",
+            marker_color=gex_colors,
+            opacity=0.8,
+            name="GEX",
+            showlegend=False,
+            hovertemplate="Strike: <b>$%{y:,.0f}</b><br>GEX: <b>%{x:,.1f}M</b><extra></extra>",
+        ), row=1, col=2)
+        fig.add_vline(x=0, line_color="#475569", line_width=1, row=1, col=2)
+        fig.update_xaxes(title_text="← Stabilising  ·  GEX ($M)  ·  Amplifying →", gridcolor="#1E293B", row=1, col=2)
+
+    # ── Shared reference lines (span both panels via shared Y) ───────────────
+    fig.add_hline(
+        y=current_price, line_color="#3B82F6", line_width=2,
+        annotation_text=f"<b>${current_price:,.0f}</b>",
+        annotation_position="bottom right",
+        annotation_font=dict(color="#3B82F6", size=10),
+    )
+    if y_min <= max_pain <= y_max:
+        fig.add_hline(
+            y=max_pain, line_color="#F59E0B", line_width=1.5, line_dash="dot",
+            annotation_text=f"Pain ${max_pain:,.0f}",
+            annotation_position="top left",
+            annotation_font=dict(color="#F59E0B", size=10),
+        )
+
+    fig.update_yaxes(title_text="Strike ($)", gridcolor="#1E293B", dtick=5,
+                     range=[y_min - 2, y_max + 2], row=1, col=1)
+    fig.update_layout(
+        template="plotly_dark",
+        height=460,
+        barmode="overlay",
+        showlegend=False,
+        margin=dict(l=60, r=10, t=36, b=50),
+        hovermode="y unified",
+    )
+    return fig
+
+
 def gex_chart(gex_df: pd.DataFrame, current_price: float, n_strikes: int = 30) -> go.Figure:
     """Horizontal bar chart of GEX by strike — green = stabilising, red = amplifying."""
     strikes = gex_df["strike"].values
