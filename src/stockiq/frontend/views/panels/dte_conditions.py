@@ -179,6 +179,27 @@ def _verdict(net: int) -> tuple:
     return "NEUTRAL", "#F59E0B", "↔", "No clear edge — consider iron condors or stay flat"
 
 
+# ── Option pricing helpers ─────────────────────────────────────────────────────
+
+def _option_mid(chain_df: pd.DataFrame, strike: float) -> float | None:
+    """Return mid price for the nearest strike; falls back to lastPrice when bid/ask are stale."""
+    if chain_df is None or chain_df.empty:
+        return None
+    idx = (chain_df["strike"] - strike).abs().idxmin()
+    row = chain_df.loc[idx]
+    bid  = float(row.get("bid",       0) or 0)
+    ask  = float(row.get("ask",       0) or 0)
+    last = float(row.get("lastPrice", 0) or 0)
+    if bid > 0 and ask > 0:
+        return round((bid + ask) / 2, 2)
+    return round(last, 2) if last > 0 else None
+
+
+def _spx(spy_strike: float) -> int:
+    """Approximate SPX / ES / MES index-level equivalent for a SPY strike (~10× ratio)."""
+    return round(spy_strike * 10)
+
+
 # ── Trade suggestion ───────────────────────────────────────────────────────────
 
 def _trade_suggestion(net: int, seed: dict, current_price: float, max_pain: float | None) -> str:
@@ -196,12 +217,14 @@ def _trade_suggestion(net: int, seed: dict, current_price: float, max_pain: floa
         stp_price, stp_label = _best_stop_call(current_price, em_move, reward, put_wall)
         risk      = max(current_price - stp_price, 0.5)
         clr, direction = "#22C55E", "CALL"
+        chain_df  = seed.get("raw_calls", pd.DataFrame())
     else:
         tgt_price, tgt_label = _best_target_put(current_price, em_move, put_wall, max_pain)
         reward    = current_price - tgt_price
         stp_price, stp_label = _best_stop_put(current_price, em_move, reward, call_wall)
         risk      = max(stp_price - current_price, 0.5)
         clr, direction = "#EF4444", "PUT"
+        chain_df  = seed.get("raw_puts", pd.DataFrame())
 
     rr     = reward / risk
     rr_clr = "#22C55E" if rr >= 2.0 else "#F59E0B" if rr >= 1.2 else "#EF4444"
@@ -219,11 +242,38 @@ def _trade_suggestion(net: int, seed: dict, current_price: float, max_pain: floa
         f'</div>'
         for lbl, val, c in metrics
     )
+
+    # ── Option cost + index-level mapping row ──────────────────────────────────
+    mid = _option_mid(chain_df, atm)
+    mid_str  = f"~${mid:.2f} mid" if mid else "N/A (mkt closed)"
+    spx_row  = (
+        f'<div style="display:flex;flex-wrap:wrap;gap:16px;align-items:center;'
+        f'background:rgba(255,255,255,0.025);border-radius:8px;padding:9px 14px;'
+        f'margin-bottom:10px">'
+        f'<div>'
+        f'<span style="font-size:10px;color:#475569;text-transform:uppercase;'
+        f'letter-spacing:.06em">SPY option cost (ATM)</span>&nbsp;&nbsp;'
+        f'<span style="font-size:13px;font-weight:700;color:{clr}">{mid_str}</span>'
+        f'</div>'
+        f'<div style="width:1px;height:24px;background:#1E293B"></div>'
+        f'<div style="font-size:11px;color:#64748B">'
+        f'<span style="color:#94A3B8;font-weight:600">SPX&thinsp;/&thinsp;ES&thinsp;/&thinsp;MES equiv</span>'
+        f'&nbsp;&nbsp;'
+        f'Entry&nbsp;<span style="color:#E2E8F0;font-weight:700">{_spx(atm):,}</span>'
+        f'&ensp;·&ensp;'
+        f'Target&nbsp;<span style="color:{clr};font-weight:700">{_spx(tgt_price):,}</span>'
+        f'&ensp;·&ensp;'
+        f'Stop&nbsp;<span style="color:#F59E0B;font-weight:700">{_spx(stp_price):,}</span>'
+        f'</div>'
+        f'</div>'
+    )
+
     return (
         f'<div style="font-size:10px;color:#64748B;font-weight:700;letter-spacing:.07em;'
         f'text-transform:uppercase;margin-bottom:10px">&#127919; Suggested Trade</div>'
         f'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px">'
         f'{grid}</div>'
+        f'{spx_row}'
         f'<div style="font-size:11px;color:#475569;line-height:1.6">'
         f'Target: {tgt_label} &nbsp;·&nbsp; Stop: {stp_label}<br>'
         f'&#9200; Enter 9:45 AM–12:00 PM &nbsp;·&nbsp; Close all by 3:45 PM'

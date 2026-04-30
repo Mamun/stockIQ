@@ -142,6 +142,21 @@ def get_put_call_ratio(scope: str = "daily") -> dict | None:
     return None
 
 
+def _yahoo_chain_for_bid_ask(expiration: str, side: str) -> pd.DataFrame:
+    """
+    Fetch bid/ask from the Yahoo chain for a specific expiration.
+    CBOE is preferred for OI but only Yahoo carries live bid/ask quotes.
+    Returns an empty DataFrame on any failure.
+    """
+    try:
+        data = fetch_spy_options_data(expiration=expiration)
+        if data:
+            return data[side]
+    except Exception:
+        pass
+    return pd.DataFrame()
+
+
 def get_spy_options_analysis(
     expiration: str = "",
     current_price: float = 0.0,
@@ -188,4 +203,6 @@ def get_spy_options_analysis(
         "expiration":    data["expiration"],
         "expirations":   data["expirations"],
         "exp_labels":    label_expirations(data["expirations"]),
+        "raw_calls":     _yahoo_chain_for_bid_ask(data["expiration"], "calls"),
+        "raw_puts":      _yahoo_chain_for_bid_ask(data["expiration"], "puts"),
     }
