@@ -74,7 +74,8 @@ def render_nasdaq_rsi_tab() -> None:
         return
 
     # ── Add company names ─────────────────────────────────────────────────────
-    df.insert(1, "Company", df["Ticker"].map(_COMPANY).fillna("—"))
+    if "Company" not in df.columns:
+        df.insert(1, "Company", df["Ticker"].map(_COMPANY).fillna("—"))
 
     # ── Apply status filter ───────────────────────────────────────────────────
     if status_filter == "🟢 Oversold (RSI ≤ 30)":

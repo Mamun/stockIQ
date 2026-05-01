@@ -58,8 +58,8 @@ No other user can see or use your key.
         if user_key:
             st.session_state[session_key] = user_key
             st.success(
-                f"✓ Your personal key is active for this session only. "
-                f"It will be removed when you close this tab.",
+                "✓ Your personal key is active for this session only. "
+                "It will be removed when you close this tab.",
                 icon="🔒",
             )
         else:

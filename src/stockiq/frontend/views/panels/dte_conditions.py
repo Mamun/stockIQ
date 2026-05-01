@@ -69,7 +69,8 @@ def _evaluate_signals(
     vix_val = vix_snapshot.get("current") if vix_snapshot else None
     if vix_val is not None:
         if vix_val < 16:
-            signals.append(("VIX", f"{vix_val:.1f}", "CALL", "Cheap options — good day to buy directional calls", "#22C55E")); call_pts += 1
+            signals.append(("VIX", f"{vix_val:.1f}", "CALL", "Cheap options — good day to buy directional calls", "#22C55E"))
+            call_pts += 1
         elif vix_val > 25:
             signals.append(("VIX", f"{vix_val:.1f}", "NEUTRAL", "Fear elevated — sell premium (condors/spreads), not directional", "#F59E0B"))
         else:
@@ -80,9 +81,11 @@ def _evaluate_signals(
     if pc_data:
         r = pc_data["ratio"]
         if r < 0.80:
-            signals.append(("P/C Ratio", f"{r:.3f}", "CALL", "More calls than puts — market leans bullish", "#22C55E")); call_pts += 1
+            signals.append(("P/C Ratio", f"{r:.3f}", "CALL", "More calls than puts — market leans bullish", "#22C55E"))
+            call_pts += 1
         elif r > 1.10:
-            signals.append(("P/C Ratio", f"{r:.3f}", "PUT",  "Fear/hedging dominant — put volume heavy", "#EF4444")); put_pts += 1
+            signals.append(("P/C Ratio", f"{r:.3f}", "PUT",  "Fear/hedging dominant — put volume heavy", "#EF4444"))
+            put_pts += 1
         else:
             signals.append(("P/C Ratio", f"{r:.3f}", "NEUTRAL", "Balanced put/call positioning", "#94A3B8"))
     else:
@@ -91,9 +94,11 @@ def _evaluate_signals(
     if max_pain:
         dist = (current_price - max_pain) / max_pain * 100
         if dist > 1.0:
-            signals.append(("Max Pain", f"${max_pain:,.0f}", "CALL", f"Price {dist:+.1f}% above — bullish price action", "#22C55E")); call_pts += 1
+            signals.append(("Max Pain", f"${max_pain:,.0f}", "CALL", f"Price {dist:+.1f}% above — bullish price action", "#22C55E"))
+            call_pts += 1
         elif dist < -1.0:
-            signals.append(("Max Pain", f"${max_pain:,.0f}", "PUT",  f"Price {dist:+.1f}% below — bearish gravitational pull", "#EF4444")); put_pts += 1
+            signals.append(("Max Pain", f"${max_pain:,.0f}", "PUT",  f"Price {dist:+.1f}% below — bearish gravitational pull", "#EF4444"))
+            put_pts += 1
         else:
             signals.append(("Max Pain", f"${max_pain:,.0f}", "NEUTRAL", f"Pinned near pain ({dist:+.1f}%) — sideways expected", "#94A3B8"))
     else:
@@ -102,17 +107,21 @@ def _evaluate_signals(
     if total_gex is not None:
         gb = total_gex / 1e9
         if total_gex >= 0:
-            signals.append(("GEX", f"{gb:+.1f}B", "CALL", "Dealers buy dips & sell rips — market pinned up", "#22C55E")); call_pts += 1
+            signals.append(("GEX", f"{gb:+.1f}B", "CALL", "Dealers buy dips & sell rips — market pinned up", "#22C55E"))
+            call_pts += 1
         else:
-            signals.append(("GEX", f"{gb:+.1f}B", "PUT",  "Dealers amplify moves — drops can accelerate", "#EF4444")); put_pts += 1
+            signals.append(("GEX", f"{gb:+.1f}B", "PUT",  "Dealers amplify moves — drops can accelerate", "#EF4444"))
+            put_pts += 1
     else:
         signals.append(("GEX", "N/A", "—", "Unavailable", "#475569"))
 
     if rsi is not None:
         if rsi >= 55:
-            signals.append(("RSI (1d)", f"{rsi:.1f}", "CALL", "Above 55 — bullish daily momentum", "#22C55E")); call_pts += 1
+            signals.append(("RSI (1d)", f"{rsi:.1f}", "CALL", "Above 55 — bullish daily momentum", "#22C55E"))
+            call_pts += 1
         elif rsi <= 45:
-            signals.append(("RSI (1d)", f"{rsi:.1f}", "PUT",  "Below 45 — bearish daily momentum", "#EF4444")); put_pts += 1
+            signals.append(("RSI (1d)", f"{rsi:.1f}", "PUT",  "Below 45 — bearish daily momentum", "#EF4444"))
+            put_pts += 1
         else:
             signals.append(("RSI (1d)", f"{rsi:.1f}", "NEUTRAL", "45–55 choppy zone — no directional edge", "#94A3B8"))
     else:
@@ -121,9 +130,11 @@ def _evaluate_signals(
     if vwap is not None:
         dist_pct = (current_price - vwap) / vwap * 100
         if dist_pct > 0.1:
-            signals.append(("VWAP", f"${vwap:.2f}", "CALL", f"+{dist_pct:.2f}% above VWAP — intraday trend bullish", "#22C55E")); call_pts += 1
+            signals.append(("VWAP", f"${vwap:.2f}", "CALL", f"+{dist_pct:.2f}% above VWAP — intraday trend bullish", "#22C55E"))
+            call_pts += 1
         elif dist_pct < -0.1:
-            signals.append(("VWAP", f"${vwap:.2f}", "PUT",  f"{dist_pct:.2f}% below VWAP — intraday trend bearish", "#EF4444")); put_pts += 1
+            signals.append(("VWAP", f"${vwap:.2f}", "PUT",  f"{dist_pct:.2f}% below VWAP — intraday trend bearish", "#EF4444"))
+            put_pts += 1
         else:
             signals.append(("VWAP", f"${vwap:.2f}", "NEUTRAL", f"Hugging VWAP ({dist_pct:+.2f}%) — no intraday edge", "#94A3B8"))
     else:
@@ -131,9 +142,11 @@ def _evaluate_signals(
 
     if or_high is not None and or_low is not None:
         if current_price > or_high:
-            signals.append(("OR Break", f">{or_high:.0f}", "CALL", "Above opening range high — trend day, follow the break", "#22C55E")); call_pts += 1
+            signals.append(("OR Break", f">{or_high:.0f}", "CALL", "Above opening range high — trend day, follow the break", "#22C55E"))
+            call_pts += 1
         elif current_price < or_low:
-            signals.append(("OR Break", f"<{or_low:.0f}", "PUT",  "Below opening range low — trend day breakdown", "#EF4444")); put_pts += 1
+            signals.append(("OR Break", f"<{or_low:.0f}", "PUT",  "Below opening range low — trend day breakdown", "#EF4444"))
+            put_pts += 1
         else:
             signals.append(("OR Break", f"{or_low:.0f}–{or_high:.0f}", "NEUTRAL", "Inside opening range — wait for a clean break", "#94A3B8"))
     else:
@@ -141,9 +154,11 @@ def _evaluate_signals(
 
     if pdh is not None and pdl is not None:
         if current_price > pdh:
-            signals.append(("PDH/PDL", f">${pdh:.0f}", "CALL", "Above prior day high — bulls reclaimed key resistance", "#22C55E")); call_pts += 1
+            signals.append(("PDH/PDL", f">${pdh:.0f}", "CALL", "Above prior day high — bulls reclaimed key resistance", "#22C55E"))
+            call_pts += 1
         elif current_price < pdl:
-            signals.append(("PDH/PDL", f"<${pdl:.0f}", "PUT",  "Below prior day low — bears broke key support", "#EF4444")); put_pts += 1
+            signals.append(("PDH/PDL", f"<${pdl:.0f}", "PUT",  "Below prior day low — bears broke key support", "#EF4444"))
+            put_pts += 1
         else:
             signals.append(("PDH/PDL", f"{pdl:.0f}–{pdh:.0f}", "NEUTRAL", "Inside prior day range — no breakout yet", "#94A3B8"))
     else:
@@ -152,13 +167,17 @@ def _evaluate_signals(
     if prev_close is not None and prev_close > 0:
         gap_pct = (current_price - prev_close) / prev_close * 100
         if gap_pct > 0.5:
-            signals.append(("Gap", f"{gap_pct:+.2f}%", "PUT",  f"Large gap up {gap_pct:.2f}% — fade candidate, gap fill likely", "#EF4444")); put_pts += 1
+            signals.append(("Gap", f"{gap_pct:+.2f}%", "PUT",  f"Large gap up {gap_pct:.2f}% — fade candidate, gap fill likely", "#EF4444"))
+            put_pts += 1
         elif gap_pct < -0.5:
-            signals.append(("Gap", f"{gap_pct:+.2f}%", "CALL", f"Large gap down {abs(gap_pct):.2f}% — fade candidate, gap fill likely", "#22C55E")); call_pts += 1
+            signals.append(("Gap", f"{gap_pct:+.2f}%", "CALL", f"Large gap down {abs(gap_pct):.2f}% — fade candidate, gap fill likely", "#22C55E"))
+            call_pts += 1
         elif 0.1 < gap_pct <= 0.5:
-            signals.append(("Gap", f"{gap_pct:+.2f}%", "CALL", f"Small gap up {gap_pct:.2f}% — trend follow setup", "#22C55E")); call_pts += 1
+            signals.append(("Gap", f"{gap_pct:+.2f}%", "CALL", f"Small gap up {gap_pct:.2f}% — trend follow setup", "#22C55E"))
+            call_pts += 1
         elif -0.5 <= gap_pct < -0.1:
-            signals.append(("Gap", f"{gap_pct:+.2f}%", "PUT",  f"Small gap down {abs(gap_pct):.2f}% — trend follow setup", "#EF4444")); put_pts += 1
+            signals.append(("Gap", f"{gap_pct:+.2f}%", "PUT",  f"Small gap down {abs(gap_pct):.2f}% — trend follow setup", "#EF4444"))
+            put_pts += 1
         else:
             signals.append(("Gap", f"{gap_pct:+.2f}%", "NEUTRAL", f"Flat open ({gap_pct:+.2f}%) — no gap directional bias", "#94A3B8"))
     else:

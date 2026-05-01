@@ -5,9 +5,8 @@
 from unittest.mock import MagicMock, patch
 import numpy as np
 import pandas as pd
-import pytest
 
-from stockiq.data.fetch import fetch_ohlcv, get_company_name, search_companies
+from stockiq.backend.data.yf_fetch import fetch_ohlcv, get_company_name, search_companies
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
@@ -30,29 +29,28 @@ def _make_yf_df(n: int = 100, price: float = 150.0) -> pd.DataFrame:
 # ── fetch_ohlcv ───────────────────────────────────────────────────────────────
 
 class TestFetchOHLCV:
-    @patch("stockiq.data.fetch.yf.download")
+    @patch("stockiq.backend.data.yf_fetch.yf.download")
     def test_returns_dataframe(self, mock_download):
         mock_download.return_value = _make_yf_df(200)
         df = fetch_ohlcv("AAPL", 365)
         assert isinstance(df, pd.DataFrame)
 
-    @patch("stockiq.data.fetch.yf.download")
+    @patch("stockiq.backend.data.yf_fetch.yf.download")
     def test_contains_ohlcv_columns(self, mock_download):
         mock_download.return_value = _make_yf_df(200)
         df = fetch_ohlcv("AAPL", 365)
         for col in ("Open", "High", "Low", "Close", "Volume"):
             assert col in df.columns
 
-    @patch("stockiq.data.fetch.yf.download")
+    @patch("stockiq.backend.data.yf_fetch.yf.download")
     def test_requests_extra_warmup_days(self, mock_download):
         mock_download.return_value = _make_yf_df(300)
         fetch_ohlcv("AAPL", 365)
-        call_kwargs = mock_download.call_args
         # The function fetches 365 + 1450 = 1815 days of history
         # Verify the start date is earlier than just 365 days ago
         assert mock_download.called
 
-    @patch("stockiq.data.fetch.yf.download")
+    @patch("stockiq.backend.data.yf_fetch.yf.download")
     def test_multiindex_columns_flattened(self, mock_download):
         """If yfinance returns a MultiIndex columns, they should be flattened."""
         df = _make_yf_df(100)
@@ -65,7 +63,7 @@ class TestFetchOHLCV:
         result = fetch_ohlcv("AAPL", 30)
         assert not isinstance(result.columns, pd.MultiIndex)
 
-    @patch("stockiq.data.fetch.yf.download")
+    @patch("stockiq.backend.data.yf_fetch.yf.download")
     def test_all_nan_close_returns_empty_df(self, mock_download):
         """A DataFrame where all Close values are NaN should be fully dropped."""
         dates = pd.bdate_range(end="2024-12-31", periods=10)
@@ -78,7 +76,7 @@ class TestFetchOHLCV:
         result = fetch_ohlcv("INVALID", 30)
         assert result.empty
 
-    @patch("stockiq.data.fetch.yf.download")
+    @patch("stockiq.backend.data.yf_fetch.yf.download")
     def test_drops_nan_close_rows(self, mock_download):
         df = _make_yf_df(50)
         df.loc[df.index[10], "Close"] = np.nan
@@ -86,7 +84,7 @@ class TestFetchOHLCV:
         result = fetch_ohlcv("AAPL", 30)
         assert result["Close"].isna().sum() == 0
 
-    @patch("stockiq.data.fetch.yf.download")
+    @patch("stockiq.backend.data.yf_fetch.yf.download")
     def test_ticker_passed_to_yfinance(self, mock_download):
         mock_download.return_value = _make_yf_df(100)
         fetch_ohlcv("MSFT", 365)
@@ -97,7 +95,7 @@ class TestFetchOHLCV:
 # ── get_company_name ──────────────────────────────────────────────────────────
 
 class TestGetCompanyName:
-    @patch("stockiq.data.fetch.yf.Ticker")
+    @patch("stockiq.backend.data.yf_fetch.yf.Ticker")
     def test_returns_long_name(self, mock_ticker_cls):
         mock_ticker = MagicMock()
         mock_ticker.info = {"longName": "Apple Inc."}
@@ -105,7 +103,7 @@ class TestGetCompanyName:
         name = get_company_name("AAPL")
         assert name == "Apple Inc."
 
-    @patch("stockiq.data.fetch.yf.Ticker")
+    @patch("stockiq.backend.data.yf_fetch.yf.Ticker")
     def test_falls_back_to_ticker_on_missing_long_name(self, mock_ticker_cls):
         mock_ticker = MagicMock()
         mock_ticker.info = {}
@@ -113,13 +111,13 @@ class TestGetCompanyName:
         name = get_company_name("XYZ")
         assert name == "XYZ"
 
-    @patch("stockiq.data.fetch.yf.Ticker")
+    @patch("stockiq.backend.data.yf_fetch.yf.Ticker")
     def test_falls_back_to_ticker_on_exception(self, mock_ticker_cls):
         mock_ticker_cls.side_effect = Exception("network error")
         name = get_company_name("FAIL")
         assert name == "FAIL"
 
-    @patch("stockiq.data.fetch.yf.Ticker")
+    @patch("stockiq.backend.data.yf_fetch.yf.Ticker")
     def test_returns_string(self, mock_ticker_cls):
         mock_ticker = MagicMock()
         mock_ticker.info = {"longName": "Microsoft Corporation"}
@@ -131,7 +129,7 @@ class TestGetCompanyName:
 # ── search_companies ──────────────────────────────────────────────────────────
 
 class TestSearchCompanies:
-    @patch("stockiq.data.fetch.yf.Search")
+    @patch("stockiq.backend.data.yf_fetch.yf.Search")
     def test_returns_list(self, mock_search_cls):
         mock_search = MagicMock()
         mock_search.quotes = [
@@ -141,7 +139,7 @@ class TestSearchCompanies:
         result = search_companies("apple")
         assert isinstance(result, list)
 
-    @patch("stockiq.data.fetch.yf.Search")
+    @patch("stockiq.backend.data.yf_fetch.yf.Search")
     def test_returns_expected_keys(self, mock_search_cls):
         mock_search = MagicMock()
         mock_search.quotes = [
@@ -153,7 +151,7 @@ class TestSearchCompanies:
             keys = set(result[0].keys())
             assert "symbol" in keys
 
-    @patch("stockiq.data.fetch.yf.Search")
+    @patch("stockiq.backend.data.yf_fetch.yf.Search")
     def test_empty_query_returns_empty_list(self, mock_search_cls):
         mock_search = MagicMock()
         mock_search.quotes = []
@@ -161,7 +159,7 @@ class TestSearchCompanies:
         result = search_companies("")
         assert result == [] or isinstance(result, list)
 
-    @patch("stockiq.data.fetch.yf.Search")
+    @patch("stockiq.backend.data.yf_fetch.yf.Search")
     def test_exception_returns_empty_list(self, mock_search_cls):
         mock_search_cls.side_effect = Exception("search error")
         result = search_companies("apple")

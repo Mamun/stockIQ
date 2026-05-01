@@ -108,6 +108,15 @@ def render_spy_chart_section(quote: dict) -> None:
         or_high = float(_or["High"].max())
         or_low  = float(_or["Low"].min())
 
+    # EMA21 — daily trend anchor, shown as a reference level
+    ema21_level = None
+    try:
+        daily = get_spy_chart_df(period="1y", interval="1d")
+        if len(daily) >= 21:
+            ema21_level = float(daily["Close"].ewm(span=21, adjust=False).mean().iloc[-1])
+    except Exception:
+        pass
+
     # Options levels — the unique value this chart adds over TradingView
     max_pain = call_wall = put_wall = em_upper = em_lower = None
     try:
@@ -156,6 +165,7 @@ def render_spy_chart_section(quote: dict) -> None:
         put_wall=put_wall    if show_options  else None,
         em_upper=em_upper    if show_options  else None,
         em_lower=em_lower    if show_options  else None,
+        ema21=ema21_level,
     )
     if _table:
         st.html(_table)
@@ -203,12 +213,37 @@ def _series_last(s) -> float | None:
         return None
 
 
+_ROLE_MAP: dict[str, tuple[str, str, str]] = {
+    # label: (role_text, text_color, bg_color)
+    "Call Wall":  ("Resistance", "#86EFAC", "#052E16"),
+    "Put Wall":   ("Support",    "#FDA4AF", "#450A0A"),
+    "Max Pain":   ("Target",     "#FCD34D", "#1C1200"),
+    "EM +":       ("Bound",      "#A78BFA", "#1E1B4B"),
+    "EM −":       ("Bound",      "#A78BFA", "#1E1B4B"),
+    "R1":         ("Resistance", "#86EFAC", "#052E16"),
+    "S1":         ("Support",    "#FDA4AF", "#450A0A"),
+    "PDH":        ("Resistance", "#94A3B8", "#1E293B"),
+    "PDL":        ("Support",    "#94A3B8", "#1E293B"),
+    "OR High":    ("Breakout",   "#FCD34D", "#1C1200"),
+    "OR Low":     ("Breakdown",  "#F87171", "#450A0A"),
+    "VWAP +2σ":  ("Overbought", "#E879F9", "#2D0A3E"),
+    "VWAP +1σ":  ("Overbought", "#E879F9", "#2D0A3E"),
+    "VWAP -1σ":  ("Oversold",   "#E879F9", "#2D0A3E"),
+    "VWAP -2σ":  ("Oversold",   "#E879F9", "#2D0A3E"),
+    "VWAP":       ("Mean Rev",   "#E879F9", "#2D0A3E"),
+    "EMA 21":     ("Trend",      "#2DD4BF", "#022C22"),
+    "Pivot":      ("Pivot",      "#38BDF8", "#082F49"),
+    "Prev Close": ("Reference",  "#64748B", "#1E293B"),
+}
+
+
 def _levels_table_html(
     current_price: float,
     vwap=None, vwap_u1=None, vwap_l1=None, vwap_u2=None, vwap_l2=None,
     or_high=None, or_low=None,
     pdh=None, pdl=None, pivot=None, r1=None, s1=None, prev_close=None,
     max_pain=None, call_wall=None, put_wall=None, em_upper=None, em_lower=None,
+    ema21=None,
 ) -> str:
     # (label, value, dot_color, category_label, category_bg)
     candidates = [
@@ -220,6 +255,7 @@ def _levels_table_html(
         ("VWAP +2σ",  vwap_u2,    "#E879F9", "VWAP",      "#2D0A3E"),
         ("VWAP +1σ",  vwap_u1,    "#E879F9", "VWAP",      "#2D0A3E"),
         ("VWAP",       vwap,       "#E879F9", "VWAP",      "#2D0A3E"),
+        ("EMA 21",     ema21,      "#2DD4BF", "Trend",     "#022C22"),
         ("Pivot",      pivot,      "#38BDF8", "Technical", "#082F49"),
         ("Prev Close", prev_close, "#475569", "Technical", "#1E293B"),
         ("VWAP -1σ",  vwap_l1,    "#E879F9", "VWAP",      "#2D0A3E"),
@@ -239,10 +275,49 @@ def _levels_table_html(
     rows.sort(key=lambda r: r[1], reverse=True)
     insert_idx = next((i for i, r in enumerate(rows) if r[1] < current_price), len(rows))
 
+    # ── Nearest above / below summary ─────────────────────────────────────────
+    def _summary_cell(row, is_above: bool) -> str:
+        if row is None:
+            label = "No level above" if is_above else "No level below"
+            return f'<div style="font-size:11px;color:#475569;">{label}</div>'
+        lbl, val, dot, _cat, _cat_bg = row
+        dist     = val - current_price
+        pct      = dist / current_price * 100
+        d_col    = "#86EFAC" if is_above else "#FDA4AF"
+        arrow    = "↑" if is_above else "↓"
+        role_txt, role_col, _ = _ROLE_MAP.get(lbl, ("—", "#64748B", "#1E293B"))
+        return (
+            f'<div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;">'
+            f'<span style="color:{d_col};font-size:15px;line-height:1;">{arrow}</span>'
+            f'<span style="display:inline-block;width:7px;height:7px;border-radius:50%;'
+            f'background:{dot};flex-shrink:0;"></span>'
+            f'<span style="font-size:12px;color:#E2E8F0;font-weight:600;">{lbl}</span>'
+            f'<span style="font-size:11px;color:{role_col};">{role_txt}</span>'
+            f'<span style="font-size:12px;color:#F8FAFC;font-family:monospace;">${val:,.2f}</span>'
+            f'<span style="font-size:12px;font-weight:600;color:{d_col};font-family:monospace;">'
+            f'{"+" if is_above else ""}{pct:.2f}%</span>'
+            f'</div>'
+        )
+
+    nearest_above = rows[insert_idx - 1] if insert_idx > 0 else None
+    nearest_below = rows[insert_idx] if insert_idx < len(rows) else None
+    summary_bar = (
+        f'<div style="display:flex;justify-content:space-between;align-items:center;'
+        f'padding:8px 14px;background:#0F172A;border:1px solid #1E293B;border-radius:8px;'
+        f'margin-bottom:6px;gap:8px;flex-wrap:wrap;">'
+        f'{_summary_cell(nearest_above, True)}'
+        f'<div style="width:1px;height:22px;background:#1E293B;flex-shrink:0;"></div>'
+        f'{_summary_cell(nearest_below, False)}'
+        f'</div>'
+    )
+
+    # ── Table rows ─────────────────────────────────────────────────────────────
     def _row(lbl, val, dot, cat, cat_bg):
-        dist  = val - current_price
-        d_col = "#86EFAC" if dist > 0 else "#FDA4AF"
-        arrow = "▲" if dist > 0 else "▼"
+        dist     = val - current_price
+        pct      = dist / current_price * 100
+        d_col    = "#86EFAC" if dist > 0 else "#FDA4AF"
+        arrow    = "▲" if dist > 0 else "▼"
+        role_txt, role_col, role_bg = _ROLE_MAP.get(lbl, ("—", "#64748B", "#1E293B"))
         return (
             f'<tr style="border-bottom:1px solid #0F172A;">'
             f'<td style="padding:7px 10px;white-space:nowrap;">'
@@ -251,17 +326,23 @@ def _levels_table_html(
             f'<span style="color:#E2E8F0;font-size:13px;">{lbl}</span></td>'
             f'<td style="padding:7px 10px;font-size:13px;font-family:monospace;'
             f'color:#F8FAFC;text-align:right;white-space:nowrap;">${val:,.2f}</td>'
-            f'<td style="padding:7px 10px;font-size:12px;color:{d_col};'
-            f'text-align:right;white-space:nowrap;font-family:monospace;">'
-            f'{arrow} ${abs(dist):,.2f}</td>'
+            f'<td style="padding:7px 10px;text-align:right;white-space:nowrap;">'
+            f'<div style="font-size:12px;font-weight:600;color:{d_col};font-family:monospace;">'
+            f'{arrow} {abs(pct):.2f}%</div>'
+            f'<div style="font-size:10px;color:#475569;font-family:monospace;">${abs(dist):,.2f}</div>'
+            f'</td>'
             f'<td style="padding:7px 10px;text-align:right;">'
             f'<span style="font-size:10px;padding:2px 7px;border-radius:4px;'
-            f'background:{cat_bg};color:#CBD5E1;">{cat}</span></td></tr>'
+            f'background:{cat_bg};color:#CBD5E1;">{cat}</span></td>'
+            f'<td style="padding:7px 10px;text-align:right;">'
+            f'<span style="font-size:10px;padding:2px 7px;border-radius:4px;'
+            f'background:{role_bg};color:{role_col};font-weight:600;">{role_txt}</span></td>'
+            f'</tr>'
         )
 
     _price_sep = (
         f'<tr style="background:#172554;border-top:2px solid #3B82F6;border-bottom:2px solid #3B82F6;">'
-        f'<td colspan="4" style="padding:6px 10px;">'
+        f'<td colspan="5" style="padding:6px 10px;">'
         f'<span style="color:#93C5FD;font-size:11px;font-weight:600;letter-spacing:0.06em;">▶ PRICE NOW</span>'
         f'<span style="color:#60A5FA;font-size:14px;font-weight:700;font-family:monospace;'
         f'margin-left:12px;">${current_price:,.2f}</span>'
@@ -276,22 +357,22 @@ def _levels_table_html(
     if insert_idx == len(rows):
         html_rows.append(_price_sep)
 
+    def _th(label, align="right"):
+        return (
+            f'<th style="padding:6px 10px;text-align:{align};font-size:10px;color:#64748B;'
+            f'font-weight:600;letter-spacing:0.1em;text-transform:uppercase;">{label}</th>'
+        )
+
     header = (
-        '<tr style="border-bottom:1px solid #1E293B;">'
-        '<th style="padding:6px 10px;text-align:left;font-size:10px;color:#64748B;'
-        'font-weight:600;letter-spacing:0.1em;text-transform:uppercase;">Level</th>'
-        '<th style="padding:6px 10px;text-align:right;font-size:10px;color:#64748B;'
-        'font-weight:600;letter-spacing:0.1em;text-transform:uppercase;">Price</th>'
-        '<th style="padding:6px 10px;text-align:right;font-size:10px;color:#64748B;'
-        'font-weight:600;letter-spacing:0.1em;text-transform:uppercase;">Dist</th>'
-        '<th style="padding:6px 10px;text-align:right;font-size:10px;color:#64748B;'
-        'font-weight:600;letter-spacing:0.1em;text-transform:uppercase;">Type</th>'
-        '</tr>'
+        f'<tr style="border-bottom:1px solid #1E293B;">'
+        f'{_th("Level", "left")}{_th("Price")}{_th("Dist")}{_th("Type")}{_th("Role")}'
+        f'</tr>'
     )
 
     return (
-        '<div style="background:#0B1120;border:1px solid #1E293B;border-radius:10px;'
-        'overflow:hidden;margin-top:6px;">'
+        summary_bar
+        + '<div style="background:#0B1120;border:1px solid #1E293B;border-radius:10px;'
+        'overflow:hidden;">'
         f'<table style="width:100%;border-collapse:collapse;">'
         f'<thead>{header}</thead>'
         f'<tbody>{"".join(html_rows)}</tbody>'

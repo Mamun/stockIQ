@@ -134,7 +134,7 @@ def render_spy_summary_card(
     SPY technical snapshot — single row.
     Optionally prepends signal cells (RSI, VIX, P/C) when provided.
     """
-    ma5 = ma50 = ma100 = ma200 = cross_label = cross_clr = None
+    ma5 = ma50 = ma100 = ma200 = ema21 = cross_label = cross_clr = None
     vol_avg_20d = None
 
     if not daily_df.empty:
@@ -145,6 +145,8 @@ def render_spy_summary_card(
         ma50  = _ma(50)
         ma100 = _ma(100)
         ma200 = _ma(200)
+        if len(daily_df) >= 21:
+            ema21 = float(daily_df["Close"].ewm(span=21, adjust=False).mean().iloc[-1])
         if ma50 and ma200:
             cross_label = "🌟 Golden Cross" if ma50 > ma200 else "💀 Death Cross"
             cross_clr   = _UP if ma50 > ma200 else _DN
@@ -238,6 +240,7 @@ def render_spy_summary_card(
         vol_cell,
         cross_cell,
         _ma_cell("MA 5",   ma5,   price) if ma5   else "",
+        _ma_cell("EMA 21", ema21, price) if ema21 else "",
         _ma_cell("MA 50",  ma50,  price) if ma50  else "",
         _ma_cell("MA 100", ma100, price) if ma100 else "",
         _ma_cell("MA 200", ma200, price) if ma200 else "",

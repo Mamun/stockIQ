@@ -2,7 +2,7 @@
 
 from ._shared import (
     ttl_cache, CACHE_TTL, SPX_TICKERS,
-    np, pd, yf, datetime, timedelta,
+    pd, datetime, timedelta,
     get_metadata, get_forward_pe, _batch_download, _rsi_last,
 )
 

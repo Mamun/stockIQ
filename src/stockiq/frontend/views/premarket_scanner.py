@@ -20,7 +20,7 @@ def _market_session() -> tuple[str, str]:
     if mins < 4 * 60:
         return "🌙 Pre-Pre-Market", f"Premarket opens at 4:00 AM ET (in {4*60 - mins} min)."
     if mins < 9 * 60 + 30:
-        return "🟡 Pre-Market Live", f"Premarket session active until 9:30 AM ET."
+        return "🟡 Pre-Market Live", "Premarket session active until 9:30 AM ET."
     if mins < 16 * 60:
         return "🟢 Market Open", "Regular session. Pre-market data is from this morning."
     if mins < 20 * 60:

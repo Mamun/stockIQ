@@ -13,7 +13,6 @@ def render_spy_header(quote: dict, idx_df: pd.DataFrame) -> None:
 
     ts = quote.get("_ts", 0)
     if ts:
-        import pytz
         as_of = (
             pd.Timestamp(ts, unit="s", tz="UTC")
             .tz_convert("America/New_York")

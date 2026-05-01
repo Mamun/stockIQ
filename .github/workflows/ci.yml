@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [develop, main]
   pull_request:
     branches: [main]
 
@@ -101,10 +101,10 @@ jobs:
           ANTHROPIC_API_KEY: dummy-key-for-ci
         run: |
           python -c "
-          from stockiq.config import MA_PERIODS
-          from stockiq.indicators import compute_mas
-          from stockiq.signals import signal_score
-          from stockiq.charts import build_chart
-          from stockiq.data.fetch import fetch_ohlcv
+          from stockiq.backend.config import MA_PERIODS
+          from stockiq.backend.models.indicators import compute_mas
+          from stockiq.backend.models.signals import signal_score
+          from stockiq.frontend.views.components.charts import build_chart
+          from stockiq.backend.data.yf_fetch import fetch_ohlcv
           print('All core modules imported OK')
           "

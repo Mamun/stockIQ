@@ -2,11 +2,10 @@
 
 
 
-import numpy as np
 import pandas as pd
 import pytest
 
-from stockiq.models.indicators import (
+from stockiq.backend.models.indicators import (
     compute_mas,
     compute_fibonacci,
     compute_rsi,
@@ -15,7 +14,7 @@ from stockiq.models.indicators import (
     compute_weekly_ma200,
     detect_reversal_patterns,
 )
-from stockiq.config import MA_PERIODS, FIB_LEVELS
+from stockiq.backend.config import MA_PERIODS, FIB_LEVELS
 
 
 # ── compute_mas ───────────────────────────────────────────────────────────────
@@ -209,14 +208,14 @@ class TestComputeDailyGaps:
         )
         result = compute_daily_gaps(df)
         zero_gaps = result[result["Gap"] == 0]
-        assert (zero_gaps["Gap Filled"] == False).all()
+        assert (~zero_gaps["Gap Filled"]).all()
 
     def test_last_3_rows_confirmed_only_if_filled(self, sample_ohlcv):
         result = compute_daily_gaps(sample_ohlcv)
         last3 = result.tail(3)
         for _, row in last3.iterrows():
             if not row["Gap Filled"]:
-                assert row["Gap Confirmed"] == False
+                assert not row["Gap Confirmed"]
 
 
 # ── patch_today_gap ───────────────────────────────────────────────────────────
@@ -243,8 +242,8 @@ class TestPatchTodayGap:
         quote = {"day_high": prev_close + abs(gap) + 5, "day_low": prev_close - 0.01}
         result = patch_today_gap(gaps, quote)
         if gap > 0:
-            assert result.iloc[-1]["Gap Filled"] == True
-            assert result.iloc[-1]["Gap Confirmed"] == True
+            assert result.iloc[-1]["Gap Filled"]
+            assert result.iloc[-1]["Gap Confirmed"]
 
     def test_upward_gap_not_filled_when_day_low_above_prev_close(self, gap_ohlcv):
         gaps = compute_daily_gaps(gap_ohlcv)
@@ -255,8 +254,8 @@ class TestPatchTodayGap:
         if gap > 0:
             quote = {"day_high": prev_close + 10, "day_low": prev_close + 0.5}
             result = patch_today_gap(gaps, quote)
-            assert result.iloc[-1]["Gap Filled"] == False
-            assert result.iloc[-1]["Gap Confirmed"] == True
+            assert not result.iloc[-1]["Gap Filled"]
+            assert result.iloc[-1]["Gap Confirmed"]
 
     def test_does_not_mutate_input_dataframe(self, gap_ohlcv, mock_quote):
         gaps = compute_daily_gaps(gap_ohlcv)
@@ -314,7 +313,7 @@ class TestDetectReversalPatterns:
             "Volume": [1e6] * 5,
         }, index=dates)
         result = detect_reversal_patterns(df)
-        assert result["pat_hammer"].iloc[-1] == True
+        assert result["pat_hammer"].iloc[-1]
 
     def test_doji_detected_on_known_candle(self):
         """Construct a doji: body <= 5% of full range."""
@@ -327,7 +326,7 @@ class TestDetectReversalPatterns:
             "Volume": [1e6] * 5,
         }, index=dates)
         result = detect_reversal_patterns(df)
-        assert result["pat_doji"].iloc[-1] == True
+        assert result["pat_doji"].iloc[-1]
 
     def test_no_patterns_in_flat_market(self):
         """All identical candles → no engulfing, no morning/evening star."""

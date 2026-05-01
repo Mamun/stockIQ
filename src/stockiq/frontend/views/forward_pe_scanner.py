@@ -84,21 +84,35 @@ historically one of the strongest value signals. PEG < 1 = +20 pts bonus.
 
     # ── URL params ────────────────────────────────────────────────────────────
     params    = st.query_params
-    auto_scan = params.get("scan", "0") == "1"
-    try:    _url_pe      = max(5,  min(60, int(params.get("pe",      25))))
-    except: _url_pe      = 25
-    try:    _url_growth  = max(0,  min(50, int(params.get("growth",   0))))
-    except: _url_growth  = 0
-    try:    _url_top     = max(5,  min(50, int(params.get("top",     30))))
-    except: _url_top     = 30
+    auto_scan = params.get("scan", "1") == "1"   # auto-scan on first load
+    try:
+        _url_pe_min = max(0, min(60, int(params.get("pe_min", 5))))
+    except (ValueError, TypeError):
+        _url_pe_min = 5
+    try:
+        _url_pe_max = max(5, min(60, int(params.get("pe_max", 25))))
+    except (ValueError, TypeError):
+        _url_pe_max = 25
+    try:
+        _url_growth = max(0, min(50, int(params.get("growth", 5))))
+    except (ValueError, TypeError):
+        _url_growth = 5
+    try:
+        _url_top = max(5, min(50, int(params.get("top", 30))))
+    except (ValueError, TypeError):
+        _url_top = 30
 
     # ── Controls ──────────────────────────────────────────────────────────────
     c1, c2, c3, c4 = st.columns([2, 2, 2, 1])
-    max_fwd_pe = c1.slider(
-        "Max Forward P/E",
-        min_value=5, max_value=60, value=_url_pe, step=5,
-        help="Only show stocks with forward P/E at or below this threshold",
+    pe_range = c1.slider(
+        "Forward P/E Range",
+        min_value=0, max_value=60,
+        value=(_url_pe_min, _url_pe_max),
+        step=1,
+        help="Show stocks with forward P/E within this range. "
+             "Drag the left handle to exclude value traps; drag the right to cap the premium.",
     )
+    min_fwd_pe, max_fwd_pe = pe_range
     min_eps_growth = c2.slider(
         "Min EPS Growth %",
         min_value=0, max_value=50, value=_url_growth, step=5,
@@ -116,7 +130,8 @@ historically one of the strongest value signals. PEG < 1 = +20 pts bonus.
         _render_legend()
         return
 
-    st.query_params["pe"]     = str(max_fwd_pe)
+    st.query_params["pe_min"] = str(min_fwd_pe)
+    st.query_params["pe_max"] = str(max_fwd_pe)
     st.query_params["growth"] = str(min_eps_growth)
     st.query_params["top"]    = str(top_n)
     st.query_params["scan"]   = "1"
@@ -124,13 +139,18 @@ historically one of the strongest value signals. PEG < 1 = +20 pts bonus.
     with st.spinner("📊 Loading forward earnings data…"):
         df = get_forward_pe_scan(
             top_n=top_n,
+            min_fwd_pe=float(min_fwd_pe),
             max_fwd_pe=float(max_fwd_pe),
             min_eps_growth=float(min_eps_growth),
         )
 
     if df.empty:
+        pe_range_str = (
+            f"Forward P/E {min_fwd_pe}–{max_fwd_pe}"
+            if min_fwd_pe > 0 else f"Forward P/E ≤ {max_fwd_pe}"
+        )
         st.warning(
-            f"No stocks found with Forward P/E ≤ {max_fwd_pe} "
+            f"No stocks found with {pe_range_str} "
             f"and EPS Growth ≥ {min_eps_growth}%. "
             "Try relaxing the filters, or run the cache build script first: "
             "`python cache/scripts/build_forward_pe_cache.py`"
@@ -208,7 +228,7 @@ def _style_table(df):
         cols   = list(df.columns)
 
         fpe_i = cols.index("Fwd P/E")
-        med_i = cols.index("Sector Med P/E")
+        cols.index("Sector Med P/E")
         if row["Fwd P/E"] and row["Sector Med P/E"]:
             discount = (row["Sector Med P/E"] - row["Fwd P/E"]) / row["Sector Med P/E"]
             if discount >= 0.20:

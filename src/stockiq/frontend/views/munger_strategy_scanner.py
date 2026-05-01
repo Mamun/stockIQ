@@ -18,12 +18,18 @@ def render_munger_tab() -> None:
     # ── URL params ────────────────────────────────────────────────────────────
     params    = st.query_params
     auto_scan = params.get("scan", "0") == "1"
-    try:    _url_dist    = max(5,  min(30, int(params.get("dist",    30))))
-    except: _url_dist    = 30
-    try:    _url_quality = max(10, min(60, int(params.get("quality", 10))))
-    except: _url_quality = 10
-    try:    _url_top     = max(10, min(50, int(params.get("top",     50))))
-    except: _url_top     = 50
+    try:
+        _url_dist = max(5, min(30, int(params.get("dist", 30))))
+    except (ValueError, TypeError):
+        _url_dist = 30
+    try:
+        _url_quality = max(10, min(60, int(params.get("quality", 10))))
+    except (ValueError, TypeError):
+        _url_quality = 10
+    try:
+        _url_top = max(10, min(50, int(params.get("top", 50))))
+    except (ValueError, TypeError):
+        _url_top = 50
 
     # ── Controls ──────────────────────────────────────────────────────────────
     c1, c2, c3, c4 = st.columns([2, 2, 2, 1])

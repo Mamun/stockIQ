@@ -20,12 +20,18 @@ def render_squeeze_scanner_tab() -> None:
     # ── URL params ────────────────────────────────────────────────────────────
     params    = st.query_params
     auto_scan = params.get("scan", "0") == "1"
-    try:    _url_rsi   = max(45,  min(85,  int(params.get("rsi",   45))))
-    except: _url_rsi   = 45
-    try:    _url_short = max(0.1, min(5.0, round(float(params.get("short", 0.1)), 1)))
-    except: _url_short = 0.1
-    try:    _url_top   = max(10,  min(50,  int(params.get("top",   50))))
-    except: _url_top   = 50
+    try:
+        _url_rsi = max(45, min(85, int(params.get("rsi", 45))))
+    except (ValueError, TypeError):
+        _url_rsi = 45
+    try:
+        _url_short = max(0.1, min(5.0, round(float(params.get("short", 0.1)), 1)))
+    except (ValueError, TypeError):
+        _url_short = 0.1
+    try:
+        _url_top = max(10, min(50, int(params.get("top", 50))))
+    except (ValueError, TypeError):
+        _url_top = 50
 
     # ── Controls ──────────────────────────────────────────────────────────────
     c1, c2, c3, c4 = st.columns([2, 2, 2, 1])

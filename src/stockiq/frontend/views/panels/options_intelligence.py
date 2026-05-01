@@ -8,7 +8,7 @@ This module is responsible only for layout, selectors, and card HTML.
 
 from __future__ import annotations
 
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor
 from datetime import date as _date, datetime as _datetime
 import pytz
 

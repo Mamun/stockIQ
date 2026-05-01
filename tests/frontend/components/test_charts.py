@@ -5,9 +5,8 @@
 import pytest
 import plotly.graph_objects as go
 
-from stockiq.models.indicators import compute_mas, compute_rsi, compute_fibonacci, detect_reversal_patterns
-from stockiq.models.signals import find_crosses
-from stockiq.views.components.charts import build_chart
+from stockiq.backend.models.indicators import compute_mas, compute_rsi, compute_fibonacci, detect_reversal_patterns
+from stockiq.frontend.views.components.charts import build_chart
 
 
 # ── Fixtures / helpers ────────────────────────────────────────────────────────

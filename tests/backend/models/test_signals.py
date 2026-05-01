@@ -6,8 +6,8 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from stockiq.models.signals import signal_score, overall_signal, find_crosses
-from stockiq.models.indicators import compute_mas, compute_rsi
+from stockiq.backend.models.signals import signal_score, overall_signal, find_crosses
+from stockiq.backend.models.indicators import compute_mas
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
@@ -93,7 +93,7 @@ class TestSignalScore:
         """MA5 < MA20 contributes -1 vs MA5 > MA20."""
         base = dict(Close=200, MA50=170, MA100=150, MA200=120)
         prev = _make_row(**self._PREV_BULL)
-        row_above = _make_row(**base, MA5=195, MA20=190)
+        _make_row(**base, MA5=195, MA20=190)
         row_below = _make_row(**base, MA5=185, MA20=190)
         _, reasons_below = signal_score(row_below, prev)
         assert any("short-term momentum negative" in r for r in reasons_below)

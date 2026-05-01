@@ -53,11 +53,16 @@ def _quality_score(info: dict) -> tuple[float, list[str]]:
 def _proximity_score(dist_pct: float) -> int:
     """Points for proximity to 200-week MA. Closer = higher score (max 15)."""
     abs_d = abs(dist_pct)
-    if abs_d <= 2:   return 15
-    if abs_d <= 5:   return 12
-    if abs_d <= 10:  return 8
-    if abs_d <= 15:  return 4
-    if abs_d <= 20:  return 2
+    if abs_d <= 2:
+        return 15
+    if abs_d <= 5:
+        return 12
+    if abs_d <= 10:
+        return 8
+    if abs_d <= 15:
+        return 4
+    if abs_d <= 20:
+        return 2
     return 0
 
 

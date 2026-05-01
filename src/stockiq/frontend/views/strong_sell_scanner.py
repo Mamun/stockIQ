@@ -1,7 +1,7 @@
 import streamlit as st
 
 from stockiq.backend.services.scanners import get_strong_sell_scan
-from stockiq.frontend.theme import DN, UP
+from stockiq.frontend.theme import DN
 from stockiq.frontend.views.components.scanner_charts import (
     analyst_downside_bar,
     analyst_sector_bar,
@@ -21,16 +21,23 @@ def render_strong_sell_tab() -> None:
     # ── URL params ────────────────────────────────────────────────────────────
     params    = st.query_params
     auto_scan = params.get("scan", "0") == "1"
-    try:    _url_downside = max(0,   min(40, int(params.get("downside", 0))))
-    except: _url_downside = 0
-    try:    _url_analysts = max(1,   min(20, int(params.get("analysts", 1))))
-    except: _url_analysts = 1
+    try:
+        _url_downside = max(0, min(40, int(params.get("downside", 0))))
+    except (ValueError, TypeError):
+        _url_downside = 0
+    try:
+        _url_analysts = max(1, min(20, int(params.get("analysts", 1))))
+    except (ValueError, TypeError):
+        _url_analysts = 1
     try:
         _r = float(params.get("rating", 2.5))
         _url_rating = _r if _r in (2.5, 3.0, 3.5, 4.0, 4.5) else 2.5
-    except: _url_rating = 2.5
-    try:    _url_top      = max(5,   min(30, int(params.get("top",      30))))
-    except: _url_top      = 30
+    except (ValueError, TypeError):
+        _url_rating = 2.5
+    try:
+        _url_top = max(5, min(30, int(params.get("top", 30))))
+    except (ValueError, TypeError):
+        _url_top = 30
 
     # ── Controls ──────────────────────────────────────────────────────────────
     c1, c2, c3, c4, c5 = st.columns([2, 2, 2, 2, 1])

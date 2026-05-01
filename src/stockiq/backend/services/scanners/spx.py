@@ -51,11 +51,18 @@ def get_strong_buy_scan(
     return fetch_spx_strong_buy_scan(min_upside, min_analysts, max_rating, top_n)
 
 
-def get_forward_pe_scan(top_n: int = 30, max_fwd_pe: float = 25.0, min_eps_growth: float = 0.0) -> pd.DataFrame:
+def get_forward_pe_scan(
+    top_n: int = 30,
+    max_fwd_pe: float = 25.0,
+    min_fwd_pe: float = 0.0,
+    min_eps_growth: float = 0.0,
+) -> pd.DataFrame:
     """Forward P/E value-growth candidates, sorted by VG Score."""
     df = fetch_spx_forward_pe_scan()
     if df.empty:
         return df
+    if min_fwd_pe > 0:
+        df = df[df["Fwd P/E"].fillna(999) >= min_fwd_pe]
     if max_fwd_pe > 0:
         df = df[df["Fwd P/E"] <= max_fwd_pe]
     if min_eps_growth > 0:

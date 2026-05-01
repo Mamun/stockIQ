@@ -54,7 +54,7 @@ ignore = ["E501", "W291", "W293", "E402"]
 [tool.coverage.run]
 source = ["src"]
 omit = [
-    "src/stockiq/views/*",   # Streamlit page modules require a running server
+    "src/stockiq/frontend/views/*",   # Streamlit page modules require a running server
     "src/stockiq/seo.py",
 ]
 

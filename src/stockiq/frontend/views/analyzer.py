@@ -4,7 +4,6 @@ import pandas as pd
 import streamlit as st
 
 from stockiq.backend.services.analyzer_service import (
-    get_buying_pressure,
     get_company_display_name,
     get_stock_crosses,
     get_stock_df,

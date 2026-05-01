@@ -190,10 +190,10 @@ def compute_buying_pressure(df: pd.DataFrame, timeframe: str = "monthly") -> dic
                 missing.append(f"Volume below threshold ({ratio:.1f}× avg — needs 1.5×)")
 
     # 3. Bullish close (close in upper 60% of candle range)
-    h, l, c = float(latest["High"]), float(latest["Low"]), float(latest["Close"])
-    rng = h - l
+    h, lo, c = float(latest["High"]), float(latest["Low"]), float(latest["Close"])
+    rng = h - lo
     if rng > 0:
-        pos = (c - l) / rng
+        pos = (c - lo) / rng
         if pos >= 0.60:
             met.append(f"Bullish close — {pos * 100:.0f}% up the candle range")
         else:
@@ -229,13 +229,13 @@ def compute_rsi(df: pd.DataFrame, period: int = 14) -> pd.Series:
 
 
 def detect_reversal_patterns(df: pd.DataFrame) -> pd.DataFrame:
-    o, h, l, c = df["Open"], df["High"], df["Low"], df["Close"]
+    o, h, lo, c = df["Open"], df["High"], df["Low"], df["Close"]
     max_oc = pd.concat([o, c], axis=1).max(axis=1)
     min_oc = pd.concat([o, c], axis=1).min(axis=1)
     body       = max_oc - min_oc
     upper_wick = h - max_oc
-    lower_wick = min_oc - l
-    full_range = h - l
+    lower_wick = min_oc - lo
+    full_range = h - lo
     bullish_c  = c > o
     bearish_c  = c < o
 
