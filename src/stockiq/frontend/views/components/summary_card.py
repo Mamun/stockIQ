@@ -26,9 +26,9 @@ def _cell(label: str, value: str, sub: str = "", sub_clr: str | None = None) -> 
     )
     return (
         f'<div style="padding:10px 18px;border-right:1px solid {_SEP};'
-        f'display:flex;flex-direction:column;justify-content:center;flex:1;min-width:80px">'
+        f'display:flex;flex-direction:column;justify-content:center;flex:1;min-width:80px;overflow:hidden">'
         f'<div style="font-size:11px;color:{_MUT};text-transform:uppercase;'
-        f'letter-spacing:.05em;white-space:nowrap">{label}</div>'
+        f'letter-spacing:.05em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{label}</div>'
         f'<div style="font-size:17px;font-weight:700;color:{_VAL};white-space:nowrap">{value}</div>'
         f'{sub_html}'
         f'</div>'

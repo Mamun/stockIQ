@@ -468,13 +468,21 @@ def spy_sparkline(
     vwap: "pd.Series | None" = None,
 ) -> go.Figure:
     """Compact close-price sparkline with optional VWAP — trajectory context only."""
+    close_vals = df["Close"].dropna()
+    y_min = float(close_vals.min()) if not close_vals.empty else 0.0
+    y_max = float(close_vals.max()) if not close_vals.empty else 1.0
+    if vwap is not None:
+        vwap_vals = vwap.dropna()
+        if not vwap_vals.empty:
+            y_min = min(y_min, float(vwap_vals.min()))
+            y_max = max(y_max, float(vwap_vals.max()))
+    pad = (y_max - y_min) * 0.15 or y_min * 0.001 or 1.0
+
     fig = go.Figure()
     fig.add_trace(go.Scatter(
         x=df.index, y=df["Close"],
         mode="lines",
         line=dict(color="#3B82F6", width=1.5),
-        fill="tozeroy",
-        fillcolor="rgba(59,130,246,0.06)",
         hovertemplate="%{x|%H:%M} &nbsp;<b>$%{y:,.2f}</b><extra></extra>",
         showlegend=False,
     ))
@@ -491,7 +499,7 @@ def spy_sparkline(
         height=160,
         margin=dict(l=50, r=10, t=6, b=30),
         xaxis=dict(gridcolor="#1E293B", showgrid=True, tickformat="%H:%M"),
-        yaxis=dict(gridcolor="#1E293B", showgrid=True),
+        yaxis=dict(gridcolor="#1E293B", showgrid=True, range=[y_min - pad, y_max + pad]),
         hovermode="x unified",
         plot_bgcolor="rgba(0,0,0,0)",
         paper_bgcolor="rgba(0,0,0,0)",
