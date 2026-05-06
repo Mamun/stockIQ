@@ -49,10 +49,13 @@ def render_options_intelligence(current_price: float) -> None:
 
     _render_what_is_expander(expander_seed, current_price)
 
+    expirations = seed["expirations"]
+    default_idx = expirations.index(today_iso) if today_iso in expirations else 0
+
     exp_col, _ = st.columns([2, 3])
     with exp_col:
         selected_label = st.selectbox(
-            "Expiration", options=list(exp_map.keys()), index=1, key="options_exp"
+            "Option Chain", options=list(exp_map.keys()), index=default_idx, key="options_exp"
         )
     selected_iso = exp_map[selected_label]
 
