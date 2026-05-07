@@ -157,6 +157,30 @@ def _yahoo_chain_for_bid_ask(expiration: str, side: str) -> pd.DataFrame:
     return pd.DataFrame()
 
 
+def get_rsi_top_analysis() -> dict:
+    """RSI-based market top detection: divergence, TF stack, failure swing, MA stretch, breadth."""
+    from stockiq.backend.models.rsi_top import (
+        check_breadth_divergence,
+        check_rsi_timeframe_stack,
+        compute_ma_stretch,
+        detect_bearish_rsi_divergence,
+        detect_rsi_failure_swing,
+    )
+    try:
+        daily_df = get_spy_chart_df(period="2y", interval="1d")
+        if daily_df.empty:
+            return {}
+        return {
+            "divergence":    detect_bearish_rsi_divergence(daily_df),
+            "tf_stack":      check_rsi_timeframe_stack(daily_df),
+            "failure_swing": detect_rsi_failure_swing(daily_df),
+            "ma_stretch":    compute_ma_stretch(daily_df),
+            "breadth":       check_breadth_divergence(daily_df),
+        }
+    except Exception:
+        return {}
+
+
 def get_spy_options_analysis(
     expiration: str = "",
     current_price: float = 0.0,

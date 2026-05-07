@@ -8,6 +8,7 @@ import streamlit as st
 from stockiq.backend.services.market_service import get_market_overview
 from stockiq.backend.services.spy_service import (
     get_put_call_ratio,
+    get_rsi_top_analysis,
     get_spy_chart_df,
     get_spy_gap_table_data,
     get_spy_quote,
@@ -17,6 +18,7 @@ from stockiq.frontend.views.components.summary_card import render_spy_summary_ca
 from stockiq.frontend.views.panels.ai_forecast import render_ai_forecast
 from stockiq.frontend.views.panels.dte_conditions import render_dte_conditions
 from stockiq.frontend.views.panels.options_intelligence import render_options_intelligence
+from stockiq.frontend.views.panels.rsi_top_signals import render_rsi_top_signals
 from stockiq.frontend.views.panels.spy_chart import render_spy_chart_section
 from stockiq.frontend.views.panels.spy_header import render_spy_header
 
@@ -53,6 +55,9 @@ def render_spy_dashboard_tab() -> None:
         render_spy_chart_section(quote)
 
         st.divider()
+        render_rsi_top_signals(_fetch_rsi_top_analysis())
+
+        st.divider()
         intraday = _fetch_intraday_signals(quote)
         render_dte_conditions(
             quote["price"], overview["vix"], rsi, pc,
@@ -79,6 +84,13 @@ def render_spy_dashboard_tab() -> None:
 
 
 # ── Private helpers ────────────────────────────────────────────────────────────
+
+def _fetch_rsi_top_analysis() -> dict:
+    try:
+        return get_rsi_top_analysis()
+    except Exception:
+        return {}
+
 
 def _fetch_daily_rsi() -> float | None:
     try:
