@@ -50,7 +50,7 @@ def _render_bx_panel(bx: dict, label: str) -> None:
     elif bx["signal"]:
         badge_bg, badge_txt = "#22C55E", "BX TRIGGERED ✓✓"
     else:
-        badge_bg, badge_txt = "#475569", "WAITING FOR BX"
+        badge_bg, badge_txt = "#475569", "NOT TRIGGERED"
 
     bar_label = bx.get("bar_label", "")
     st.markdown(

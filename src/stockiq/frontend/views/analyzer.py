@@ -2,10 +2,10 @@
 
 import pandas as pd
 import streamlit as st
+import streamlit.components.v1 as components
 
 from stockiq.backend.services.analyzer_service import (
     get_company_display_name,
-    get_stock_crosses,
     get_stock_df,
     get_stock_fibonacci,
     get_stock_gaps,
@@ -14,7 +14,6 @@ from stockiq.backend.services.analyzer_service import (
     search_stocks,
 )
 from stockiq.frontend.theme import BG, DN, MUT, NEU, SEP, UP, VAL
-from stockiq.frontend.views.components.charts import build_chart
 from stockiq.frontend.views.components.gap_table import render_gap_table
 from stockiq.frontend.views.panels.analyzer_fundamentals import render_fundamentals_panel
 from stockiq.frontend.views.panels.analyzer_signals import (
@@ -22,7 +21,7 @@ from stockiq.frontend.views.panels.analyzer_signals import (
     render_signal_analysis,
 )
 
-_PERIODS = {"1M": 30, "3M": 90, "6M": 180, "1Y": 365, "2Y": 730, "5Y": 1825}
+_PERIODS = {"1D": 1, "1W": 7, "1M": 30, "3M": 90, "6M": 180, "1Y": 365, "2Y": 730, "5Y": 1825}
 _DEFAULT_PERIOD = "1Y"
 
 
@@ -129,72 +128,65 @@ def render_analyzer_tab() -> None:
         if "Volume" in df.columns else 0.0
     )
 
-    # ── Section 1: Header ────────────────────────────────────────────────────
-    h_name, h_price, h_signal = st.columns([4, 2, 2])
-    with h_name:
-        st.markdown(
-            f'<div style="padding-top:6px">'
-            f'<div style="font-size:1.4rem;font-weight:700;color:{VAL}">{company_name}</div>'
-            f'<div style="font-size:0.9rem;color:{MUT};margin-top:2px">{ticker}</div>'
-            f'</div>',
-            unsafe_allow_html=True,
-        )
-    with h_price:
-        st.markdown(
-            f'<div style="padding-top:4px">'
-            f'<div style="font-size:2rem;font-weight:800;color:{VAL}">${price:,.2f}</div>'
-            f'<div style="font-size:0.95rem;color:{chg_clr};margin-top:2px">'
-            f'{arrow} {abs(chg):.2f} &nbsp;({chg_pct:+.2f}%)'
-            f'</div></div>',
-            unsafe_allow_html=True,
-        )
-    with h_signal:
-        st.markdown(
-            f'<div style="background:{signal_color};border-radius:8px;padding:12px 8px;'
-            f'text-align:center">'
-            f'<div style="font-size:0.85rem;font-weight:800;color:#fff;'
-            f'letter-spacing:.03em">{signal_label}</div>'
-            f'<div style="font-size:0.78rem;color:rgba(255,255,255,.8);margin-top:2px">'
-            f'Score {score:+d}</div>'
-            f'</div>',
-            unsafe_allow_html=True,
-        )
-    st.markdown("<div style='margin-top:12px'></div>", unsafe_allow_html=True)
+    # ── Sections 1 + 2: Combined header + quick stats ────────────────────────
+    # Company name + price + signal badge — all on one line
+    st.markdown(
+        f'<div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px">'
+        f'<span style="font-size:1.25rem;font-weight:700;color:{VAL}">{company_name}</span>'
+        f'<span style="color:{MUT};font-size:0.9rem">{ticker}</span>'
+        f'<span style="font-size:1.5rem;font-weight:800;color:{VAL};margin-left:8px">'
+        f'${price:,.2f}</span>'
+        f'<span style="font-size:0.9rem;color:{chg_clr}">'
+        f'{arrow} {abs(chg):.2f} ({chg_pct:+.2f}%)</span>'
+        f'<span style="background:{signal_color};color:#fff;font-size:0.82rem;font-weight:700;'
+        f'padding:3px 14px;border-radius:20px;letter-spacing:.04em;margin-left:8px">'
+        f'{signal_label}</span>'
+        f'<span style="color:{MUT};font-size:0.78rem">Score {score:+d}</span>'
+        f'</div>',
+        unsafe_allow_html=True,
+    )
 
-    # ── Section 2: Quick stats ────────────────────────────────────────────────
-    qs1, qs2, qs3, qs4 = st.columns(4)
-    _stat = _stat_card   # local alias for brevity
+    # Quick stats as compact table
+    stat_rows = []
+    if w52_high > w52_low:
+        pos_pct   = (price - w52_low) / (w52_high - w52_low) * 100
+        range_clr = UP if pos_pct >= 50 else DN
+        stat_rows.append(("52W Range", f"{pos_pct:.1f}% of range",
+                           f"${w52_low:,.2f} — ${w52_high:,.2f}", range_clr))
+    if rsi_val:
+        rsi_clr = DN if rsi_val >= 70 else UP if rsi_val <= 30 else NEU
+        rsi_lbl = "Overbought" if rsi_val >= 70 else "Oversold" if rsi_val <= 30 else "Neutral"
+        stat_rows.append(("RSI (14)", f"{rsi_val:.1f}", rsi_lbl, rsi_clr))
+    if ma200:
+        diff200   = (price - ma200) / ma200 * 100
+        ma200_clr = UP if diff200 >= 0 else DN
+        stat_rows.append(("vs MA 200", f"{diff200:+.1f}%", f"MA200 at ${ma200:,.2f}", ma200_clr))
+    if vol_now and vol_avg:
+        vol_vs  = (vol_now / vol_avg - 1) * 100
+        vol_clr = UP if vol_vs >= 20 else DN if vol_vs <= -20 else MUT
+        stat_rows.append(("Volume", f"{vol_now/1e6:.1f}M", f"{vol_vs:+.0f}% vs 20D avg", vol_clr))
 
-    with qs1:
-        if w52_high > w52_low:
-            pos_pct   = (price - w52_low) / (w52_high - w52_low) * 100
-            range_clr = UP if pos_pct >= 50 else DN
-            qs1.markdown(
-                _stat("52W Range", f"{pos_pct:.1f}% of range",
-                      f"${w52_low:,.2f} — ${w52_high:,.2f}", range_clr),
-                unsafe_allow_html=True,
-            )
-    with qs2:
-        if rsi_val:
-            rsi_clr = DN if rsi_val >= 70 else UP if rsi_val <= 30 else NEU
-            rsi_lbl = "Overbought" if rsi_val >= 70 else "Oversold" if rsi_val <= 30 else "Neutral"
-            qs2.markdown(_stat("RSI (14)", f"{rsi_val:.1f}", rsi_lbl, rsi_clr), unsafe_allow_html=True)
-    with qs3:
-        if ma200:
-            diff200   = (price - ma200) / ma200 * 100
-            ma200_clr = UP if diff200 >= 0 else DN
-            qs3.markdown(
-                _stat("vs MA 200", f"{diff200:+.1f}%", f"MA200 at ${ma200:,.2f}", ma200_clr),
-                unsafe_allow_html=True,
-            )
-    with qs4:
-        if vol_now and vol_avg:
-            vol_vs  = (vol_now / vol_avg - 1) * 100
-            vol_clr = UP if vol_vs >= 20 else DN if vol_vs <= -20 else MUT
-            qs4.markdown(
-                _stat("Volume", f"{vol_now/1e6:.1f}M", f"{vol_vs:+.0f}% vs 20D avg", vol_clr),
-                unsafe_allow_html=True,
-            )
+    html_rows = ""
+    for i, (lbl, val, sub, clr) in enumerate(stat_rows):
+        bg = f"background:{BG};" if i % 2 == 0 else ""
+        sub_html = (
+            f'<span style="color:{clr or MUT};font-size:0.7rem;margin-left:6px">{sub}</span>'
+            if sub else ""
+        )
+        html_rows += (
+            f'<div style="{bg}display:flex;align-items:center;gap:8px;'
+            f'padding:5px 8px;border-radius:4px">'
+            f'<span style="color:{MUT};font-size:0.82rem;white-space:nowrap">{lbl}</span>'
+            f'<span style="font-size:0.85rem;font-weight:600;color:{clr or VAL};white-space:nowrap">'
+            f'{val}{sub_html}</span>'
+            f'</div>'
+        )
+    if html_rows:
+        st.markdown(
+            f'<div style="border:1px solid {SEP};border-radius:8px;overflow:hidden">'
+            f'{html_rows}</div>',
+            unsafe_allow_html=True,
+        )
 
     st.markdown("---")
 
@@ -223,12 +215,7 @@ def render_analyzer_tab() -> None:
         return
 
     fib = get_stock_fibonacci(display_df)
-    golden, death = get_stock_crosses(display_df)
-    fig = build_chart(display_df, fib, ticker,
-                      show_vol=True, show_fib=False,
-                      show_patterns=True, show_rsi=show_rsi,
-                      golden_dates=golden, death_dates=death)
-    st.plotly_chart(fig, width="stretch")
+    _render_tradingview_chart(ticker, selected_period, show_rsi)
     st.markdown("---")
 
     # ── Section 5+6: Signals + BX + Key Levels ───────────────────────────────
@@ -253,6 +240,42 @@ def render_analyzer_tab() -> None:
         rsi_dedup         = display_df["RSI"][~display_df.index.duplicated(keep="last")]
         gaps_df["RSI"]    = rsi_dedup.reindex(gaps_df.index)
     render_gap_table(gaps_df, show_rsi=True)
+
+
+# ── TradingView Advanced Chart widget ────────────────────────────────────────
+
+_TV_RANGE = {"1D": "1D", "1W": "5D", "1M": "1M", "3M": "3M", "6M": "6M", "1Y": "12M", "2Y": "24M", "5Y": "60M"}
+_TV_INTERVAL = {"1D": "5", "1W": "60", "1M": "D", "3M": "D", "6M": "D", "1Y": "D", "2Y": "W", "5Y": "W"}
+
+
+def _render_tradingview_chart(ticker: str, period: str, show_rsi: bool) -> None:
+    interval = _TV_INTERVAL.get(period, "D")
+    range_val = _TV_RANGE.get(period, "12M")
+    studies = '["RSI@tv-basicstudies"]' if show_rsi else "[]"
+
+    html = f"""
+    <div id="tv_wrap" style="height:520px;width:100%">
+      <script src="https://s3.tradingview.com/tv.js"></script>
+      <script>
+        new TradingView.widget({{
+          container_id: "tv_wrap",
+          autosize:     true,
+          symbol:       "{ticker}",
+          interval:     "{interval}",
+          range:        "{range_val}",
+          timezone:     "America/New_York",
+          theme:        "dark",
+          style:        "1",
+          locale:       "en",
+          hide_top_toolbar:   false,
+          hide_legend:        false,
+          allow_symbol_change: false,
+          studies: {studies}
+        }});
+      </script>
+    </div>
+    """
+    components.html(html, height=540)
 
 
 # ── Key levels panel (always-visible right column below chart) ────────────────
@@ -295,23 +318,6 @@ def _render_key_levels(latest, fib: dict, price: float) -> None:
             f'<span style="color:{clr}">{mark}</span></span></div>',
             unsafe_allow_html=True,
         )
-
-
-# ── HTML helper (local, identical pattern to analyzer_fundamentals._stat_card) ─
-
-def _stat_card(label: str, value: str, sub: str = "", sub_color: str | None = None) -> str:
-    sub_html = (
-        f'<div style="font-size:11px;color:{sub_color or MUT};margin-top:3px">{sub}</div>'
-        if sub else ""
-    )
-    return (
-        f'<div style="background:{BG};border:1px solid {SEP};border-radius:8px;padding:14px 16px">'
-        f'<div style="font-size:11px;color:{MUT};text-transform:uppercase;'
-        f'letter-spacing:.05em;margin-bottom:4px">{label}</div>'
-        f'<div style="font-size:19px;font-weight:700;color:{VAL}">{value}</div>'
-        f'{sub_html}'
-        f'</div>'
-    )
 
 
 # ── Session state init & entry point ──────────────────────────────────────────
