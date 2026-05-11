@@ -26,6 +26,19 @@ from stockiq.frontend.views.components.spy_charts import (
 _ET = pytz.timezone("America/New_York")
 
 
+def _share_url(path: str, exp_iso: str = "") -> str:
+    try:
+        import urllib.parse
+        parsed = urllib.parse.urlparse(st.context.url)
+        url = f"{parsed.scheme}://{parsed.netloc}{path}"
+        if exp_iso:
+            url += f"?exp={exp_iso}"
+        return url
+    except Exception:
+        suffix = f"?exp={exp_iso}" if exp_iso else ""
+        return path + suffix
+
+
 def render_options_intelligence(current_price: float) -> None:
     seed = get_spy_options_analysis(expiration="", current_price=current_price)
     if not seed:
@@ -96,7 +109,7 @@ def render_options_intelligence(current_price: float) -> None:
 
     suggestion = compute_strategy_suggestion(current_price, em, pc, gex_df, oi_df, max_pain, vol, gaps_df=gaps_df)
     with strat_col:
-        _render_strategy_card(suggestion, selected_label)
+        _render_strategy_card(suggestion, selected_label, selected_iso)
 
     st.markdown('<div style="height:12px"></div>', unsafe_allow_html=True)
 
@@ -594,11 +607,12 @@ def _expander_levels_block(suggestion: dict | None) -> str:
     stop    = suggestion.get("stop_level")
     stp_src = suggestion.get("stop_source", "")
     stp_pct = suggestion.get("stop_pct")
-    gap     = suggestion.get("gap_fill")
-    gap_pct = suggestion.get("gap_fill_pct")
-    gap_dt  = suggestion.get("gap_fill_date", "")
-    hold    = suggestion.get("hold_note", "")
-    mp_warn = suggestion.get("mp_headwind", False)
+    gap      = suggestion.get("gap_fill")
+    gap_pct  = suggestion.get("gap_fill_pct")
+    gap_dt   = suggestion.get("gap_fill_date", "")
+    gap_type = suggestion.get("gap_fill_type", "")
+    hold     = suggestion.get("hold_note", "")
+    mp_warn  = suggestion.get("mp_headwind", False)
 
     def _fmt(price, pct, src):
         if price is None:
@@ -610,7 +624,8 @@ def _expander_levels_block(suggestion: dict | None) -> str:
     lines.append(f"> · Target: {_fmt(ref, ref_pct, ref_src)}")
     lines.append(f"> · Stop: {_fmt(stop, stp_pct, stp_src)}")
     if gap is not None and (ref is None or abs(gap - ref) > 0.50):
-        gap_label = f"Gap fill{' · ' + gap_dt if gap_dt else ''}"
+        gap_parts = [p for p in [gap_type, gap_dt] if p and p != "—"]
+        gap_label = "Gap fill" + (" · " + " · ".join(gap_parts) if gap_parts else "")
         lines.append(f"> · Nearest gap fill: {_fmt(gap, gap_pct, gap_label)}")
     if mp_warn:
         lines.append("> · ⚠ Max pain sits between current price and target — may slow progress")
@@ -843,7 +858,7 @@ Data is sourced from Yahoo Finance (15-min delay). Sweeps update with the expira
 
 # ── Strategy Suggester card ────────────────────────────────────────────────────
 
-def _render_strategy_card(suggestion: dict | None, exp_label: str = "") -> None:
+def _render_strategy_card(suggestion: dict | None, exp_label: str = "", exp_iso: str = "") -> None:
     if not suggestion:
         return
 
@@ -887,10 +902,11 @@ def _render_strategy_card(suggestion: dict | None, exp_label: str = "") -> None:
     stop_level  = suggestion.get("stop_level")
     stop_source = suggestion.get("stop_source", "—")
     stop_pct    = suggestion.get("stop_pct")
-    gap_fill    = suggestion.get("gap_fill")
+    gap_fill      = suggestion.get("gap_fill")
     gap_fill_pct  = suggestion.get("gap_fill_pct")
     gap_fill_date = suggestion.get("gap_fill_date")
-    mp_headwind = suggestion.get("mp_headwind", False)
+    gap_fill_type = suggestion.get("gap_fill_type", "")
+    mp_headwind   = suggestion.get("mp_headwind", False)
     hold_note   = suggestion.get("hold_note", "")
     direction   = suggestion["direction"]
 
@@ -913,7 +929,9 @@ def _render_strategy_card(suggestion: dict | None, exp_label: str = "") -> None:
     # Show gap fill row only if it differs from the primary reference target
     show_gap  = (gap_fill is not None
                  and (ref_target is None or abs(gap_fill - ref_target) > 0.50))
-    gap_html  = (_level_html(gap_fill, gap_fill_pct, "Gap fill", "#F59E0B", gap_fill_date or "")
+    _gap_type_parts = [p for p in [gap_fill_type, gap_fill_date] if p and p != "—"]
+    _gap_src  = "Gap fill" + (" · " + " · ".join(_gap_type_parts) if _gap_type_parts else "")
+    gap_html  = (_level_html(gap_fill, gap_fill_pct, _gap_src, "#F59E0B")
                  if show_gap else "")
 
     mp_warn = (
@@ -947,6 +965,12 @@ def _render_strategy_card(suggestion: dict | None, exp_label: str = "") -> None:
         f'{hold_html}'
         f'</div>'
     )
+
+    _sc1, _sc2 = st.columns([12, 1])
+    with _sc2:
+        with st.popover("🔗", use_container_width=True, help="Share this strategy card"):
+            st.code(_share_url("/spy-trade-idea", exp_iso), language=None)
+            st.caption("Copy the link above to share this strategy card.")
 
     c_main, c_why = st.columns([3, 2])
     with c_main:

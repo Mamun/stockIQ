@@ -10,7 +10,8 @@ def get_pages() -> dict:
         "Market": [
             st.Page(f"{_VIEWS}/spy_dashboard.py",    title="SPY Dashboard",      icon="📈", url_path="spy",            default=True),
             st.Page(f"{_VIEWS}/volatility.py",       title="Volatility / VIX",   icon="📉", url_path="volatility"),
-            st.Page(f"{_VIEWS}/ai_forecast_page.py", title="SPY AI Outlook",     icon="🤖", url_path="spy-ai-forecast"),
+            st.Page(f"{_VIEWS}/ai_forecast_page.py",  title="SPY AI Outlook",        icon="🤖", url_path="spy-ai-forecast"),
+            st.Page(f"{_VIEWS}/spy_strategy_page.py", title="SPY Trade Idea",         icon="🎯", url_path="spy-trade-idea"),
             st.Page(f"{_VIEWS}/spy_levels_page.py",  title="SPY Key Levels",     icon="📐", url_path="spy-levels"),
             st.Page(f"{_VIEWS}/spy_gap_table.py",    title="SPY Gap Table",      icon="📋", url_path="spy-gaps"),
             st.Page(f"{_VIEWS}/dte_guide.py",        title="0DTE Options Guide", icon="⚡", url_path="0dte-guide"),

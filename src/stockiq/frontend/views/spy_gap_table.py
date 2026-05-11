@@ -22,6 +22,7 @@ def render_spy_gap_table_page() -> None:
         gaps_df,
         show_rsi=True,
         show_next_day=True,
+        show_type=True,
         height=900,
     )
 

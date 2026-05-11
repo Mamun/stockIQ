@@ -440,9 +440,11 @@ def compute_strategy_suggestion(
     gap_fill_level: float | None = None
     gap_fill_pct:   float | None = None
     gap_fill_date:  str   | None = None
+    gap_fill_type:  str          = "—"
     if (gaps_df is not None and not gaps_df.empty
             and "Gap" in gaps_df.columns and "Prev Close" in gaps_df.columns
             and "Gap Filled" in gaps_df.columns):
+        has_type_col = "Type" in gaps_df.columns
         unfilled = gaps_df[
             (gaps_df["Gap"].abs() >= 0.10) &
             (~gaps_df["Gap Filled"].astype(bool))
@@ -454,6 +456,7 @@ def compute_strategy_suggestion(
                 gap_fill_level = round(float(above.at[idx, "Prev Close"]), 2)
                 gap_fill_pct   = round((gap_fill_level - current_price) / current_price * 100, 2)
                 gap_fill_date  = idx.strftime("%b %-d") if hasattr(idx, "strftime") else str(idx)[:10]
+                gap_fill_type  = str(above.at[idx, "Type"]) if has_type_col else "—"
         elif direction == "Bearish":
             below = unfilled[unfilled["Prev Close"] < current_price * 0.999]
             if not below.empty:
@@ -461,6 +464,7 @@ def compute_strategy_suggestion(
                 gap_fill_level = round(float(below.at[idx, "Prev Close"]), 2)
                 gap_fill_pct   = round((gap_fill_level - current_price) / current_price * 100, 2)
                 gap_fill_date  = idx.strftime("%b %-d") if hasattr(idx, "strftime") else str(idx)[:10]
+                gap_fill_type  = str(below.at[idx, "Type"]) if has_type_col else "—"
 
     # Primary reference target (nearest meaningful level in trade direction)
     ref_target:  float | None = None
@@ -469,16 +473,26 @@ def compute_strategy_suggestion(
     stop_source: str          = "—"
     total_gex = float(gex_df["gex"].sum()) if not gex_df.empty else 0.0
 
+    def _gap_label(gtype: str) -> str:
+        return f"Gap fill · {gtype}" if gtype and gtype != "—" else "Gap fill"
+
     if direction == "Bullish":
         cands = []
+        breakaway_cand = None
         if gap_fill_level and gap_fill_level > current_price:
-            cands.append((gap_fill_level, "Gap fill"))
+            entry = (gap_fill_level, _gap_label(gap_fill_type))
+            if gap_fill_type == "Breakaway":
+                breakaway_cand = entry
+            else:
+                cands.append(entry)
         if call_wall_t and call_wall_t > current_price:
             cands.append((call_wall_t, "Call wall"))
         if em and em["high"] > current_price:
             cands.append((em["high"], "EM upper"))
         if max_pain and max_pain > current_price:
             cands.append((max_pain, "Max pain"))
+        if breakaway_cand:
+            cands.append(breakaway_cand)
         if cands:
             ref_target, ref_source = min(cands, key=lambda x: x[0])
         if put_wall_t and put_wall_t < current_price:
@@ -492,14 +506,21 @@ def compute_strategy_suggestion(
         )
     elif direction == "Bearish":
         cands = []
+        breakaway_cand = None
         if gap_fill_level and gap_fill_level < current_price:
-            cands.append((gap_fill_level, "Gap fill"))
+            entry = (gap_fill_level, _gap_label(gap_fill_type))
+            if gap_fill_type == "Breakaway":
+                breakaway_cand = entry
+            else:
+                cands.append(entry)
         if put_wall_t and put_wall_t < current_price:
             cands.append((put_wall_t, "Put wall"))
         if em and em["low"] < current_price:
             cands.append((em["low"], "EM lower"))
         if max_pain and max_pain < current_price:
             cands.append((max_pain, "Max pain"))
+        if breakaway_cand:
+            cands.append(breakaway_cand)
         if cands:
             ref_target, ref_source = max(cands, key=lambda x: x[0])
         if call_wall_t and call_wall_t > current_price:
@@ -553,6 +574,7 @@ def compute_strategy_suggestion(
         "gap_fill":      gap_fill_level,
         "gap_fill_pct":  gap_fill_pct,
         "gap_fill_date": gap_fill_date,
+        "gap_fill_type": gap_fill_type,
         "mp_headwind":   mp_headwind,
         "hold_note":     hold_note,
     }

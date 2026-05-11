@@ -15,6 +15,7 @@ def render_gap_table(
     title: str = "Daily Gaps (Last 30 Days)",
     show_rsi: bool = False,
     show_next_day: bool = False,
+    show_type: bool = False,
     price_prefix: str = "$",
     share_url: str | None = None,
     rows: int = 30,
@@ -24,10 +25,11 @@ def render_gap_table(
 
     Args:
         gaps_df:       DataFrame returned by compute_daily_gaps() (optionally
-                       enriched with RSI, Next Day columns).
+                       enriched with RSI, Next Day, Type columns).
         title:         Section heading text.
         show_rsi:      Show RSI + RSI Zone columns (gaps_df must have 'RSI').
         show_next_day: Show Next Day direction column (gaps_df must have 'Next Day').
+        show_type:     Show gap Type column (gaps_df must have 'Type').
         price_prefix:  '$' for stocks/ETFs, '' for indices like VIX.
         share_url:     If set, renders a share popover next to the title.
         rows:          How many recent rows to show.
@@ -50,7 +52,8 @@ def render_gap_table(
         st.markdown(f"#### {title} {_pending_note}", unsafe_allow_html=True)
 
     # ── Build display DataFrame ───────────────────────────────────────────────
-    has_vol = "Volume" in gaps_df.columns
+    has_vol  = "Volume" in gaps_df.columns
+    has_type = show_type and "Type" in gaps_df.columns
     base_cols = ["Open", "High", "Low", "Close", "Gap", "Gap %", "Gap Filled", "Gap Confirmed"]
     if has_vol:
         base_cols.insert(2, "Volume")
@@ -58,6 +61,8 @@ def render_gap_table(
         base_cols.append("RSI")
     if show_next_day and "Next Day" in gaps_df.columns:
         base_cols.append("Next Day")
+    if has_type:
+        base_cols.append("Type")
 
     gaps_data = gaps_df.tail(rows)[base_cols].reset_index()
 
@@ -70,6 +75,8 @@ def render_gap_table(
         col_names.append("RSI")
     if show_next_day and "Next Day" in gaps_df.columns:
         col_names.append("Next Day")
+    if has_type:
+        col_names.append("Type")
     gaps_data.columns = col_names
 
     gaps_data["Date"] = gaps_data["Date"].dt.strftime("%m-%d")
@@ -95,6 +102,8 @@ def render_gap_table(
     if has_vol:
         display_cols.append("Volume")
     display_cols += ["Gap $", "Gap %", "Status"]
+    if has_type:
+        display_cols.append("Type")
     if has_rsi_col:
         display_cols += ["RSI", "RSI Zone"]
     if show_next_day and "Next Day" in gaps_data.columns:
@@ -140,6 +149,16 @@ def render_gap_table(
             return "color: #EF4444; font-weight: 700"
         return ""
 
+    _TYPE_COLORS = {
+        "Common":     "color:#94A3B8",
+        "Runaway":    "color:#F59E0B; font-weight:600",
+        "Breakaway":  "color:#60A5FA; font-weight:700",
+        "Exhaustion": "color:#F97316; font-weight:700",
+    }
+
+    def _color_type(val):
+        return _TYPE_COLORS.get(val, "")
+
     # ── Format spec ───────────────────────────────────────────────────────────
     p = price_prefix
     fmt = {
@@ -157,6 +176,8 @@ def render_gap_table(
 
     # ── Build styled dataframe ────────────────────────────────────────────────
     styled = display.style.apply(_highlight, axis=1).format(fmt, na_rep="—")
+    if has_type and "Type" in display_cols:
+        styled = styled.map(_color_type, subset=["Type"])
     if has_rsi_col:
         styled = styled.map(_color_rsi_zone, subset=["RSI Zone"]).map(_color_rsi, subset=["RSI"])
     if show_next_day and "Next Day" in display_cols:

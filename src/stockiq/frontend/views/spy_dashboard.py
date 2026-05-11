@@ -188,6 +188,7 @@ def _render_gap_section(gap_data: dict) -> None:
         title="Daily Gaps (Last 30 Days)",
         show_rsi=True,
         show_next_day=True,
+        show_type=True,
         share_url=share_url,
     )
 

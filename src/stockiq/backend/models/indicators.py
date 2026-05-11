@@ -117,6 +117,71 @@ def patch_today_gap(gaps_df: pd.DataFrame, quote: dict) -> pd.DataFrame:
     return gaps_df
 
 
+def classify_gap_types(df: pd.DataFrame) -> pd.Series:
+    """
+    Classify each row of a gaps_df (from compute_daily_gaps) as one of:
+      Common     — small gap < 0.30%, fills quickly, low significance
+      Runaway    — mid-range gap 0.30-0.80%, continuation of current trend
+      Breakaway  — >= 0.50%, high volume, unfilled; marks start of a new leg
+      Exhaustion — >= 0.50% at overbought/oversold RSI, or large gap that filled
+
+    Requires: Gap, Gap %, Gap Filled columns.
+    Optional: Volume (enables vol-ratio logic), RSI (enables exhaustion detection).
+    """
+    has_vol = "Volume" in df.columns
+    has_rsi = "RSI" in df.columns
+    avg_vol = df["Volume"].rolling(20, min_periods=5).mean() if has_vol else None
+
+    results = []
+    for i, (idx, row) in enumerate(df.iterrows()):
+        gap_pct = abs(float(row.get("Gap %", 0) or 0))
+        gap_val = float(row.get("Gap", 0) or 0)
+        filled  = bool(row.get("Gap Filled", False))
+
+        if gap_pct == 0:
+            results.append("—")
+            continue
+
+        if gap_pct < 0.30:
+            results.append("Common")
+            continue
+
+        rsi = None
+        if has_rsi:
+            rsi_raw = row.get("RSI")
+            if rsi_raw is not None and not pd.isna(rsi_raw):
+                rsi = float(rsi_raw)
+
+        vr = None
+        if has_vol and avg_vol is not None:
+            av = float(avg_vol.iloc[i]) if not pd.isna(avg_vol.iloc[i]) else 0
+            if av > 0:
+                vr = float(row["Volume"]) / av
+
+        # Exhaustion: gap at extreme RSI, or large gap that reversed and filled
+        is_exhaustion = False
+        if rsi is not None:
+            if gap_val > 0 and rsi >= 68:
+                is_exhaustion = True
+            elif gap_val < 0 and rsi <= 32:
+                is_exhaustion = True
+        if gap_pct >= 0.80 and filled:
+            is_exhaustion = True
+
+        if is_exhaustion:
+            results.append("Exhaustion")
+            continue
+
+        # Breakaway: significant gap, above-avg volume, not filled
+        if gap_pct >= 0.50 and (vr is None or vr >= 1.30) and not filled:
+            results.append("Breakaway")
+            continue
+
+        results.append("Runaway")
+
+    return pd.Series(results, index=df.index, name="Type")
+
+
 def compute_buying_pressure(df: pd.DataFrame, timeframe: str = "monthly") -> dict:
     """
     Buying Pressure (BX) signal — detects selling exhaustion and onset of real buying.

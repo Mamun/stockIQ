@@ -17,7 +17,7 @@ from stockiq.backend.data.market import fetch_vix_ohlc
 from stockiq.backend.data.local_gap_cache import apply_gap_cache, save_confirmed_gaps
 from stockiq.backend.data.local_ohlc_cache import enrich_with_cache
 from stockiq.backend.data.yf_fetch import fetch_ohlcv
-from stockiq.backend.models.indicators import compute_daily_gaps, compute_rsi, patch_today_gap
+from stockiq.backend.models.indicators import classify_gap_types, compute_daily_gaps, compute_rsi, patch_today_gap
 from stockiq.backend.models.options import (
     compute_max_pain, compute_oi_by_strike, label_expirations,
     compute_gex, compute_expected_move, compute_sweep_signals, compute_vol_regime,
@@ -128,7 +128,8 @@ def get_spy_gap_table_data() -> dict:
         axis=1,
     )
 
-    gaps_df["RSI"] = rsi_long.reindex(gaps_df.index)
+    gaps_df["RSI"]  = rsi_long.reindex(gaps_df.index)
+    gaps_df["Type"] = classify_gap_types(gaps_df)
 
     return {"gaps_df": gaps_df, "quote": quote, "daily_df": daily_df}
 
@@ -163,7 +164,7 @@ def get_spy_gaps_df() -> pd.DataFrame:
     """
     Unfilled SPY daily gaps for reference-target computation in strategy suggester.
     Reuses the already-cached daily OHLCV — no extra network call.
-    Returns DataFrame with Gap, Gap %, Gap Filled, Prev Close columns (DatetimeIndex).
+    Returns DataFrame with Gap, Gap %, Gap Filled, Prev Close, Type columns (DatetimeIndex).
     """
     from stockiq.backend.models.indicators import compute_daily_gaps, patch_today_gap
     from stockiq.backend.data.local_gap_cache import apply_gap_cache
@@ -175,7 +176,9 @@ def get_spy_gaps_df() -> pd.DataFrame:
         raw     = compute_daily_gaps(daily_df)
         if raw.empty:
             return pd.DataFrame()
-        return apply_gap_cache(patch_today_gap(raw, quote))
+        gaps = apply_gap_cache(patch_today_gap(raw, quote))
+        gaps["Type"] = classify_gap_types(gaps)
+        return gaps
     except Exception:
         return pd.DataFrame()
 
