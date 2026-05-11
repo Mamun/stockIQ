@@ -21,6 +21,7 @@ from stockiq.backend.models.indicators import compute_daily_gaps, compute_rsi, p
 from stockiq.backend.models.options import (
     compute_max_pain, compute_oi_by_strike, label_expirations,
     compute_gex, compute_expected_move, compute_sweep_signals, compute_vol_regime,
+    compute_put_call_ratio,
 )
 
 _QUOTE_FETCHERS = {
@@ -233,6 +234,7 @@ def get_spy_options_analysis(
     oi_df         = compute_oi_by_strike(data["calls"], data["puts"], current_price or max_pain)
     gex_df        = compute_gex(data["calls"], data["puts"], current_price or max_pain, data["expiration"])
     expected_move = compute_expected_move(data["calls"], data["puts"], current_price or max_pain, data["expiration"])
+    pc            = compute_put_call_ratio(data["calls"], data["puts"], data["expiration"])
 
     # Yahoo chain carries volume data; use it for sweeps and bid/ask
     raw_calls = _yahoo_chain_for_bid_ask(data["expiration"], "calls")
@@ -244,6 +246,7 @@ def get_spy_options_analysis(
         "oi_df":         oi_df,
         "gex_df":        gex_df,
         "expected_move": expected_move,
+        "pc":            pc,
         "sweep_signals": sweep_df,
         "expiration":    data["expiration"],
         "expirations":   data["expirations"],

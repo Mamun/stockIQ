@@ -15,7 +15,7 @@ import pytz
 import pandas as pd
 import streamlit as st
 
-from stockiq.backend.services.spy_service import get_spy_options_analysis, get_put_call_ratio, get_vol_regime
+from stockiq.backend.services.spy_service import get_spy_options_analysis, get_vol_regime
 from stockiq.backend.models.options import compute_strategy_suggestion
 from stockiq.frontend.views.components.spy_charts import (
     oi_gex_combined_chart,
@@ -49,7 +49,7 @@ def render_options_intelligence(current_price: float) -> None:
         expander_seed = seed
 
     vol = get_vol_regime()
-    _render_what_is_expander(expander_seed, current_price, vol)
+    _render_what_is_expander(expander_seed, current_price, vol, pc=expander_seed.get("pc"))
 
     expirations = seed["expirations"]
     default_idx = expirations.index(today_iso) if today_iso in expirations else 0
@@ -62,13 +62,14 @@ def render_options_intelligence(current_price: float) -> None:
         )
     selected_iso = exp_map[selected_label]
 
-    pc_scope_key, pc_scope_note = _derive_pc_scope(selected_iso)
-    pc         = get_put_call_ratio(scope=pc_scope_key)
     data       = get_spy_options_analysis(expiration=selected_iso, current_price=current_price)
     fetched_at = _datetime.now(tz=_ET).strftime("%-I:%M %p ET · %b %-d")
     if not data:
         st.caption("Options data unavailable for this expiration.")
         return
+
+    pc            = data.get("pc")
+    pc_scope_note = pc.get("scope_note", "") if pc else ""
 
     max_pain   = data["max_pain"]
     oi_df      = data["oi_df"]
@@ -385,24 +386,6 @@ def _render_gamma_squeeze_panel(squeeze: dict) -> None:
     st.markdown('</div>', unsafe_allow_html=True)
 
 
-# ── P/C scope derivation ───────────────────────────────────────────────────────
-
-def _derive_pc_scope(selected_iso: str) -> tuple[str, str]:
-    try:
-        dte = (_datetime.strptime(selected_iso, "%Y-%m-%d").date() - _date.today()).days
-    except Exception:
-        dte = 0
-    if dte <= 1:
-        return "daily",   "Today's option volume · resets each trading day"
-    if dte <= 7:
-        return "7d",      "Open interest · expirations within 7 days"
-    if dte <= 14:
-        return "14d",     "Open interest · expirations within 14 days"
-    if dte <= 21:
-        return "21d",     "Open interest · expirations within 21 days"
-    return "monthly", "Open interest · expirations ≤ 30 days out"
-
-
 # ── Max Pain helpers ───────────────────────────────────────────────────────────
 
 def _max_pain_style(dist_pct: float) -> tuple[str, str]:
@@ -549,7 +532,7 @@ def _render_gex_summary_card(gex_df: pd.DataFrame) -> None:
 
 # ── "What is?" expander ────────────────────────────────────────────────────────
 
-def _render_what_is_expander(seed: dict, current_price: float, vol: dict | None = None) -> None:
+def _render_what_is_expander(seed: dict, current_price: float, vol: dict | None = None, pc: dict | None = None) -> None:
     """Educational expander using live data from the seed (nearest expiration)."""
     oi_df  = seed.get("oi_df", pd.DataFrame())
     gex_df = seed.get("gex_df", pd.DataFrame())
@@ -574,7 +557,6 @@ def _render_what_is_expander(seed: dict, current_price: float, vol: dict | None 
         "Far from max pain — strong directional move"
     )
 
-    pc       = get_put_call_ratio(scope="daily")
     total_gex = gex_df["gex"].sum() if not gex_df.empty else None
     gex_b    = f"{total_gex / 1e9:+.1f}B" if total_gex is not None else "N/A"
     gex_sign = "Long Gamma / Positive GEX" if (total_gex or 0) >= 0 else "Short Gamma / Negative GEX"
@@ -740,10 +722,29 @@ def _render_strategy_card(suggestion: dict | None, exp_label: str = "") -> None:
     dir_clr    = suggestion["dir_color"]
     conf_clr   = suggestion["conf_color"]
     vb_clr     = suggestion["vb_color"]
-    exp_note   = f" · {exp_label}" if exp_label else ""
     em_range   = (f'${suggestion["em_low"]:,.2f} – ${suggestion["em_high"]:,.2f}'
                   if suggestion["em_low"] and suggestion["em_high"] else "—")
     strike_str = suggestion["strike_label"] or "—"
+
+    # Derive a context-aware title from the expiration label
+    if exp_label:
+        dte_part = exp_label.split("(")[-1].rstrip(")").strip() if "(" in exp_label else ""
+        try:
+            dte_num = int(dte_part.rstrip("d"))
+        except (ValueError, AttributeError):
+            dte_num = 7
+        if dte_num == 0:
+            setup_title = f"Today's Setup · {exp_label}"
+        elif dte_num <= 2:
+            setup_title = f"Near-Term Setup · {exp_label}"
+        elif dte_num <= 9:
+            setup_title = f"This Week's Setup · {exp_label}"
+        elif dte_num <= 35:
+            setup_title = f"This Month's Setup · {exp_label}"
+        else:
+            setup_title = f"Longer-Term Setup · {exp_label}"
+    else:
+        setup_title = "This Week's Setup"
 
     rationale_html = "".join(
         f'<div style="font-size:0.77rem;color:#94A3B8;margin-bottom:3px">◆ {r}</div>'
@@ -757,7 +758,7 @@ def _render_strategy_card(suggestion: dict | None, exp_label: str = "") -> None:
             f'border-left:4px solid {strat_clr};border-radius:10px;padding:16px 20px">'
             f'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'
             f'<span style="font-size:11px;font-weight:700;color:#64748B;letter-spacing:.08em;'
-            f'text-transform:uppercase">This Week\'s Setup{exp_note}</span>'
+            f'text-transform:uppercase">{setup_title}</span>'
             f'<span style="background:{conf_clr}22;color:{conf_clr};font-size:0.68rem;font-weight:700;'
             f'padding:2px 8px;border-radius:4px;letter-spacing:.06em">'
             f'{suggestion["confidence"]} CONFIDENCE</span>'

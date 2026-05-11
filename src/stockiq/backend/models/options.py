@@ -116,7 +116,7 @@ def compute_gex(
         K, sigma, oi, strikes = K[valid], sigma[valid], oi[valid], K[valid]
         d1    = (np.log(current_price / K) + (r + 0.5 * sigma**2) * T) / (sigma * np.sqrt(T))
         gamma = np.exp(-0.5 * d1**2) / (np.sqrt(2 * np.pi) * current_price * sigma * np.sqrt(T))
-        gex   = sign * gamma * oi * 100 * current_price**2
+        gex   = sign * gamma * oi * 100 * current_price
         return pd.DataFrame({"strike": strikes, "gex": gex})
 
     combined = (
@@ -301,13 +301,13 @@ def compute_strategy_suggestion(
         r = pc["ratio"]
         if r < 0.8:
             direction_votes.append("bullish")
-            rationale.append(f"P/C {r:.2f} — call-heavy flow, market leans bullish")
+            rationale.append(f"P/C {r:.2f} — call-heavy positioning, bullish tilt for this expiration")
         elif r > 1.2:
             direction_votes.append("bearish")
-            rationale.append(f"P/C {r:.2f} — put-heavy flow, market leans bearish")
+            rationale.append(f"P/C {r:.2f} — put-heavy positioning, bearish tilt for this expiration")
         else:
             direction_votes.append("neutral")
-            rationale.append(f"P/C {r:.2f} — balanced flow, no directional edge")
+            rationale.append(f"P/C {r:.2f} — balanced positioning, no directional edge")
 
     if max_pain and current_price:
         dist = (max_pain - current_price) / current_price * 100
@@ -344,10 +344,18 @@ def compute_strategy_suggestion(
         put_wall   = float(oi_df.loc[oi_df["put_oi"].idxmax(),  "strike"])
         dist_call  = (call_wall - current_price) / current_price * 100
         dist_put   = (put_wall  - current_price) / current_price * 100
-        if dist_put < 0 and abs(dist_put) < 1.5:
+        put_close  = dist_put < 0 and abs(dist_put) < 1.5
+        call_close = dist_call > 0 and dist_call < 1.5
+        if put_close and call_close:
+            direction_votes.append("neutral")
+            rationale.append(
+                f"Price pinned: put wall ${put_wall:,.0f} ({abs(dist_put):.1f}% below) "
+                f"& call wall ${call_wall:,.0f} (+{dist_call:.1f}% above)"
+            )
+        elif put_close:
             direction_votes.append("bullish")
             rationale.append(f"Put wall ${put_wall:,.0f} ({abs(dist_put):.1f}% below) — strong nearby floor")
-        elif dist_call > 0 and dist_call < 1.5:
+        elif call_close:
             direction_votes.append("bearish")
             rationale.append(f"Call wall ${call_wall:,.0f} (+{dist_call:.1f}% above) — ceiling nearby, resistance likely")
 
@@ -482,6 +490,75 @@ def compute_sweep_signals(
         .head(top_n)
         .reset_index(drop=True)
     )
+
+
+def compute_put_call_ratio(
+    calls: pd.DataFrame,
+    puts: pd.DataFrame,
+    expiration: str = "",
+) -> dict | None:
+    """
+    P/C ratio computed directly from a single expiration's chain data.
+    Uses volume for 0DTE (same-day) expirations, open interest for future dates.
+    Falls back to open interest when volume is unavailable or zero.
+    """
+    try:
+        dte = max(
+            (datetime.strptime(expiration, "%Y-%m-%d").date() - datetime.today().date()).days, 0
+        )
+    except Exception:
+        dte = 99
+
+    use_volume = dte == 0
+
+    def _total(df: pd.DataFrame, col: str) -> int:
+        if col in df.columns:
+            v = int(df[col].fillna(0).sum())
+            if v > 0:
+                return v
+        return 0
+
+    col = "volume" if use_volume else "openInterest"
+    total_puts  = _total(puts,  col)
+    total_calls = _total(calls, col)
+
+    # Fall back to OI if volume is zero (e.g. market closed or CBOE provider)
+    if use_volume and total_puts == 0 and total_calls == 0:
+        total_puts  = _total(puts,  "openInterest")
+        total_calls = _total(calls, "openInterest")
+        use_volume  = False
+
+    if not total_calls:
+        return None
+
+    ratio = round(total_puts / total_calls, 3)
+    if ratio > 1.2:
+        signal, color = "Extreme Fear — contrarian bullish", "#22C55E"
+    elif ratio > 1.0:
+        signal, color = "Fearful — mild bullish lean",       "#86EFAC"
+    elif ratio > 0.8:
+        signal, color = "Neutral",                            "#94A3B8"
+    elif ratio > 0.6:
+        signal, color = "Complacent — mild bearish lean",    "#F59E0B"
+    else:
+        signal, color = "Extreme Greed — contrarian bearish", "#EF4444"
+
+    metric_lbl  = "Volume" if use_volume else "Open interest"
+    scope_label = "0DTE" if dte == 0 else f"{dte}d"
+    scope_note  = f"{metric_lbl} · {expiration} · {dte} day{'s' if dte != 1 else ''} to expiry"
+
+    return {
+        "ratio":       ratio,
+        "signal":      signal,
+        "color":       color,
+        "puts":        total_puts,
+        "calls":       total_calls,
+        "scope_label": scope_label,
+        "scope_note":  scope_note,
+        "exp_count":   1,
+        "exp_nearest": expiration,
+        "exp_farthest": expiration,
+    }
 
 
 def label_expirations(expirations: list[str], today: datetime | None = None) -> list[str]:
