@@ -20,7 +20,7 @@ from stockiq.backend.data.yf_fetch import fetch_ohlcv
 from stockiq.backend.models.indicators import classify_gap_types, compute_daily_gaps, compute_rsi, patch_today_gap
 from stockiq.backend.models.options import (
     compute_max_pain, compute_oi_by_strike, label_expirations,
-    compute_gex, compute_expected_move, compute_sweep_signals, compute_vol_regime,
+    compute_gex, compute_gex_components, compute_expected_move, compute_sweep_signals, compute_vol_regime,
     compute_put_call_ratio,
 )
 
@@ -311,12 +311,14 @@ def get_spy_options_analysis(
     except Exception:
         _fallback_iv = 0.20
 
-    gex_df = compute_gex(_gex_calls, _gex_puts, current_price or max_pain, data["expiration"], fallback_iv=_fallback_iv)
+    gex_df         = compute_gex(_gex_calls, _gex_puts, current_price or max_pain, data["expiration"], fallback_iv=_fallback_iv)
+    gex_components = compute_gex_components(_gex_calls, _gex_puts, current_price or max_pain, data["expiration"], fallback_iv=_fallback_iv)
 
     return {
-        "max_pain":      max_pain,
-        "oi_df":         oi_df,
-        "gex_df":        gex_df,
+        "max_pain":       max_pain,
+        "oi_df":          oi_df,
+        "gex_df":         gex_df,
+        "gex_components": gex_components,
         "expected_move": expected_move,
         "pc":            pc,
         "sweep_signals": sweep_df,

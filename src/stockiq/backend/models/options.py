@@ -136,6 +136,88 @@ def compute_gex(
     return combined
 
 
+def compute_gex_components(
+    calls: pd.DataFrame,
+    puts: pd.DataFrame,
+    current_price: float,
+    expiration: str,
+    fallback_iv: float = 0.0,
+) -> dict:
+    """
+    GEX breakdown for the summary card.
+
+    Returns:
+        call_gex   — total positive GEX from calls ($)
+        put_gex    — total negative GEX from puts ($)
+        net_gex    — call_gex + put_gex
+        total_gex  — |call_gex| + |put_gex|  (gross notional)
+        call_oi    — total call open interest
+        put_oi     — total put open interest
+        call_wall  — strike with highest call GEX (dealer resistance level)
+        put_wall   — strike with most negative put GEX (dealer support level)
+        zero_gamma — interpolated strike where net GEX crosses zero (None if not found)
+    """
+    try:
+        dte = max((datetime.strptime(expiration, "%Y-%m-%d").date()
+                   - datetime.today().date()).days, 0)
+    except Exception:
+        dte = 7
+    T = max(dte, 1) / 365.0
+    r = 0.045
+
+    def _series(df: pd.DataFrame, sign: float) -> pd.DataFrame:
+        K     = df["strike"].values.astype(float)
+        sigma = df["impliedVolatility"].fillna(0).values.astype(float)
+        oi    = df["openInterest"].fillna(0).values.astype(float)
+        if fallback_iv > 0.001:
+            sigma = np.where(sigma < 0.001, fallback_iv, sigma)
+        valid = (sigma > 0.001) & (oi > 0) & (K > 0)
+        if not valid.any():
+            return pd.DataFrame(columns=["strike", "gex"])
+        K, sigma, oi = K[valid], sigma[valid], oi[valid]
+        d1    = (np.log(current_price / K) + (r + 0.5 * sigma**2) * T) / (sigma * np.sqrt(T))
+        gamma = np.exp(-0.5 * d1**2) / (np.sqrt(2 * np.pi) * current_price * sigma * np.sqrt(T))
+        return pd.DataFrame({"strike": K, "gex": sign * gamma * oi * 100 * current_price})
+
+    call_df = _series(calls, +1).groupby("strike", as_index=False)["gex"].sum()
+    put_df  = _series(puts,  -1).groupby("strike", as_index=False)["gex"].sum()
+
+    call_gex  = float(call_df["gex"].sum()) if not call_df.empty else 0.0
+    put_gex   = float(put_df["gex"].sum())  if not put_df.empty  else 0.0
+    call_wall = float(call_df.loc[call_df["gex"].idxmax(), "strike"]) if not call_df.empty else None
+    put_wall  = float(put_df.loc[put_df["gex"].idxmin(),  "strike"])  if not put_df.empty  else None
+
+    # Zero gamma: strike nearest ATM where net GEX profile crosses zero
+    combined = (
+        pd.concat([call_df, put_df])
+        .groupby("strike", as_index=False)["gex"].sum()
+        .sort_values("strike")
+        .reset_index(drop=True)
+    )
+    zero_gamma: float | None = None
+    if len(combined) >= 2:
+        s, g = combined["strike"].values, combined["gex"].values
+        crossings = [
+            float(s[i] + (s[i + 1] - s[i]) * (-g[i]) / (g[i + 1] - g[i]))
+            for i in range(len(g) - 1)
+            if g[i] * g[i + 1] < 0
+        ]
+        if crossings:
+            zero_gamma = round(min(crossings, key=lambda x: abs(x - current_price)), 2)
+
+    return {
+        "call_gex":   call_gex,
+        "put_gex":    put_gex,
+        "net_gex":    call_gex + put_gex,
+        "total_gex":  abs(call_gex) + abs(put_gex),
+        "call_oi":    int(calls["openInterest"].fillna(0).sum()),
+        "put_oi":     int(puts["openInterest"].fillna(0).sum()),
+        "call_wall":  call_wall,
+        "put_wall":   put_wall,
+        "zero_gamma": zero_gamma,
+    }
+
+
 def compute_expected_move(
     calls: pd.DataFrame,
     puts: pd.DataFrame,

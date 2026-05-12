@@ -121,46 +121,118 @@ def render_expected_move_card(em: dict | None, exp_label: str) -> None:
     )
 
 
-def render_gex_summary_card(gex_df: pd.DataFrame) -> None:
+def render_gex_summary_card(
+    gex_df: pd.DataFrame,
+    gex_components: dict | None = None,
+    current_price: float = 0.0,
+) -> None:
     if gex_df.empty:
         st.markdown(
             '<div style="padding:16px;font-size:11px;color:#64748B">GEX unavailable.</div>',
             unsafe_allow_html=True,
         )
         return
-    total_gex = gex_df["gex"].sum()
-    total_label = (
-        f"{total_gex / 1e9:+.2f}B" if abs(total_gex) >= 1e9
-        else f"{total_gex / 1e6:+.1f}M"
-    )
-    if total_gex >= 0:
+
+    def _fmt(v: float) -> str:
+        if abs(v) >= 1e9:
+            return f"{v / 1e9:+.2f}B"
+        return f"{v / 1e6:+.1f}M"
+
+    def _fmt_abs(v: float) -> str:
+        if abs(v) >= 1e9:
+            return f"{v / 1e9:.2f}B"
+        return f"{v / 1e6:.1f}M"
+
+    def _pct(strike: float | None) -> str:
+        if not strike or not current_price:
+            return ""
+        p = (strike - current_price) / current_price * 100
+        return f"{p:+.2f}%"
+
+    net_gex = gex_components["net_gex"] if gex_components else float(gex_df["gex"].sum())
+
+    if net_gex >= 0:
         gex_color = "#22C55E"
         gex_gamma = "Long Gamma"
-        gex_sign  = "Positive GEX"
-        gex_note  = "Dealers buy dips & sell rips — price tends to stay range-bound"
+        gex_note  = "Dealers buy dips &amp; sell rips — price tends to stay range-bound"
     else:
         gex_color = "#EF4444"
         gex_gamma = "Short Gamma"
-        gex_sign  = "Negative GEX"
         gex_note  = "Dealers amplify moves — expect larger intraday swings"
-    peak_support = float(gex_df.loc[gex_df["gex"].idxmax(), "strike"])
-    peak_resist  = float(gex_df.loc[gex_df["gex"].idxmin(), "strike"])
+
+    net_label = _fmt(net_gex)
+
+    if gex_components:
+        call_gex_lbl   = _fmt(gex_components["call_gex"])
+        put_gex_lbl    = _fmt(gex_components["put_gex"])
+        total_gex_lbl  = _fmt_abs(gex_components["total_gex"])
+        call_oi        = gex_components["call_oi"]
+        put_oi         = gex_components["put_oi"]
+        total_oi       = call_oi + put_oi
+        call_wall      = gex_components.get("call_wall")
+        put_wall       = gex_components.get("put_wall")
+        zero_gamma     = gex_components.get("zero_gamma")
+        cw_str  = f"${call_wall:,.0f}"  if call_wall  else "—"
+        pw_str  = f"${put_wall:,.0f}"   if put_wall   else "—"
+        zg_str  = f"${zero_gamma:,.2f}" if zero_gamma else "—"
+
+        breakdown_html = f"""
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-top:10px">
+    <div>
+      <div style="font-size:9px;color:#64748B;text-transform:uppercase;letter-spacing:.05em">Call GEX</div>
+      <div style="font-size:12px;font-weight:700;color:#22C55E">{call_gex_lbl}</div>
+      <div style="font-size:9px;color:#475569">{call_oi:,} OI</div>
+    </div>
+    <div>
+      <div style="font-size:9px;color:#64748B;text-transform:uppercase;letter-spacing:.05em">Put GEX</div>
+      <div style="font-size:12px;font-weight:700;color:#EF4444">{put_gex_lbl}</div>
+      <div style="font-size:9px;color:#475569">{put_oi:,} OI</div>
+    </div>
+    <div>
+      <div style="font-size:9px;color:#64748B;text-transform:uppercase;letter-spacing:.05em">Total GEX</div>
+      <div style="font-size:12px;font-weight:700;color:#94A3B8">{total_gex_lbl}</div>
+      <div style="font-size:9px;color:#475569">{total_oi:,} OI</div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-top:8px;
+              padding-top:8px;border-top:1px solid #1E293B">
+    <div>
+      <div style="font-size:9px;color:#64748B;text-transform:uppercase;letter-spacing:.05em">Call Wall</div>
+      <div style="font-size:12px;font-weight:700;color:#22C55E">{cw_str}</div>
+      <div style="font-size:9px;color:#475569">{_pct(call_wall)}</div>
+    </div>
+    <div>
+      <div style="font-size:9px;color:#64748B;text-transform:uppercase;letter-spacing:.05em">Put Wall</div>
+      <div style="font-size:12px;font-weight:700;color:#EF4444">{pw_str}</div>
+      <div style="font-size:9px;color:#475569">{_pct(put_wall)}</div>
+    </div>
+    <div>
+      <div style="font-size:9px;color:#64748B;text-transform:uppercase;letter-spacing:.05em">Zero Gamma</div>
+      <div style="font-size:12px;font-weight:700;color:#F59E0B">{zg_str}</div>
+      <div style="font-size:9px;color:#475569">{_pct(zero_gamma)}</div>
+    </div>
+  </div>"""
+    else:
+        peak_support = float(gex_df.loc[gex_df["gex"].idxmax(), "strike"])
+        peak_resist  = float(gex_df.loc[gex_df["gex"].idxmin(), "strike"])
+        breakdown_html = f"""
+  <div style="font-size:10px;color:#94A3B8;line-height:1.8;margin-top:8px">
+    Peak dealer support: <b style="color:#22C55E">${peak_support:,.0f}</b><br>
+    Peak dealer flip: <b style="color:#EF4444">${peak_resist:,.0f}</b>
+  </div>"""
+
     st.markdown(
         f"""
 <div style="background:rgba(255,255,255,0.03);border:1px solid #1E293B;border-radius:10px;
-            padding:16px;min-height:175px;box-sizing:border-box">
+            padding:16px;box-sizing:border-box">
   <div style="font-size:10px;color:#94A3B8;font-weight:700;letter-spacing:.07em;
               text-transform:uppercase;margin-bottom:4px">Gamma Exposure (GEX)</div>
-  <div style="font-size:32px;font-weight:900;color:{gex_color};line-height:1;margin:4px 0">
-    {total_label}
+  <div style="font-size:28px;font-weight:900;color:{gex_color};line-height:1;margin:2px 0">{net_label}</div>
+  <div style="font-size:11px;font-weight:700;color:{gex_color}">{gex_gamma}
+    <span style="color:#64748B;font-size:9px;font-weight:400"> · Net GEX</span>
   </div>
-  <div style="font-size:13px;font-weight:800;color:{gex_color};line-height:1.2">{gex_gamma}</div>
-  <div style="font-size:10px;color:#64748B;margin-bottom:6px">{gex_sign}</div>
-  <div style="font-size:10px;color:#94A3B8;line-height:1.8">
-    {gex_note}<br>
-    Peak dealer support: <b style="color:#22C55E">${peak_support:,.0f}</b><br>
-    Peak dealer flip: <b style="color:#EF4444">${peak_resist:,.0f}</b>
-  </div>
+  {breakdown_html}
+  <div style="font-size:9px;color:#475569;margin-top:8px">{gex_note}</div>
 </div>""",
         unsafe_allow_html=True,
     )

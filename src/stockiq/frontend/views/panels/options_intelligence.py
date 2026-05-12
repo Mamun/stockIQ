@@ -138,7 +138,7 @@ def render_options_intelligence(current_price: float) -> None:
         with r2c1:
             render_expected_move_card(em, selected_label)
         with r2c2:
-            render_gex_summary_card(gex_df)
+            render_gex_summary_card(gex_df, data.get("gex_components"), current_price)
     per_exp = False  # default — aggregated GEX (full dealer book)
     with chart_col:
         if not oi_df.empty or not gex_df.empty:
