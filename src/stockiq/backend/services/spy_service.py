@@ -266,32 +266,37 @@ def get_spy_options_analysis(
 
     # GEX requires IV — CBOE returns iv=0 for short-dated expirations (0DTE/1DTE),
     # and both CBOE and Yahoo return iv=0 after market hours (no bid/ask).
-    # Strategy:
-    #   1. Always use CBOE data for OI (reliable; Yahoo reports oi=0 for 0DTE).
-    #   2. Overlay Yahoo IV by strike when Yahoo has IV > 0 for the same expiration.
-    #   3. VIX/100 fallback fills any remaining iv=0 strikes.
+    # Three-tier strategy:
+    #   1. Yahoo has OI + IV → use Yahoo wholesale (best for weekly/monthly expirations).
+    #   2. Yahoo has IV but OI=0 (0DTE) → keep CBOE OI, overlay Yahoo IV by strike.
+    #   3. Yahoo unavailable → use CBOE data; VIX/100 fallback fills iv=0 strikes.
     _ydata = fetch_spy_options_data(expiration=data["expiration"])
-    _yahoo_has_iv = (
+    _yahoo_ok = (
         _ydata
         and _ydata.get("expiration") == data["expiration"]
         and not _ydata["calls"].empty
         and "impliedVolatility" in _ydata["calls"].columns
-        and (_ydata["calls"]["impliedVolatility"] > 0.001).any()
     )
+    _yahoo_has_iv  = _yahoo_ok and (_ydata["calls"]["impliedVolatility"] > 0.001).any()
+    _yahoo_has_oi  = _yahoo_ok and "openInterest" in _ydata["calls"].columns and (_ydata["calls"]["openInterest"] > 0).any()
 
-    def _merge_iv(cboe_df: pd.DataFrame, yahoo_df: pd.DataFrame) -> pd.DataFrame:
-        """Take CBOE OI + override IV from Yahoo by strike where Yahoo has valid IV."""
-        merged = cboe_df.copy()
-        iv_map = yahoo_df.set_index("strike")["impliedVolatility"]
-        yahoo_iv = merged["strike"].map(iv_map)
-        better = yahoo_iv > 0.001
-        merged.loc[better, "impliedVolatility"] = yahoo_iv[better]
-        return merged
-
-    if _yahoo_has_iv:
-        _gex_calls = _merge_iv(data["calls"], _ydata["calls"])
-        _gex_puts  = _merge_iv(data["puts"],  _ydata["puts"])
+    if _yahoo_has_iv and _yahoo_has_oi:
+        # Full Yahoo data — use as-is (longer-dated expirations)
+        _gex_calls = _ydata["calls"]
+        _gex_puts  = _ydata["puts"]
+    elif _yahoo_has_iv:
+        # 0DTE: Yahoo has IV but OI=0 — keep CBOE OI, patch in Yahoo IV by strike
+        def _patch_iv(cboe_df: pd.DataFrame, yahoo_df: pd.DataFrame) -> pd.DataFrame:
+            out = cboe_df.copy()
+            iv_map   = yahoo_df.set_index("strike")["impliedVolatility"]
+            yahoo_iv = out["strike"].map(iv_map)
+            better   = yahoo_iv > 0.001
+            out.loc[better, "impliedVolatility"] = yahoo_iv[better]
+            return out
+        _gex_calls = _patch_iv(data["calls"], _ydata["calls"])
+        _gex_puts  = _patch_iv(data["puts"],  _ydata["puts"])
     else:
+        # No usable Yahoo data — fall back to CBOE + VIX fallback
         _gex_calls = data["calls"]
         _gex_puts  = data["puts"]
 
