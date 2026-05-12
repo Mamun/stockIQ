@@ -128,6 +128,7 @@ def render_options_intelligence(current_price: float) -> None:
     agg_gex_df      = _agg.get("combined", pd.DataFrame())
     agg_call_gex_df = _agg.get("calls",    pd.DataFrame())
     agg_put_gex_df  = _agg.get("puts",     pd.DataFrame())
+    agg_oi_df       = _agg.get("oi",       pd.DataFrame())
 
     cards_col, chart_col = st.columns([2, 5])
     with cards_col:
@@ -151,12 +152,13 @@ def render_options_intelligence(current_price: float) -> None:
                 key="gex_per_exp",
                 help="Default shows net GEX across all near-term expirations (dealer full book). Check to see this expiration only.",
             )
-            chart_gex_df   = gex_df if per_exp else agg_gex_df
+            chart_oi_df    = oi_df    if per_exp else agg_oi_df
+            chart_gex_df   = gex_df   if per_exp else agg_gex_df
             chart_call_gex = data.get("call_gex_df") if per_exp else agg_call_gex_df
             chart_put_gex  = data.get("put_gex_df")  if per_exp else agg_put_gex_df
             st.plotly_chart(
                 oi_gex_combined_chart(
-                    oi_df, chart_gex_df, current_price, max_pain,
+                    chart_oi_df, chart_gex_df, current_price, max_pain,
                     n_strikes=30 if per_exp else 60,
                     call_gex_df=chart_call_gex,
                     put_gex_df=chart_put_gex,

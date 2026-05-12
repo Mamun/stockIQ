@@ -71,7 +71,7 @@ def oi_gex_combined_chart(
     gex_df: pd.DataFrame,
     current_price: float,
     max_pain: float,
-    n_strikes: int = 30,
+    n_strikes: int = 40,
     call_gex_df: pd.DataFrame | None = None,
     put_gex_df: pd.DataFrame | None = None,
 ) -> go.Figure:
@@ -81,13 +81,13 @@ def oi_gex_combined_chart(
     The shared axis makes the OI→GEX relationship immediately readable:
     a strike with massive OI but tiny GEX means low-gamma (deep ITM/OTM) contracts.
     """
-    # Clip GEX to a dollar window centred on current price.
+    # Clip everything to a dollar window centred on current price.
     dollar_half = n_strikes // 2
+    lo, hi = current_price - dollar_half, current_price + dollar_half
     if not gex_df.empty:
-        gex_df = gex_df[
-            (gex_df["strike"] >= current_price - dollar_half) &
-            (gex_df["strike"] <= current_price + dollar_half)
-        ].copy()
+        gex_df = gex_df[(gex_df["strike"] >= lo) & (gex_df["strike"] <= hi)].copy()
+    if not oi_df.empty:
+        oi_df = oi_df[(oi_df["strike"] >= lo) & (oi_df["strike"] <= hi)].copy()
 
     # Bucket all datasets to $5 strike increments so OI (CBOE $1 increments)
     # and GEX render at the same bar height on the shared Y axis.
@@ -129,10 +129,6 @@ def oi_gex_combined_chart(
         y_min, y_max = min(active_strikes), max(active_strikes)
     else:
         y_min, y_max = current_price - dollar_half, current_price + dollar_half
-
-    # Clip OI to the same window
-    if not oi_df.empty:
-        oi_df = oi_df[(oi_df["strike"] >= y_min) & (oi_df["strike"] <= y_max)].copy()
 
     fig = make_subplots(
         rows=1, cols=2,
@@ -219,7 +215,23 @@ def oi_gex_combined_chart(
             "← Put GEX  ·  GEX ($M)  ·  Call GEX →" if use_split
             else "← Amplifying  ·  GEX ($M)  ·  Stabilising →"
         )
-        fig.update_xaxes(title_text=gex_axis_title, gridcolor="#1E293B", row=1, col=2)
+        # Symmetric x-range so the axis title stays centred regardless of
+        # whether call or put GEX dominates in absolute terms.
+        _gex_vals: list[float] = []
+        if use_split:
+            if not call_gex_df.empty:
+                _gex_vals.append(float(call_gex_df["gex"].abs().max()) / 1e6)
+            if not put_gex_df.empty:
+                _gex_vals.append(float(put_gex_df["gex"].abs().max()) / 1e6)
+        elif not gex_df.empty:
+            _gex_vals.append(float(gex_df["gex"].abs().max()) / 1e6)
+        _gex_max = max(_gex_vals) * 1.1 if _gex_vals else 1.0
+        fig.update_xaxes(
+            title_text=gex_axis_title,
+            range=[-_gex_max, _gex_max],
+            gridcolor="#1E293B",
+            row=1, col=2,
+        )
 
     # ── Shared reference lines (span both panels via shared Y) ───────────────
     fig.add_hline(

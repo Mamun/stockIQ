@@ -255,7 +255,7 @@ def get_spy_options_analysis(
         return None
 
     max_pain      = compute_max_pain(data["calls"], data["puts"])
-    oi_df         = compute_oi_by_strike(data["calls"], data["puts"], current_price or max_pain)
+    oi_df         = compute_oi_by_strike(data["calls"], data["puts"], current_price or max_pain, n_strikes=200)
     expected_move = compute_expected_move(data["calls"], data["puts"], current_price or max_pain, data["expiration"])
     pc            = compute_put_call_ratio(data["calls"], data["puts"], data["expiration"])
 
@@ -347,32 +347,36 @@ def get_spy_aggregated_gex(
     separate call (green) and put (red) bars — matching InsideFinance's layout.
     Positive GEX = long gamma (stabilising); negative GEX = short gamma (amplifying).
     """
-    def _fetch(exp: str) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    def _fetch(exp: str) -> tuple:
         try:
             d = get_spy_options_analysis(expiration=exp, current_price=current_price)
             if not d:
-                return pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
+                return pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
             return (
                 d.get("call_gex_df", pd.DataFrame()),
                 d.get("put_gex_df",  pd.DataFrame()),
                 d.get("gex_df",      pd.DataFrame()),
+                d.get("oi_df",       pd.DataFrame()),
             )
         except Exception:
-            return pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
+            return pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
 
     call_frames: list[pd.DataFrame] = []
     put_frames:  list[pd.DataFrame] = []
     comb_frames: list[pd.DataFrame] = []
+    oi_frames:   list[pd.DataFrame] = []
     with ThreadPoolExecutor(max_workers=4) as pool:
-        for cdf, pdf, gdf in pool.map(_fetch, expirations[:max_exp]):
+        for cdf, pdf, gdf, odf in pool.map(_fetch, expirations[:max_exp]):
             if cdf is not None and not cdf.empty:
                 call_frames.append(cdf)
             if pdf is not None and not pdf.empty:
                 put_frames.append(pdf)
             if gdf is not None and not gdf.empty:
                 comb_frames.append(gdf)
+            if odf is not None and not odf.empty:
+                oi_frames.append(odf)
 
-    def _agg(frames: list[pd.DataFrame]) -> pd.DataFrame:
+    def _agg_gex(frames: list[pd.DataFrame]) -> pd.DataFrame:
         if not frames:
             return pd.DataFrame()
         # Bucket to $5 so $1-increment 0DTE CBOE chains don't create 60 thin bars.
@@ -384,8 +388,22 @@ def get_spy_aggregated_gex(
             .reset_index(drop=True)
         )
 
+    def _agg_oi(frames: list[pd.DataFrame]) -> pd.DataFrame:
+        if not frames:
+            return pd.DataFrame()
+        raw = pd.concat(frames).groupby("strike", as_index=False).agg(
+            {"call_oi": "sum", "put_oi": "sum"}
+        )
+        raw["strike"] = (raw["strike"] / 5).round() * 5
+        return (
+            raw.groupby("strike", as_index=False).agg({"call_oi": "sum", "put_oi": "sum"})
+            .sort_values("strike")
+            .reset_index(drop=True)
+        )
+
     return {
-        "combined": _agg(comb_frames),
-        "calls":    _agg(call_frames),
-        "puts":     _agg(put_frames),
+        "combined": _agg_gex(comb_frames),
+        "calls":    _agg_gex(call_frames),
+        "puts":     _agg_gex(put_frames),
+        "oi":       _agg_oi(oi_frames),
     }
