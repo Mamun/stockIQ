@@ -266,10 +266,11 @@ def get_spy_options_analysis(
 
     # GEX requires IV — CBOE returns iv=0 for short-dated expirations (0DTE/1DTE),
     # and both CBOE and Yahoo return iv=0 after market hours (no bid/ask).
-    # Three-tier strategy:
-    #   1. Yahoo has OI + IV → use Yahoo wholesale (best for weekly/monthly expirations).
-    #   2. Yahoo has IV but OI=0 (0DTE) → keep CBOE OI, overlay Yahoo IV by strike.
-    #   3. Yahoo unavailable → use CBOE data; VIX/100 fallback fills iv=0 strikes.
+    # Strategy: use Yahoo as base (best IV), fill OI from CBOE per-strike where Yahoo=0.
+    # This handles all cases without wholesale switching:
+    #   - Longer-dated: Yahoo has OI everywhere → merge is a no-op.
+    #   - 0DTE: Yahoo OI=0 everywhere → all OI comes from CBOE.
+    #   - 1DTE: Yahoo missing OI at specific strikes → those gaps filled from CBOE.
     _ydata = fetch_spy_options_data(expiration=data["expiration"])
     _yahoo_ok = (
         _ydata
@@ -277,26 +278,29 @@ def get_spy_options_analysis(
         and not _ydata["calls"].empty
         and "impliedVolatility" in _ydata["calls"].columns
     )
-    _yahoo_has_iv  = _yahoo_ok and (_ydata["calls"]["impliedVolatility"] > 0.001).any()
-    _yahoo_has_oi  = _yahoo_ok and "openInterest" in _ydata["calls"].columns and (_ydata["calls"]["openInterest"] > 0).any()
+    _yahoo_has_iv = _yahoo_ok and (_ydata["calls"]["impliedVolatility"] > 0.001).any()
 
-    if _yahoo_has_iv and _yahoo_has_oi:
-        # Full Yahoo data — use as-is (longer-dated expirations)
-        _gex_calls = _ydata["calls"]
-        _gex_puts  = _ydata["puts"]
-    elif _yahoo_has_iv:
-        # 0DTE: Yahoo has IV but OI=0 — keep CBOE OI, patch in Yahoo IV by strike
-        def _patch_iv(cboe_df: pd.DataFrame, yahoo_df: pd.DataFrame) -> pd.DataFrame:
+    if _yahoo_has_iv:
+        # CBOE provides the complete strike universe (never drops far-OTM strikes).
+        # Yahoo provides accurate IV (CBOE IV=0 for short-dated) and timely OI for
+        # longer-dated expirations.  Merge: start with CBOE, overlay Yahoo IV where
+        # valid, prefer Yahoo OI where non-zero (more current for weekly/monthly).
+        def _best_gex_chain(cboe_df: pd.DataFrame, yahoo_df: pd.DataFrame) -> pd.DataFrame:
             out = cboe_df.copy()
-            iv_map   = yahoo_df.set_index("strike")["impliedVolatility"]
-            yahoo_iv = out["strike"].map(iv_map)
-            better   = yahoo_iv > 0.001
-            out.loc[better, "impliedVolatility"] = yahoo_iv[better]
+            if yahoo_df.empty:
+                return out
+            y = yahoo_df.set_index("strike")
+            if "impliedVolatility" in y.columns:
+                yiv = out["strike"].map(y["impliedVolatility"]).fillna(0)
+                out.loc[yiv > 0.001, "impliedVolatility"] = yiv[yiv > 0.001]
+            if "openInterest" in y.columns:
+                yoi = out["strike"].map(y["openInterest"]).fillna(0)
+                out.loc[yoi > 0, "openInterest"] = yoi[yoi > 0]
             return out
-        _gex_calls = _patch_iv(data["calls"], _ydata["calls"])
-        _gex_puts  = _patch_iv(data["puts"],  _ydata["puts"])
+        _gex_calls = _best_gex_chain(data["calls"], _ydata["calls"])
+        _gex_puts  = _best_gex_chain(data["puts"],  _ydata["puts"])
     else:
-        # No usable Yahoo data — fall back to CBOE + VIX fallback
+        # No usable Yahoo IV — fall back to CBOE + VIX fallback
         _gex_calls = data["calls"]
         _gex_puts  = data["puts"]
 
@@ -322,3 +326,44 @@ def get_spy_options_analysis(
         "raw_calls":     raw_calls,
         "raw_puts":      raw_puts,
     }
+
+
+def get_spy_aggregated_gex(
+    expirations: list[str],
+    current_price: float,
+    max_exp: int = 6,
+) -> pd.DataFrame:
+    """Sum GEX across the nearest max_exp expirations by strike.
+
+    Gives the net dealer book exposure — what dealers must hedge across their
+    entire options book, not just one expiration.  Positive GEX = long gamma
+    (stabilising); negative GEX = short gamma (amplifying).
+    """
+    def _fetch(exp: str) -> pd.DataFrame:
+        try:
+            d = get_spy_options_analysis(expiration=exp, current_price=current_price)
+            return d.get("gex_df", pd.DataFrame()) if d else pd.DataFrame()
+        except Exception:
+            return pd.DataFrame()
+
+    frames: list[pd.DataFrame] = []
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        for gdf in pool.map(_fetch, expirations[:max_exp]):
+            if gdf is not None and not gdf.empty:
+                frames.append(gdf)
+
+    if not frames:
+        return pd.DataFrame()
+
+    raw = (
+        pd.concat(frames)
+        .groupby("strike", as_index=False)["gex"].sum()
+    )
+    # Bucket to $5 strike increments so $1-increment 0DTE chains don't create
+    # 60 thin bars in the chart (CBOE near-term chains use $1 increments).
+    raw["strike"] = (raw["strike"] / 5).round() * 5
+    return (
+        raw.groupby("strike", as_index=False)["gex"].sum()
+        .sort_values("strike")
+        .reset_index(drop=True)
+    )

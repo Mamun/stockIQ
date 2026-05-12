@@ -17,7 +17,7 @@ import pytz
 import streamlit as st
 
 from stockiq.backend.models.options import compute_strategy_suggestion
-from stockiq.backend.services.spy_service import get_spy_gaps_df, get_spy_options_analysis, get_vol_regime
+from stockiq.backend.services.spy_service import get_spy_aggregated_gex, get_spy_gaps_df, get_spy_options_analysis, get_vol_regime
 from stockiq.frontend.views.components.options_charts import oi_gex_combined_chart, oi_heatmap_chart
 from stockiq.frontend.views.panels.options_cards import (
     max_pain_style,
@@ -124,6 +124,8 @@ def render_options_intelligence(current_price: float) -> None:
         unsafe_allow_html=True,
     )
 
+    agg_gex_df = get_spy_aggregated_gex(seed["expirations"], current_price)
+
     cards_col, chart_col = st.columns([2, 5])
     with cards_col:
         r1c1, r1c2 = st.columns(2)
@@ -137,20 +139,33 @@ def render_options_intelligence(current_price: float) -> None:
             render_expected_move_card(em, selected_label)
         with r2c2:
             render_gex_summary_card(gex_df)
+    per_exp = False  # default — aggregated GEX (full dealer book)
     with chart_col:
         if not oi_df.empty or not gex_df.empty:
+            per_exp = st.checkbox(
+                f"GEX: {selected_label} only",
+                value=False,
+                key="gex_per_exp",
+                help="Default shows net GEX across all near-term expirations (dealer full book). Check to see this expiration only.",
+            )
+            chart_gex_df = gex_df if per_exp else agg_gex_df
             st.plotly_chart(
-                oi_gex_combined_chart(oi_df, gex_df, current_price, max_pain),
+                oi_gex_combined_chart(
+                    oi_df, chart_gex_df, current_price, max_pain,
+                    n_strikes=30 if per_exp else 120,
+                ),
                 use_container_width=True,
             )
         else:
             st.caption("No options data for this expiration.")
 
+    # Signals use the same GEX source as the chart so levels are consistent.
+    signals_gex = gex_df if per_exp else agg_gex_df
     sig_col, squeeze_col = st.columns([1, 1], gap="large")
     with sig_col:
-        render_signals_panel(compute_signals(gex_df, oi_df, current_price, max_pain, selected_label))
+        render_signals_panel(compute_signals(signals_gex, oi_df, current_price, max_pain, selected_label))
     with squeeze_col:
-        render_gamma_squeeze_panel(compute_gamma_squeeze(gex_df, oi_df, pc, current_price))
+        render_gamma_squeeze_panel(compute_gamma_squeeze(signals_gex, oi_df, pc, current_price))
 
     sweep_df = data.get("sweep_signals", pd.DataFrame())
     render_sweep_panel(sweep_df, selected_label, fetched_at)

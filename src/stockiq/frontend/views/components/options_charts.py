@@ -79,10 +79,7 @@ def oi_gex_combined_chart(
     The shared axis makes the OI→GEX relationship immediately readable:
     a strike with massive OI but tiny GEX means low-gamma (deep ITM/OTM) contracts.
     """
-    # Clip GEX using a dollar window rather than a row count.
-    # Row-count slicing inflates the range when far-OTM strikes switch from $1
-    # to $5 increments — 5 rows above $750 spans $25 instead of $5, pushing
-    # y_max to 770+ while the data there is negligible.
+    # Clip GEX to a dollar window centred on current price.
     dollar_half = n_strikes // 2
     if not gex_df.empty:
         gex_df = gex_df[
@@ -90,7 +87,24 @@ def oi_gex_combined_chart(
             (gex_df["strike"] <= current_price + dollar_half)
         ].copy()
 
-    # Y range from union of the two datasets (include OI strikes outside GEX window)
+    # Bucket both datasets to $5 strike increments so OI (CBOE $1 increments)
+    # and GEX render at the same bar height on the shared Y axis.
+    # Without bucketing, GEX bars span $5 while OI bars span $1 — GEX looks 5×
+    # taller on the shared axis.
+    bucket = 5.0
+    if not gex_df.empty:
+        gex_df["strike"] = (gex_df["strike"] / bucket).round() * bucket
+        gex_df = gex_df.groupby("strike", as_index=False)["gex"].sum()
+    if not oi_df.empty:
+        oi_df = oi_df.copy()
+        oi_df["strike"] = (oi_df["strike"] / bucket).round() * bucket
+        oi_df = (
+            oi_df.groupby("strike", as_index=False)
+            .agg({"call_oi": "sum", "put_oi": "sum"})
+            .reset_index(drop=True)
+        )
+
+    # Y range: GEX window drives the range; OI bars fill where they have data.
     active_strikes: list[float] = []
     if not gex_df.empty:
         active_strikes.extend(gex_df["strike"].tolist())

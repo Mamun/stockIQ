@@ -295,8 +295,8 @@ def render_vol_regime_bar(vol: dict | None) -> None:
             f'text-transform:uppercase;margin-bottom:4px">IV Rank (1Y)</div>'
             f'<div style="font-size:36px;font-weight:900;color:{rank_clr};line-height:1;margin-bottom:6px">'
             f'{rank:.0f}<span style="font-size:16px">%</span></div>'
-            f'<div style="background:#1E293B;border-radius:3px;height:4px;margin-bottom:6px">'
-            f'<div style="width:{min(rank,100):.0f}%;height:100%;background:{rank_clr};border-radius:3px"></div></div>'
+            f'<div style="background:linear-gradient(to right,{rank_clr} {min(rank,100):.0f}%,#1E293B {min(rank,100):.0f}%);'
+            f'border-radius:3px;height:4px;margin-bottom:6px"></div>'
             f'<div style="font-size:11px;font-weight:700;color:{rank_clr}">{rank_lbl}</div>'
             f'<div style="font-size:9px;color:#64748B;margin-top:4px">52w: {vol["vix_52lo"]:.1f} – {vol["vix_52hi"]:.1f}</div>'
             f'</div>',

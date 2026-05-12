@@ -121,7 +121,8 @@ def compute_gamma_squeeze(
     if not gex_df.empty:
         total_gex = float(gex_df["gex"].sum())
         if total_gex < 0:
-            gamma_score = min(30, int(abs(total_gex) / 1e8))
+            # SPY net negative GEX typically ranges $50M–$500M; score scales 0–30.
+            gamma_score = min(30, int(abs(total_gex) / 1e7))
     factors["Gamma Regime"] = gamma_score
 
     call_score = 0
@@ -207,8 +208,8 @@ def render_gamma_squeeze_panel(squeeze: dict) -> None:
         f'<div style="font-size:0.7rem;color:#64748B;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">PROBABILITY SCORE</div>'
         f'<div style="font-size:2.2rem;font-weight:900;color:#F1F5F9;line-height:1;margin-bottom:10px">'
         f'{score}<span style="font-size:0.9rem;color:#64748B">/100</span></div>'
-        f'<div style="background:#1E293B;border-radius:4px;height:6px;margin-bottom:4px">'
-        f'<div style="width:{score}%;height:100%;background:{badge_color};border-radius:4px"></div></div>'
+        f'<div style="background:linear-gradient(to right,{badge_color} {score}%,#1E293B {score}%);'
+        f'border-radius:4px;height:6px;margin-bottom:4px"></div>'
         f'<div style="display:flex;justify-content:space-between;font-size:0.65rem;color:#475569;margin-bottom:14px">'
         f'<span>Unlikely</span><span>Possible</span><span>Likely</span><span>Imminent</span></div>'
         f'<div style="font-size:0.7rem;color:#64748B;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">FACTOR BREAKDOWN</div>',
@@ -221,8 +222,8 @@ def render_gamma_squeeze_panel(squeeze: dict) -> None:
         st.markdown(
             f'<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">'
             f'<span style="font-size:0.8rem;color:#94A3B8;width:150px;white-space:nowrap">{factor}</span>'
-            f'<div style="flex:1;background:#1E293B;border-radius:3px;height:5px">'
-            f'<div style="width:{bar_w:.0f}%;height:100%;background:{bar_clr};border-radius:3px"></div></div>'
+            f'<div style="flex:1;background:linear-gradient(to right,{bar_clr} {bar_w:.0f}%,#1E293B {bar_w:.0f}%);'
+            f'border-radius:3px;height:5px"></div>'
             f'<span style="font-size:0.82rem;color:#F1F5F9;width:22px;text-align:right">{val}</span>'
             f'</div>',
             unsafe_allow_html=True,
