@@ -65,7 +65,7 @@
   "TSLA": {
     "recommendationMean": 2.34043,
     "numberOfAnalystOpinions": 41,
-    "targetMeanPrice": 419.93658,
+    "targetMeanPrice": 420.54633,
     "targetHighPrice": 600.0,
     "targetLowPrice": 123.0
   },
@@ -156,7 +156,7 @@
   "ORCL": {
     "recommendationMean": 1.51163,
     "numberOfAnalystOpinions": 39,
-    "targetMeanPrice": 255.94821,
+    "targetMeanPrice": 255.3841,
     "targetHighPrice": 400.0,
     "targetLowPrice": 155.0
   },
@@ -175,9 +175,9 @@
     "targetLowPrice": 57.5
   },
   "AMD": {
-    "recommendationMean": 1.4902,
+    "recommendationMean": 1.45098,
     "numberOfAnalystOpinions": 48,
-    "targetMeanPrice": 483.9375,
+    "targetMeanPrice": 486.33334,
     "targetHighPrice": 665.0,
     "targetLowPrice": 225.0
   },
@@ -282,12 +282,12 @@
   "HON": {
     "recommendationMean": 2.03704,
     "numberOfAnalystOpinions": 26,
-    "targetMeanPrice": 247.24886,
+    "targetMeanPrice": 246.67192,
     "targetHighPrice": 292.0,
     "targetLowPrice": 198.0
   },
   "INTC": {
-    "recommendationMean": 2.60417,
+    "recommendationMean": 2.625,
     "numberOfAnalystOpinions": 41,
     "targetMeanPrice": 93.11707,
     "targetHighPrice": 150.0,
@@ -525,9 +525,9 @@
     "targetLowPrice": 40.0
   },
   "GILD": {
-    "recommendationMean": 1.64516,
-    "numberOfAnalystOpinions": 29,
-    "targetMeanPrice": 157.82759,
+    "recommendationMean": 1.66667,
+    "numberOfAnalystOpinions": 28,
+    "targetMeanPrice": 157.57143,
     "targetHighPrice": 180.0,
     "targetLowPrice": 122.0
   },
@@ -806,9 +806,9 @@
   },
   "FDX": {
     "recommendationMean": 1.88889,
-    "numberOfAnalystOpinions": 11,
-    "targetMeanPrice": 307.8529,
-    "targetHighPrice": 378.0,
+    "numberOfAnalystOpinions": 12,
+    "targetMeanPrice": 317.61517,
+    "targetHighPrice": 425.0,
     "targetLowPrice": 160.0
   },
   "UPS": {
@@ -994,7 +994,7 @@
     "targetLowPrice": 140.0
   },
   "GDDY": {
-    "recommendationMean": 2.125,
+    "recommendationMean": null,
     "numberOfAnalystOpinions": 14,
     "targetMeanPrice": 114.28571,
     "targetHighPrice": 190.0,
@@ -1297,7 +1297,7 @@
   "DASH": {
     "recommendationMean": 1.61364,
     "numberOfAnalystOpinions": 42,
-    "targetMeanPrice": 245.9857,
+    "targetMeanPrice": 244.6762,
     "targetHighPrice": 350.0,
     "targetLowPrice": 172.0
   },
@@ -1892,7 +1892,7 @@
   "STLD": {
     "recommendationMean": 2.0,
     "numberOfAnalystOpinions": 11,
-    "targetMeanPrice": 265.63635,
+    "targetMeanPrice": 268.81818,
     "targetHighPrice": 310.0,
     "targetLowPrice": 221.0
   },
