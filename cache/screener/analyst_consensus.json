@@ -254,7 +254,7 @@
   "ACN": {
     "recommendationMean": 1.96429,
     "numberOfAnalystOpinions": 26,
-    "targetMeanPrice": 228.895,
+    "targetMeanPrice": 227.74115,
     "targetHighPrice": 320.0,
     "targetLowPrice": 177.0
   },
@@ -1540,11 +1540,11 @@
     "targetLowPrice": 117.0
   },
   "PSTG": {
-    "recommendationMean": 1.85714,
-    "numberOfAnalystOpinions": 19,
-    "targetMeanPrice": 89.89474,
-    "targetHighPrice": 105.0,
-    "targetLowPrice": 63.0
+    "recommendationMean": null,
+    "numberOfAnalystOpinions": null,
+    "targetMeanPrice": null,
+    "targetHighPrice": null,
+    "targetLowPrice": null
   },
   "DHR": {
     "recommendationMean": 1.46154,
@@ -2023,7 +2023,7 @@
     "targetLowPrice": 137.0
   },
   "NNN": {
-    "recommendationMean": 2.88235,
+    "recommendationMean": null,
     "numberOfAnalystOpinions": 15,
     "targetMeanPrice": 46.23333,
     "targetHighPrice": 50.0,
