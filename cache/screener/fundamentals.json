@@ -252,11 +252,11 @@
     "earningsGrowth": 0.134
   },
   "ACN": {
-    "returnOnEquity": 0.24763,
-    "profitMargins": 0.10606,
-    "revenueGrowth": 0.083,
-    "debtToEquity": 25.469,
-    "earningsGrowth": 0.04
+    "returnOnEquity": 0.24406,
+    "profitMargins": 0.10656,
+    "revenueGrowth": 0.056,
+    "debtToEquity": 25.035,
+    "earningsGrowth": 0.096
   },
   "NKE": {
     "returnOnEquity": 0.16016,
@@ -1403,7 +1403,7 @@
     "returnOnEquity": 0.62953997,
     "profitMargins": 0.28689,
     "revenueGrowth": 0.127,
-    "debtToEquity": 61.339,
+    "debtToEquity": 61.443,
     "earningsGrowth": 0.079
   },
   "APP": {
@@ -1540,10 +1540,10 @@
     "earningsGrowth": 0.234
   },
   "PSTG": {
-    "returnOnEquity": 0.13675,
-    "profitMargins": 0.05138,
+    "returnOnEquity": null,
+    "profitMargins": null,
     "revenueGrowth": null,
-    "debtToEquity": 127.364,
+    "debtToEquity": null,
     "earningsGrowth": null
   },
   "DHR": {
