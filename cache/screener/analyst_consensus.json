@@ -42,7 +42,7 @@
     "targetLowPrice": 664.46
   },
   "BRK-B": {
-    "recommendationMean": 1.75,
+    "recommendationMean": null,
     "numberOfAnalystOpinions": 3,
     "targetMeanPrice": 520.3333,
     "targetHighPrice": 570.0,
@@ -254,7 +254,7 @@
   "ACN": {
     "recommendationMean": 2.0,
     "numberOfAnalystOpinions": 25,
-    "targetMeanPrice": 200.8908,
+    "targetMeanPrice": 197.6508,
     "targetHighPrice": 280.0,
     "targetLowPrice": 135.0
   },
@@ -315,7 +315,7 @@
     "targetLowPrice": 270.0
   },
   "LOW": {
-    "recommendationMean": 1.8,
+    "recommendationMean": null,
     "numberOfAnalystOpinions": 33,
     "targetMeanPrice": 263.72726,
     "targetHighPrice": 300.0,
@@ -854,9 +854,9 @@
     "targetLowPrice": 43.0
   },
   "BSX": {
-    "recommendationMean": 1.48387,
-    "numberOfAnalystOpinions": 30,
-    "targetMeanPrice": 77.1,
+    "recommendationMean": 1.5,
+    "numberOfAnalystOpinions": 29,
+    "targetMeanPrice": 76.48276,
     "targetHighPrice": 106.0,
     "targetLowPrice": 55.0
   },
@@ -868,7 +868,7 @@
     "targetLowPrice": 84.0
   },
   "NSC": {
-    "recommendationMean": 2.55,
+    "recommendationMean": null,
     "numberOfAnalystOpinions": 17,
     "targetMeanPrice": 335.70587,
     "targetHighPrice": 378.0,
@@ -933,7 +933,7 @@
   "KR": {
     "recommendationMean": 2.08333,
     "numberOfAnalystOpinions": 21,
-    "targetMeanPrice": 72.14286,
+    "targetMeanPrice": 71.80952,
     "targetHighPrice": 85.0,
     "targetLowPrice": 58.0
   },
@@ -1008,7 +1008,7 @@
     "targetLowPrice": 265.0
   },
   "CDW": {
-    "recommendationMean": 1.81818,
+    "recommendationMean": 1.9,
     "numberOfAnalystOpinions": 9,
     "targetMeanPrice": 142.0,
     "targetHighPrice": 163.0,
@@ -1162,7 +1162,7 @@
     "targetLowPrice": 54.0
   },
   "PPL": {
-    "recommendationMean": 1.6875,
+    "recommendationMean": null,
     "numberOfAnalystOpinions": 15,
     "targetMeanPrice": 41.2,
     "targetHighPrice": 48.0,
@@ -1848,7 +1848,7 @@
     "targetLowPrice": 420.0
   },
   "XYL": {
-    "recommendationMean": 1.91304,
+    "recommendationMean": null,
     "numberOfAnalystOpinions": 17,
     "targetMeanPrice": 150.64706,
     "targetHighPrice": 183.0,
@@ -2004,7 +2004,7 @@
   "KIM": {
     "recommendationMean": 2.36,
     "numberOfAnalystOpinions": 22,
-    "targetMeanPrice": 25.77273,
+    "targetMeanPrice": 25.81818,
     "targetHighPrice": 28.0,
     "targetLowPrice": 24.0
   },
@@ -2037,7 +2037,7 @@
     "targetLowPrice": 26.0
   },
   "MRNA": {
-    "recommendationMean": 3.08696,
+    "recommendationMean": 3.0,
     "numberOfAnalystOpinions": 20,
     "targetMeanPrice": 43.3,
     "targetHighPrice": 69.0,
