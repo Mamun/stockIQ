@@ -345,7 +345,7 @@
   "CAT": {
     "recommendationMean": 2.14286,
     "numberOfAnalystOpinions": 26,
-    "targetMeanPrice": 963.5635,
+    "targetMeanPrice": 958.8327,
     "targetHighPrice": 1218.0,
     "targetLowPrice": 575.0
   },
@@ -665,7 +665,7 @@
     "targetLowPrice": 361.0
   },
   "SNPS": {
-    "recommendationMean": 1.70833,
+    "recommendationMean": null,
     "numberOfAnalystOpinions": 25,
     "targetMeanPrice": 564.4308,
     "targetHighPrice": 650.0,
@@ -1289,8 +1289,8 @@
   },
   "UBER": {
     "recommendationMean": 1.4902,
-    "numberOfAnalystOpinions": 48,
-    "targetMeanPrice": 103.88667,
+    "numberOfAnalystOpinions": 47,
+    "targetMeanPrice": 103.7566,
     "targetHighPrice": 150.0,
     "targetLowPrice": 70.0
   },
@@ -1717,7 +1717,7 @@
   "WSM": {
     "recommendationMean": 2.21739,
     "numberOfAnalystOpinions": 20,
-    "targetMeanPrice": 214.65,
+    "targetMeanPrice": 215.15,
     "targetHighPrice": 260.0,
     "targetLowPrice": 138.0
   },
@@ -1939,9 +1939,9 @@
     "targetLowPrice": 31.0
   },
   "WMB": {
-    "recommendationMean": 1.47826,
-    "numberOfAnalystOpinions": 21,
-    "targetMeanPrice": 83.71429,
+    "recommendationMean": 1.59091,
+    "numberOfAnalystOpinions": 20,
+    "targetMeanPrice": 83.55,
     "targetHighPrice": 99.0,
     "targetLowPrice": 67.0
   },
@@ -2011,7 +2011,7 @@
   "ARE": {
     "recommendationMean": 2.9375,
     "numberOfAnalystOpinions": 14,
-    "targetMeanPrice": 51.0,
+    "targetMeanPrice": 51.85714,
     "targetHighPrice": 60.0,
     "targetLowPrice": 42.0
   },
