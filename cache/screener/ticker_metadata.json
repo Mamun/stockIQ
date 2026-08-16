@@ -40,7 +40,7 @@
     "sector": "Consumer Cyclical"
   },
   "JPM": {
-    "name": "JP Morgan Chase & Co.",
+    "name": "JPMorgan Chase & Co.",
     "sector": "Financial Services"
   },
   "V": {
@@ -60,11 +60,11 @@
     "sector": "Financial Services"
   },
   "HD": {
-    "name": "Home Depot, Inc. (The)",
+    "name": "The Home Depot, Inc.",
     "sector": "Consumer Cyclical"
   },
   "PG": {
-    "name": "Procter & Gamble Company (The)",
+    "name": "The Procter & Gamble Company",
     "sector": "Consumer Defensive"
   },
   "JNJ": {
@@ -84,7 +84,7 @@
     "sector": "Consumer Defensive"
   },
   "MRK": {
-    "name": "Merck & Company, Inc.",
+    "name": "Merck & Co., Inc.",
     "sector": "Healthcare"
   },
   "ORCL": {
@@ -104,7 +104,7 @@
     "sector": "Technology"
   },
   "KO": {
-    "name": "Coca-Cola Company (The)",
+    "name": "The Coca-Cola Company",
     "sector": "Consumer Defensive"
   },
   "CVX": {
@@ -120,7 +120,7 @@
     "sector": "Communication Services"
   },
   "PFE": {
-    "name": "Pfizer, Inc.",
+    "name": "Pfizer Inc.",
     "sector": "Healthcare"
   },
   "ABT": {
@@ -136,7 +136,7 @@
     "sector": "Technology"
   },
   "PM": {
-    "name": "Philip Morris International Inc",
+    "name": "Philip Morris International Inc.",
     "sector": "Consumer Defensive"
   },
   "LIN": {
@@ -152,7 +152,7 @@
     "sector": "Consumer Cyclical"
   },
   "DIS": {
-    "name": "Walt Disney Company (The)",
+    "name": "The Walt Disney Company",
     "sector": "Communication Services"
   },
   "AXP": {
@@ -196,7 +196,7 @@
     "sector": "Industrials"
   },
   "CAT": {
-    "name": "Caterpillar, Inc.",
+    "name": "Caterpillar Inc.",
     "sector": "Industrials"
   },
   "NOW": {
@@ -212,7 +212,7 @@
     "sector": "Healthcare"
   },
   "GS": {
-    "name": "Goldman Sachs Group, Inc. (The)",
+    "name": "The Goldman Sachs Group, Inc.",
     "sector": "Financial Services"
   },
   "SPGI": {
@@ -236,7 +236,7 @@
     "sector": "Consumer Defensive"
   },
   "TMO": {
-    "name": "Thermo Fisher Scientific Inc",
+    "name": "Thermo Fisher Scientific Inc.",
     "sector": "Healthcare"
   },
   "PLD": {
@@ -260,7 +260,7 @@
     "sector": "Financial Services"
   },
   "ETN": {
-    "name": "Eaton Corporation, PLC",
+    "name": "Eaton Corporation plc",
     "sector": "Industrials"
   },
   "DE": {
@@ -272,7 +272,7 @@
     "sector": "Consumer Cyclical"
   },
   "MDT": {
-    "name": "Medtronic plc.",
+    "name": "Medtronic plc",
     "sector": "Healthcare"
   },
   "NEE": {
@@ -320,7 +320,7 @@
     "sector": "Financial Services"
   },
   "ICE": {
-    "name": "Intercontinental Exchange Inc.",
+    "name": "Intercontinental Exchange, Inc.",
     "sector": "Financial Services"
   },
   "TJX": {
@@ -348,7 +348,7 @@
     "sector": "Financial Services"
   },
   "APD": {
-    "name": "Air Products and Chemicals, Inc",
+    "name": "Air Products and Chemicals, Inc.",
     "sector": "Basic Materials"
   },
   "ECL": {
@@ -408,7 +408,7 @@
     "sector": "Financial Services"
   },
   "AIG": {
-    "name": "American International Group, I",
+    "name": "American International Group, Inc.",
     "sector": "Financial Services"
   },
   "ALL": {
@@ -420,7 +420,7 @@
     "sector": "Financial Services"
   },
   "AFL": {
-    "name": "AFLAC Incorporated",
+    "name": "Aflac Incorporated",
     "sector": "Financial Services"
   },
   "MET": {
@@ -532,7 +532,7 @@
     "sector": "Consumer Defensive"
   },
   "KR": {
-    "name": "Kroger Company (The)",
+    "name": "The Kroger Co.",
     "sector": "Consumer Defensive"
   },
   "CVS": {
@@ -576,7 +576,7 @@
     "sector": "Technology"
   },
   "CDW": {
-    "name": "CDW Corporation",
+    "name": "CDW Corporation Common Stock",
     "sector": "Technology"
   },
   "WDC": {
@@ -584,7 +584,7 @@
     "sector": "Technology"
   },
   "STX": {
-    "name": "Seagate Technology Holdings PLC",
+    "name": "Seagate Technology Holdings plc",
     "sector": "Technology"
   },
   "HPQ": {
@@ -652,11 +652,11 @@
     "sector": "Utilities"
   },
   "SO": {
-    "name": "Southern Company (The)",
+    "name": "The Southern Company",
     "sector": "Utilities"
   },
   "SRE": {
-    "name": "DBA Sempra",
+    "name": "Sempra",
     "sector": "Utilities"
   },
   "ES": {
@@ -916,7 +916,7 @@
     "sector": "Healthcare"
   },
   "MTD": {
-    "name": "Mettler-Toledo International, I",
+    "name": "Mettler-Toledo International Inc.",
     "sector": "Healthcare"
   },
   "HOLX": {
@@ -952,7 +952,7 @@
     "sector": "Financial Services"
   },
   "BR": {
-    "name": "Broadridge Financial Solutions,",
+    "name": "Broadridge Financial Solutions, Inc.",
     "sector": "Technology"
   },
   "FIS": {
@@ -1008,15 +1008,15 @@
     "sector": "Consumer Defensive"
   },
   "EL": {
-    "name": "Estee Lauder Companies, Inc. (T",
+    "name": "The Estée Lauder Companies Inc.",
     "sector": "Consumer Defensive"
   },
   "CHD": {
-    "name": "Church & Dwight Company, Inc.",
+    "name": "Church & Dwight Co., Inc.",
     "sector": "Consumer Defensive"
   },
   "CAG": {
-    "name": "ConAgra Brands, Inc.",
+    "name": "Conagra Brands, Inc.",
     "sector": "Consumer Defensive"
   },
   "HRL": {
@@ -1068,7 +1068,7 @@
     "sector": "Basic Materials"
   },
   "FCX": {
-    "name": "Freeport-McMoRan, Inc.",
+    "name": "Freeport-McMoRan Inc.",
     "sector": "Basic Materials"
   },
   "NEM": {
@@ -1144,11 +1144,11 @@
     "sector": "Real Estate"
   },
   "KIM": {
-    "name": "Kimco Realty Corporation (HC)",
+    "name": "Kimco Realty Corporation",
     "sector": "Real Estate"
   },
   "ARE": {
-    "name": "Alexandria Real Estate Equities",
+    "name": "Alexandria Real Estate Equities, Inc.",
     "sector": "Real Estate"
   },
   "CBRE": {
@@ -1196,7 +1196,7 @@
     "sector": "Technology"
   },
   "TDG": {
-    "name": "Transdigm Group Incorporated",
+    "name": "TransDigm Group Incorporated",
     "sector": "Industrials"
   }
 }
