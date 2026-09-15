@@ -156,7 +156,7 @@
   "ORCL": {
     "recommendationMean": 1.60465,
     "numberOfAnalystOpinions": 41,
-    "targetMeanPrice": 239.0961,
+    "targetMeanPrice": 238.99854,
     "targetHighPrice": 400.0,
     "targetLowPrice": 110.0
   },
@@ -1344,9 +1344,9 @@
     "targetLowPrice": 160.0
   },
   "SNOW": {
-    "recommendationMean": 1.4902,
-    "numberOfAnalystOpinions": 48,
-    "targetMeanPrice": 418.2875,
+    "recommendationMean": 1.5,
+    "numberOfAnalystOpinions": 47,
+    "targetMeanPrice": 425.18723,
     "targetHighPrice": 525.0,
     "targetLowPrice": 110.0
   },
@@ -1409,7 +1409,7 @@
   "APP": {
     "recommendationMean": 1.57576,
     "numberOfAnalystOpinions": 31,
-    "targetMeanPrice": 508.3871,
+    "targetMeanPrice": 501.9355,
     "targetHighPrice": 790.0,
     "targetLowPrice": 325.0
   },
@@ -1799,7 +1799,7 @@
     "targetLowPrice": 422.0
   },
   "CARR": {
-    "recommendationMean": null,
+    "recommendationMean": 1.91667,
     "numberOfAnalystOpinions": 21,
     "targetMeanPrice": 77.81524,
     "targetHighPrice": 90.0,
