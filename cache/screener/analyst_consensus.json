@@ -8,8 +8,8 @@
   },
   "MSFT": {
     "recommendationMean": 1.38596,
-    "numberOfAnalystOpinions": 51,
-    "targetMeanPrice": 631.09235,
+    "numberOfAnalystOpinions": 52,
+    "targetMeanPrice": 633.2829,
     "targetHighPrice": 870.0,
     "targetLowPrice": 440.0
   },
@@ -21,9 +21,9 @@
     "targetLowPrice": 180.0
   },
   "AMZN": {
-    "recommendationMean": 1.33333,
+    "recommendationMean": 1.31667,
     "numberOfAnalystOpinions": 58,
-    "targetMeanPrice": 327.6969,
+    "targetMeanPrice": 327.09344,
     "targetHighPrice": 405.0,
     "targetLowPrice": 230.0
   },
@@ -51,7 +51,7 @@
   "LLY": {
     "recommendationMean": 1.6129,
     "numberOfAnalystOpinions": 29,
-    "targetMeanPrice": 1403.6427,
+    "targetMeanPrice": 1421.0565,
     "targetHighPrice": 1650.0,
     "targetLowPrice": 930.0
   },
@@ -65,14 +65,14 @@
   "TSLA": {
     "recommendationMean": 2.29545,
     "numberOfAnalystOpinions": 40,
-    "targetMeanPrice": 411.8155,
+    "targetMeanPrice": 413.10126,
     "targetHighPrice": 600.0,
     "targetLowPrice": 128.11
   },
   "JPM": {
     "recommendationMean": 2.03846,
     "numberOfAnalystOpinions": 23,
-    "targetMeanPrice": 373.26086,
+    "targetMeanPrice": 373.47827,
     "targetHighPrice": 425.0,
     "targetLowPrice": 312.0
   },
@@ -100,8 +100,8 @@
   "MA": {
     "recommendationMean": 1.45,
     "numberOfAnalystOpinions": 37,
-    "targetMeanPrice": 697.2814,
-    "targetHighPrice": 775.0,
+    "targetMeanPrice": 701.9841,
+    "targetHighPrice": 800.0,
     "targetLowPrice": 550.0
   },
   "HD": {
@@ -127,9 +127,9 @@
   },
   "ABBV": {
     "recommendationMean": 1.68966,
-    "numberOfAnalystOpinions": 27,
-    "targetMeanPrice": 283.18518,
-    "targetHighPrice": 325.0,
+    "numberOfAnalystOpinions": 26,
+    "targetMeanPrice": 298.5,
+    "targetHighPrice": 350.0,
     "targetLowPrice": 200.0
   },
   "WMT": {
@@ -149,14 +149,14 @@
   "MRK": {
     "recommendationMean": 1.82143,
     "numberOfAnalystOpinions": 26,
-    "targetMeanPrice": 159.83269,
+    "targetMeanPrice": 159.90962,
     "targetHighPrice": 186.0,
     "targetLowPrice": 105.0
   },
   "ORCL": {
     "recommendationMean": 1.5814,
     "numberOfAnalystOpinions": 41,
-    "targetMeanPrice": 235.8034,
+    "targetMeanPrice": 235.55951,
     "targetHighPrice": 400.0,
     "targetLowPrice": 110.0
   },
@@ -170,35 +170,35 @@
   "BAC": {
     "recommendationMean": 1.48,
     "numberOfAnalystOpinions": 22,
-    "targetMeanPrice": 62.84091,
+    "targetMeanPrice": 62.61364,
     "targetHighPrice": 71.0,
     "targetLowPrice": 56.0
   },
   "AMD": {
     "recommendationMean": 1.49091,
-    "numberOfAnalystOpinions": 50,
-    "targetMeanPrice": 640.208,
+    "numberOfAnalystOpinions": 49,
+    "targetMeanPrice": 645.82446,
     "targetHighPrice": 1250.0,
-    "targetLowPrice": 365.0
+    "targetLowPrice": 430.0
   },
   "KO": {
     "recommendationMean": 1.72,
     "numberOfAnalystOpinions": 24,
-    "targetMeanPrice": 97.54167,
+    "targetMeanPrice": 97.75,
     "targetHighPrice": 106.0,
     "targetLowPrice": 80.0
   },
   "CVX": {
     "recommendationMean": 1.69231,
     "numberOfAnalystOpinions": 24,
-    "targetMeanPrice": 232.5,
+    "targetMeanPrice": 234.08333,
     "targetHighPrice": 272.0,
     "targetLowPrice": 175.0
   },
   "MCD": {
-    "recommendationMean": 2.05882,
-    "numberOfAnalystOpinions": 29,
-    "targetMeanPrice": 291.68967,
+    "recommendationMean": 2.0303,
+    "numberOfAnalystOpinions": 28,
+    "targetMeanPrice": 291.75,
     "targetHighPrice": 390.0,
     "targetLowPrice": 230.0
   },
@@ -275,7 +275,7 @@
   "AXP": {
     "recommendationMean": 2.2069,
     "numberOfAnalystOpinions": 24,
-    "targetMeanPrice": 365.74542,
+    "targetMeanPrice": 365.78708,
     "targetHighPrice": 425.0,
     "targetLowPrice": 329.0
   },
@@ -289,8 +289,8 @@
   "INTC": {
     "recommendationMean": 2.57143,
     "numberOfAnalystOpinions": 43,
-    "targetMeanPrice": 101.02326,
-    "targetHighPrice": 165.0,
+    "targetMeanPrice": 93.88372,
+    "targetHighPrice": 160.0,
     "targetLowPrice": 70.0
   },
   "IBM": {
@@ -324,14 +324,14 @@
   "SBUX": {
     "recommendationMean": 2.37143,
     "numberOfAnalystOpinions": 29,
-    "targetMeanPrice": 110.41379,
+    "targetMeanPrice": 110.65517,
     "targetHighPrice": 141.0,
     "targetLowPrice": 82.0
   },
   "BA": {
     "recommendationMean": 1.42857,
     "numberOfAnalystOpinions": 26,
-    "targetMeanPrice": 237.42308,
+    "targetMeanPrice": 235.65385,
     "targetHighPrice": 305.0,
     "targetLowPrice": 157.0
   },
@@ -343,16 +343,16 @@
     "targetLowPrice": 200.0
   },
   "CAT": {
-    "recommendationMean": 2.0,
+    "recommendationMean": 1.96552,
     "numberOfAnalystOpinions": 26,
-    "targetMeanPrice": 881.45233,
+    "targetMeanPrice": 859.52924,
     "targetHighPrice": 1150.0,
     "targetLowPrice": 575.0
   },
   "NOW": {
     "recommendationMean": 1.44898,
     "numberOfAnalystOpinions": 46,
-    "targetMeanPrice": 155.05783,
+    "targetMeanPrice": 154.68826,
     "targetHighPrice": 266.0,
     "targetLowPrice": 72.0
   },
@@ -373,7 +373,7 @@
   "GS": {
     "recommendationMean": 2.46154,
     "numberOfAnalystOpinions": 21,
-    "targetMeanPrice": 1031.1428,
+    "targetMeanPrice": 1030.6666,
     "targetHighPrice": 1250.0,
     "targetLowPrice": 730.0
   },
@@ -387,7 +387,7 @@
   "MS": {
     "recommendationMean": 2.30769,
     "numberOfAnalystOpinions": 22,
-    "targetMeanPrice": 211.31818,
+    "targetMeanPrice": 211.5,
     "targetHighPrice": 262.0,
     "targetLowPrice": 185.0
   },
@@ -400,8 +400,8 @@
   },
   "SYK": {
     "recommendationMean": 1.73333,
-    "numberOfAnalystOpinions": 26,
-    "targetMeanPrice": 342.26923,
+    "numberOfAnalystOpinions": 27,
+    "targetMeanPrice": 341.37296,
     "targetHighPrice": 465.0,
     "targetLowPrice": 275.0
   },
@@ -436,8 +436,8 @@
   "REGN": {
     "recommendationMean": 1.82143,
     "numberOfAnalystOpinions": 27,
-    "targetMeanPrice": 924.0,
-    "targetHighPrice": 1110.0,
+    "targetMeanPrice": 961.96295,
+    "targetHighPrice": 1175.0,
     "targetLowPrice": 730.0
   },
   "MMC": {
@@ -485,21 +485,21 @@
   "NEE": {
     "recommendationMean": 1.90909,
     "numberOfAnalystOpinions": 19,
-    "targetMeanPrice": 94.57895,
+    "targetMeanPrice": 94.0,
     "targetHighPrice": 110.0,
     "targetLowPrice": 56.0
   },
   "MO": {
     "recommendationMean": 2.64286,
     "numberOfAnalystOpinions": 11,
-    "targetMeanPrice": 72.54545,
+    "targetMeanPrice": 73.27273,
     "targetHighPrice": 85.0,
     "targetLowPrice": 58.0
   },
   "T": {
     "recommendationMean": 2.08333,
     "numberOfAnalystOpinions": 23,
-    "targetMeanPrice": 27.71739,
+    "targetMeanPrice": 27.58696,
     "targetHighPrice": 34.0,
     "targetLowPrice": 20.0
   },
@@ -513,21 +513,21 @@
   "CL": {
     "recommendationMean": 2.09524,
     "numberOfAnalystOpinions": 20,
-    "targetMeanPrice": 98.15,
-    "targetHighPrice": 110.0,
+    "targetMeanPrice": 99.65,
+    "targetHighPrice": 111.0,
     "targetLowPrice": 87.0
   },
   "BMY": {
-    "recommendationMean": 2.48148,
-    "numberOfAnalystOpinions": 23,
-    "targetMeanPrice": 65.30435,
+    "recommendationMean": 2.5,
+    "numberOfAnalystOpinions": 24,
+    "targetMeanPrice": 65.25,
     "targetHighPrice": 80.0,
     "targetLowPrice": 40.0
   },
   "GILD": {
     "recommendationMean": 1.67857,
     "numberOfAnalystOpinions": 26,
-    "targetMeanPrice": 170.88461,
+    "targetMeanPrice": 172.5,
     "targetHighPrice": 200.0,
     "targetLowPrice": 131.0
   },
@@ -547,8 +547,8 @@
   },
   "HCA": {
     "recommendationMean": 2.0,
-    "numberOfAnalystOpinions": 22,
-    "targetMeanPrice": 469.9091,
+    "numberOfAnalystOpinions": 21,
+    "targetMeanPrice": 470.38095,
     "targetHighPrice": 550.0,
     "targetLowPrice": 380.0
   },
@@ -562,7 +562,7 @@
   "ICE": {
     "recommendationMean": 1.8125,
     "numberOfAnalystOpinions": 15,
-    "targetMeanPrice": 191.06667,
+    "targetMeanPrice": 192.06667,
     "targetHighPrice": 243.0,
     "targetLowPrice": 167.0
   },
@@ -576,21 +576,21 @@
   "USB": {
     "recommendationMean": 1.79167,
     "numberOfAnalystOpinions": 22,
-    "targetMeanPrice": 68.65909,
+    "targetMeanPrice": 68.75,
     "targetHighPrice": 75.0,
-    "targetLowPrice": 64.0
+    "targetLowPrice": 65.0
   },
   "PNC": {
     "recommendationMean": 1.82609,
     "numberOfAnalystOpinions": 21,
-    "targetMeanPrice": 263.5238,
-    "targetHighPrice": 286.0,
+    "targetMeanPrice": 263.33334,
+    "targetHighPrice": 285.0,
     "targetLowPrice": 240.0
   },
   "AON": {
-    "recommendationMean": 2.14286,
+    "recommendationMean": 2.19048,
     "numberOfAnalystOpinions": 19,
-    "targetMeanPrice": 358.94736,
+    "targetMeanPrice": 361.6316,
     "targetHighPrice": 435.0,
     "targetLowPrice": 259.0
   },
@@ -639,8 +639,8 @@
   "KLAC": {
     "recommendationMean": 1.7931,
     "numberOfAnalystOpinions": 26,
-    "targetMeanPrice": 221.42308,
-    "targetHighPrice": 325.0,
+    "targetMeanPrice": 217.57692,
+    "targetHighPrice": 275.0,
     "targetLowPrice": 175.0
   },
   "AMAT": {
@@ -651,7 +651,7 @@
     "targetLowPrice": 358.0
   },
   "PANW": {
-    "recommendationMean": 1.70909,
+    "recommendationMean": 1.69091,
     "numberOfAnalystOpinions": 50,
     "targetMeanPrice": 398.52,
     "targetHighPrice": 525.0,
@@ -709,7 +709,7 @@
   "SCHW": {
     "recommendationMean": 1.83333,
     "numberOfAnalystOpinions": 22,
-    "targetMeanPrice": 117.31818,
+    "targetMeanPrice": 116.86364,
     "targetHighPrice": 147.0,
     "targetLowPrice": 82.0
   },
@@ -730,7 +730,7 @@
   "PRU": {
     "recommendationMean": 3.38889,
     "numberOfAnalystOpinions": 15,
-    "targetMeanPrice": 107.6,
+    "targetMeanPrice": 107.53333,
     "targetHighPrice": 132.0,
     "targetLowPrice": 87.0
   },
@@ -786,7 +786,7 @@
   "KEY": {
     "recommendationMean": 2.0,
     "numberOfAnalystOpinions": 20,
-    "targetMeanPrice": 25.105,
+    "targetMeanPrice": 25.13,
     "targetHighPrice": 43.0,
     "targetLowPrice": 22.0
   },
@@ -807,7 +807,7 @@
   "FDX": {
     "recommendationMean": 1.72414,
     "numberOfAnalystOpinions": 26,
-    "targetMeanPrice": 356.84616,
+    "targetMeanPrice": 357.0,
     "targetHighPrice": 479.0,
     "targetLowPrice": 160.0
   },
@@ -828,7 +828,7 @@
   "GD": {
     "recommendationMean": 2.08333,
     "numberOfAnalystOpinions": 21,
-    "targetMeanPrice": 408.6838,
+    "targetMeanPrice": 413.4457,
     "targetHighPrice": 465.0,
     "targetLowPrice": 309.0
   },
@@ -856,8 +856,8 @@
   "BSX": {
     "recommendationMean": 1.90323,
     "numberOfAnalystOpinions": 28,
-    "targetMeanPrice": 51.24143,
-    "targetHighPrice": 78.0,
+    "targetMeanPrice": 50.02714,
+    "targetHighPrice": 65.0,
     "targetLowPrice": 41.0
   },
   "EW": {
@@ -877,7 +877,7 @@
   "UNP": {
     "recommendationMean": 1.72,
     "numberOfAnalystOpinions": 24,
-    "targetMeanPrice": 331.41666,
+    "targetMeanPrice": 331.375,
     "targetHighPrice": 375.0,
     "targetLowPrice": 245.0
   },
@@ -898,7 +898,7 @@
   "ITW": {
     "recommendationMean": 3.25,
     "numberOfAnalystOpinions": 14,
-    "targetMeanPrice": 294.5,
+    "targetMeanPrice": 294.14285,
     "targetHighPrice": 326.0,
     "targetLowPrice": 253.0
   },
@@ -926,8 +926,8 @@
   "DG": {
     "recommendationMean": 2.32258,
     "numberOfAnalystOpinions": 29,
-    "targetMeanPrice": 142.89655,
-    "targetHighPrice": 180.0,
+    "targetMeanPrice": 141.51724,
+    "targetHighPrice": 178.0,
     "targetLowPrice": 90.0
   },
   "KR": {
@@ -954,7 +954,7 @@
   "IQV": {
     "recommendationMean": 1.3,
     "numberOfAnalystOpinions": 17,
-    "targetMeanPrice": 309.7647,
+    "targetMeanPrice": 311.47058,
     "targetHighPrice": 346.0,
     "targetLowPrice": 268.0
   },
@@ -996,7 +996,7 @@
   "GDDY": {
     "recommendationMean": 2.44444,
     "numberOfAnalystOpinions": 16,
-    "targetMeanPrice": 109.375,
+    "targetMeanPrice": 111.5625,
     "targetHighPrice": 170.0,
     "targetLowPrice": 76.0
   },
@@ -1024,7 +1024,7 @@
   "STX": {
     "recommendationMean": 1.46154,
     "numberOfAnalystOpinions": 24,
-    "targetMeanPrice": 1032.5416,
+    "targetMeanPrice": 1044.8334,
     "targetHighPrice": 1588.0,
     "targetLowPrice": 700.0
   },
@@ -1094,7 +1094,7 @@
   "PSX": {
     "recommendationMean": 2.1,
     "numberOfAnalystOpinions": 19,
-    "targetMeanPrice": 291.73685,
+    "targetMeanPrice": 291.78946,
     "targetHighPrice": 350.0,
     "targetLowPrice": 188.0
   },
@@ -1122,14 +1122,14 @@
   "EQT": {
     "recommendationMean": 1.5,
     "numberOfAnalystOpinions": 22,
-    "targetMeanPrice": 65.90909,
+    "targetMeanPrice": 66.27273,
     "targetHighPrice": 77.0,
     "targetLowPrice": 52.0
   },
   "D": {
     "recommendationMean": 2.5,
     "numberOfAnalystOpinions": 12,
-    "targetMeanPrice": 70.0,
+    "targetMeanPrice": 69.83333,
     "targetHighPrice": 87.0,
     "targetLowPrice": 62.0
   },
@@ -1148,7 +1148,7 @@
     "targetLowPrice": 74.0
   },
   "SRE": {
-    "recommendationMean": 1.61905,
+    "recommendationMean": 1.57143,
     "numberOfAnalystOpinions": 19,
     "targetMeanPrice": 97.42105,
     "targetHighPrice": 118.0,
@@ -1162,7 +1162,7 @@
     "targetLowPrice": 49.0
   },
   "PPL": {
-    "recommendationMean": 1.63158,
+    "recommendationMean": 1.57895,
     "numberOfAnalystOpinions": 18,
     "targetMeanPrice": 39.72222,
     "targetHighPrice": 44.0,
@@ -1184,13 +1184,13 @@
   },
   "WEC": {
     "recommendationMean": 2.4,
-    "numberOfAnalystOpinions": 17,
-    "targetMeanPrice": 117.88235,
+    "numberOfAnalystOpinions": 18,
+    "targetMeanPrice": 118.27778,
     "targetHighPrice": 131.0,
     "targetLowPrice": 106.5
   },
   "XEL": {
-    "recommendationMean": 1.4,
+    "recommendationMean": 1.45,
     "numberOfAnalystOpinions": 19,
     "targetMeanPrice": 89.15789,
     "targetHighPrice": 99.0,
@@ -1213,7 +1213,7 @@
   "AMT": {
     "recommendationMean": 1.52,
     "numberOfAnalystOpinions": 23,
-    "targetMeanPrice": 215.73914,
+    "targetMeanPrice": 215.8261,
     "targetHighPrice": 260.0,
     "targetLowPrice": 188.0
   },
@@ -1241,21 +1241,21 @@
   "WELL": {
     "recommendationMean": 1.54545,
     "numberOfAnalystOpinions": 21,
-    "targetMeanPrice": 260.2857,
+    "targetMeanPrice": 260.7143,
     "targetHighPrice": 292.0,
     "targetLowPrice": 219.0
   },
   "DLR": {
     "recommendationMean": 1.44118,
     "numberOfAnalystOpinions": 32,
-    "targetMeanPrice": 224.90625,
+    "targetMeanPrice": 224.71875,
     "targetHighPrice": 250.0,
     "targetLowPrice": 190.0
   },
   "O": {
     "recommendationMean": 2.56,
     "numberOfAnalystOpinions": 21,
-    "targetMeanPrice": 64.63095,
+    "targetMeanPrice": 64.34524,
     "targetHighPrice": 74.0,
     "targetLowPrice": 59.0
   },
@@ -1297,7 +1297,7 @@
   "DASH": {
     "recommendationMean": 1.59524,
     "numberOfAnalystOpinions": 40,
-    "targetMeanPrice": 252.234,
+    "targetMeanPrice": 251.234,
     "targetHighPrice": 350.0,
     "targetLowPrice": 172.0
   },
@@ -1311,16 +1311,16 @@
   "HLT": {
     "recommendationMean": 1.86207,
     "numberOfAnalystOpinions": 27,
-    "targetMeanPrice": 362.1111,
+    "targetMeanPrice": 365.18518,
     "targetHighPrice": 421.0,
     "targetLowPrice": 275.0
   },
   "CCL": {
-    "recommendationMean": 1.55172,
-    "numberOfAnalystOpinions": 26,
-    "targetMeanPrice": 33.89231,
+    "recommendationMean": 1.6,
+    "numberOfAnalystOpinions": 27,
+    "targetMeanPrice": 33.48889,
     "targetHighPrice": 43.0,
-    "targetLowPrice": 28.7
+    "targetLowPrice": 23.0
   },
   "DAL": {
     "recommendationMean": 1.32,
@@ -1332,14 +1332,14 @@
   "UAL": {
     "recommendationMean": 1.32,
     "numberOfAnalystOpinions": 23,
-    "targetMeanPrice": 150.08696,
+    "targetMeanPrice": 149.69565,
     "targetHighPrice": 203.0,
     "targetLowPrice": 98.0
   },
   "NET": {
     "recommendationMean": 1.94118,
     "numberOfAnalystOpinions": 31,
-    "targetMeanPrice": 345.48386,
+    "targetMeanPrice": 346.12903,
     "targetHighPrice": 430.0,
     "targetLowPrice": 160.0
   },
@@ -1360,7 +1360,7 @@
   "VEEV": {
     "recommendationMean": 1.93103,
     "numberOfAnalystOpinions": 27,
-    "targetMeanPrice": 301.1111,
+    "targetMeanPrice": 303.51852,
     "targetHighPrice": 375.0,
     "targetLowPrice": 180.0
   },
@@ -1372,16 +1372,16 @@
     "targetLowPrice": 190.0
   },
   "TWLO": {
-    "recommendationMean": 1.7,
-    "numberOfAnalystOpinions": 28,
-    "targetMeanPrice": 267.88107,
+    "recommendationMean": 1.67742,
+    "numberOfAnalystOpinions": 29,
+    "targetMeanPrice": 267.6093,
     "targetHighPrice": 325.0,
     "targetLowPrice": 165.0
   },
   "PINS": {
     "recommendationMean": 2.05263,
     "numberOfAnalystOpinions": 36,
-    "targetMeanPrice": 26.05556,
+    "targetMeanPrice": 25.61111,
     "targetHighPrice": 41.0,
     "targetLowPrice": 20.0
   },
@@ -1437,7 +1437,7 @@
   "DDOG": {
     "recommendationMean": 1.44681,
     "numberOfAnalystOpinions": 47,
-    "targetMeanPrice": 294.48553,
+    "targetMeanPrice": 295.12384,
     "targetHighPrice": 350.0,
     "targetLowPrice": 158.0
   },
@@ -1451,7 +1451,7 @@
   "FTNT": {
     "recommendationMean": 2.90698,
     "numberOfAnalystOpinions": 36,
-    "targetMeanPrice": 145.70833,
+    "targetMeanPrice": 145.98611,
     "targetHighPrice": 190.0,
     "targetLowPrice": 110.0
   },
@@ -1464,8 +1464,8 @@
   },
   "COIN": {
     "recommendationMean": 1.97368,
-    "numberOfAnalystOpinions": 33,
-    "targetMeanPrice": 206.03333,
+    "numberOfAnalystOpinions": 34,
+    "targetMeanPrice": 203.62059,
     "targetHighPrice": 280.0,
     "targetLowPrice": 110.0
   },
@@ -1486,7 +1486,7 @@
   "TEAM": {
     "recommendationMean": 1.54545,
     "numberOfAnalystOpinions": 31,
-    "targetMeanPrice": 229.1684,
+    "targetMeanPrice": 230.20065,
     "targetHighPrice": 480.0,
     "targetLowPrice": 145.0
   },
@@ -1507,7 +1507,7 @@
   "TMUS": {
     "recommendationMean": 1.60714,
     "numberOfAnalystOpinions": 25,
-    "targetMeanPrice": 225.56,
+    "targetMeanPrice": 225.64,
     "targetHighPrice": 296.0,
     "targetLowPrice": 165.0
   },
@@ -1570,21 +1570,21 @@
   "RMD": {
     "recommendationMean": 2.3,
     "numberOfAnalystOpinions": 17,
-    "targetMeanPrice": 251.51706,
+    "targetMeanPrice": 265.1053,
     "targetHighPrice": 320.0,
-    "targetLowPrice": 175.0
+    "targetLowPrice": 210.0
   },
   "DXCM": {
     "recommendationMean": 1.34483,
     "numberOfAnalystOpinions": 26,
-    "targetMeanPrice": 97.23077,
+    "targetMeanPrice": 98.15385,
     "targetHighPrice": 120.0,
     "targetLowPrice": 79.0
   },
   "BIIB": {
     "recommendationMean": 1.77778,
     "numberOfAnalystOpinions": 32,
-    "targetMeanPrice": 263.60406,
+    "targetMeanPrice": 264.22906,
     "targetHighPrice": 325.0,
     "targetLowPrice": 175.0
   },
@@ -1617,31 +1617,31 @@
     "targetLowPrice": null
   },
   "AMP": {
-    "recommendationMean": 2.76923,
-    "numberOfAnalystOpinions": 10,
-    "targetMeanPrice": 544.3,
+    "recommendationMean": 2.71429,
+    "numberOfAnalystOpinions": 11,
+    "targetMeanPrice": 545.0,
     "targetHighPrice": 638.0,
     "targetLowPrice": 445.0
   },
   "TROW": {
     "recommendationMean": 3.35714,
     "numberOfAnalystOpinions": 13,
-    "targetMeanPrice": 106.07692,
+    "targetMeanPrice": 105.15385,
     "targetHighPrice": 116.0,
     "targetLowPrice": 89.0
   },
   "SYF": {
     "recommendationMean": 1.95652,
     "numberOfAnalystOpinions": 23,
-    "targetMeanPrice": 86.82609,
+    "targetMeanPrice": 86.78261,
     "targetHighPrice": 103.0,
     "targetLowPrice": 73.0
   },
   "CBOE": {
     "recommendationMean": 2.66667,
     "numberOfAnalystOpinions": 15,
-    "targetMeanPrice": 338.53333,
-    "targetHighPrice": 450.0,
+    "targetMeanPrice": 345.06668,
+    "targetHighPrice": 461.0,
     "targetLowPrice": 299.0
   },
   "MTB": {
@@ -1661,15 +1661,15 @@
   "HBAN": {
     "recommendationMean": 1.80952,
     "numberOfAnalystOpinions": 19,
-    "targetMeanPrice": 18.75263,
+    "targetMeanPrice": 18.77895,
     "targetHighPrice": 22.5,
     "targetLowPrice": 17.0
   },
   "BR": {
     "recommendationMean": 2.33333,
     "numberOfAnalystOpinions": 8,
-    "targetMeanPrice": 213.375,
-    "targetHighPrice": 250.0,
+    "targetMeanPrice": 208.625,
+    "targetHighPrice": 240.0,
     "targetLowPrice": 176.0
   },
   "FIS": {
@@ -1688,8 +1688,8 @@
   },
   "CMG": {
     "recommendationMean": 1.8,
-    "numberOfAnalystOpinions": 31,
-    "targetMeanPrice": 40.58065,
+    "numberOfAnalystOpinions": 30,
+    "targetMeanPrice": 40.56667,
     "targetHighPrice": 53.0,
     "targetLowPrice": 32.0
   },
@@ -1731,7 +1731,7 @@
   "MGM": {
     "recommendationMean": 2.26087,
     "numberOfAnalystOpinions": 19,
-    "targetMeanPrice": 38.78947,
+    "targetMeanPrice": 38.73684,
     "targetHighPrice": 57.0,
     "targetLowPrice": 26.0
   },
@@ -1743,7 +1743,7 @@
     "targetLowPrice": 37.0
   },
   "RL": {
-    "recommendationMean": 1.55556,
+    "recommendationMean": 1.61111,
     "numberOfAnalystOpinions": 16,
     "targetMeanPrice": 446.6875,
     "targetHighPrice": 521.0,
@@ -1752,14 +1752,14 @@
   "BBWI": {
     "recommendationMean": 2.66667,
     "numberOfAnalystOpinions": 15,
-    "targetMeanPrice": 24.2,
+    "targetMeanPrice": 24.26667,
     "targetHighPrice": 54.0,
     "targetLowPrice": 17.0
   },
   "STZ": {
     "recommendationMean": 2.04167,
     "numberOfAnalystOpinions": 23,
-    "targetMeanPrice": 150.86957,
+    "targetMeanPrice": 151.1739,
     "targetHighPrice": 209.0,
     "targetLowPrice": 99.0
   },
@@ -1773,8 +1773,8 @@
   "CHD": {
     "recommendationMean": 2.28571,
     "numberOfAnalystOpinions": 19,
-    "targetMeanPrice": 104.89474,
-    "targetHighPrice": 120.0,
+    "targetMeanPrice": 106.36842,
+    "targetHighPrice": 124.0,
     "targetLowPrice": 78.0
   },
   "CAG": {
@@ -1794,14 +1794,14 @@
   "TT": {
     "recommendationMean": 1.80769,
     "numberOfAnalystOpinions": 23,
-    "targetMeanPrice": 519.2965,
-    "targetHighPrice": 575.0,
+    "targetMeanPrice": 518.42694,
+    "targetHighPrice": 573.0,
     "targetLowPrice": 414.0
   },
   "CARR": {
     "recommendationMean": 2.07692,
     "numberOfAnalystOpinions": 23,
-    "targetMeanPrice": 69.44,
+    "targetMeanPrice": 69.09217,
     "targetHighPrice": 88.0,
     "targetLowPrice": 55.0
   },
@@ -1836,9 +1836,9 @@
   "RSG": {
     "recommendationMean": 2.03704,
     "numberOfAnalystOpinions": 24,
-    "targetMeanPrice": 252.0,
-    "targetHighPrice": 275.0,
-    "targetLowPrice": 208.0
+    "targetMeanPrice": 254.875,
+    "targetHighPrice": 277.0,
+    "targetLowPrice": 215.0
   },
   "PWR": {
     "recommendationMean": 1.4,
@@ -1878,7 +1878,7 @@
   "NEM": {
     "recommendationMean": 1.65217,
     "numberOfAnalystOpinions": 21,
-    "targetMeanPrice": 135.50952,
+    "targetMeanPrice": 135.4619,
     "targetHighPrice": 165.0,
     "targetLowPrice": 70.0
   },
@@ -1897,7 +1897,7 @@
     "targetLowPrice": 205.45
   },
   "CF": {
-    "recommendationMean": 2.81818,
+    "recommendationMean": 2.86364,
     "numberOfAnalystOpinions": 20,
     "targetMeanPrice": 128.886,
     "targetHighPrice": 195.72,
@@ -1906,7 +1906,7 @@
   "MOS": {
     "recommendationMean": 2.45,
     "numberOfAnalystOpinions": 18,
-    "targetMeanPrice": 25.88333,
+    "targetMeanPrice": 25.77222,
     "targetHighPrice": 35.0,
     "targetLowPrice": 17.0
   },
@@ -1926,15 +1926,15 @@
   },
   "OKE": {
     "recommendationMean": 2.27273,
-    "numberOfAnalystOpinions": 19,
-    "targetMeanPrice": 101.78947,
+    "numberOfAnalystOpinions": 20,
+    "targetMeanPrice": 101.95,
     "targetHighPrice": 112.0,
     "targetLowPrice": 93.0
   },
   "KMI": {
     "recommendationMean": 2.0,
     "numberOfAnalystOpinions": 22,
-    "targetMeanPrice": 37.5,
+    "targetMeanPrice": 37.54545,
     "targetHighPrice": 43.0,
     "targetLowPrice": 32.0
   },
@@ -2060,14 +2060,14 @@
   "CEG": {
     "recommendationMean": 1.56,
     "numberOfAnalystOpinions": 23,
-    "targetMeanPrice": 339.68,
+    "targetMeanPrice": 339.2452,
     "targetHighPrice": 399.0,
     "targetLowPrice": 238.0
   },
   "VST": {
     "recommendationMean": 1.30435,
     "numberOfAnalystOpinions": 22,
-    "targetMeanPrice": 206.86365,
+    "targetMeanPrice": 205.40909,
     "targetHighPrice": 306.0,
     "targetLowPrice": 106.0
   },
@@ -2080,8 +2080,8 @@
   },
   "RBLX": {
     "recommendationMean": 2.31429,
-    "numberOfAnalystOpinions": 34,
-    "targetMeanPrice": 48.85706,
+    "numberOfAnalystOpinions": 33,
+    "targetMeanPrice": 49.12545,
     "targetHighPrice": 65.0,
     "targetLowPrice": 33.0
   },
