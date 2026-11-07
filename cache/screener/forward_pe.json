@@ -1,507 +1,507 @@
 {
   "AAPL": {
-    "forwardPE": 32.321957,
-    "forwardEps": 10.64818,
-    "trailingPE": 38.326283,
+    "forwardPE": 32.412743,
+    "forwardEps": 10.56282,
+    "trailingPE": 38.125835,
     "earningsGrowth": 0.141,
     "revenueGrowth": 0.117,
-    "pegRatio": 2.8
+    "pegRatio": 2.83
   },
   "MSFT": {
-    "forwardPE": 22.164799,
+    "forwardPE": 21.944775,
     "forwardEps": 24.17933,
-    "trailingPE": 27.971294,
+    "trailingPE": 27.693632,
     "earningsGrowth": 0.323,
     "revenueGrowth": 0.188,
-    "pegRatio": 1.64
+    "pegRatio": 1.59
   },
   "NVDA": {
-    "forwardPE": 11.410906,
+    "forwardPE": 11.727595,
     "forwardEps": 15.9146,
-    "trailingPE": 22.958282,
+    "trailingPE": 23.59545,
     "earningsGrowth": 1.278,
     "revenueGrowth": 1.059,
-    "pegRatio": 0.24
+    "pegRatio": 0.22
   },
   "AMZN": {
-    "forwardPE": 23.838448,
-    "forwardEps": 10.91556,
-    "trailingPE": 21.03557,
+    "forwardPE": 23.781048,
+    "forwardEps": 10.90364,
+    "trailingPE": 20.962004,
     "earningsGrowth": -0.031,
     "revenueGrowth": 0.121,
-    "pegRatio": 1.24
+    "pegRatio": 1.21
   },
   "GOOGL": {
-    "forwardPE": 18.238125,
-    "forwardEps": 15.49337,
-    "trailingPE": 14.755614,
+    "forwardPE": 18.450144,
+    "forwardEps": 15.43511,
+    "trailingPE": 14.871018,
     "earningsGrowth": -0.253,
     "revenueGrowth": 0.247,
     "pegRatio": 1.0
   },
   "META": {
-    "forwardPE": 17.002434,
+    "forwardPE": 17.144897,
     "forwardEps": 35.58785,
-    "trailingPE": 20.64415,
+    "trailingPE": 20.81713,
     "earningsGrowth": 2.648,
     "revenueGrowth": 0.261,
-    "pegRatio": 0.82
+    "pegRatio": 0.79
   },
   "BRK-B": {
-    "forwardPE": 25.51459,
+    "forwardPE": 25.450394,
     "forwardEps": 22.43148,
-    "trailingPE": 14.394619,
+    "trailingPE": 14.358401,
     "earningsGrowth": 1.078,
     "revenueGrowth": 0.1,
     "pegRatio": 10.06
   },
   "LLY": {
-    "forwardPE": 27.211615,
-    "forwardEps": 50.15248,
-    "trailingPE": 44.295033,
+    "forwardPE": 26.8897,
+    "forwardEps": 50.35385,
+    "trailingPE": 43.94677,
     "earningsGrowth": 0.163,
     "revenueGrowth": 0.386,
-    "pegRatio": 1.31
+    "pegRatio": 1.26
   },
   "AVGO": {
-    "forwardPE": 14.977084,
+    "forwardPE": 15.088052,
     "forwardEps": 19.46507,
-    "trailingPE": 37.23244,
+    "trailingPE": 37.5083,
     "earningsGrowth": 2.153,
     "revenueGrowth": 0.855,
-    "pegRatio": 0.32
+    "pegRatio": 0.29
   },
   "TSLA": {
-    "forwardPE": 159.17322,
+    "forwardPE": 165.9025,
     "forwardEps": 2.15922,
-    "trailingPE": 377.6813,
+    "trailingPE": 393.64835,
     "earningsGrowth": -0.436,
     "revenueGrowth": -0.002,
-    "pegRatio": 4.49
+    "pegRatio": 4.01
   },
   "JPM": {
-    "forwardPE": 13.191226,
+    "forwardPE": 13.079781,
     "forwardEps": 25.57306,
-    "trailingPE": 14.150167,
+    "trailingPE": 14.030621,
     "earningsGrowth": 0.099,
     "revenueGrowth": 0.102,
-    "pegRatio": 1.49
+    "pegRatio": 1.43
   },
   "V": {
-    "forwardPE": 24.674456,
+    "forwardPE": 24.677958,
     "forwardEps": 17.12662,
-    "trailingPE": 34.301136,
+    "trailingPE": 34.306007,
     "earningsGrowth": 0.219,
     "revenueGrowth": 0.132,
-    "pegRatio": 1.98
+    "pegRatio": 1.91
   },
   "UNH": {
-    "forwardPE": 16.993822,
+    "forwardPE": 16.9264,
     "forwardEps": 23.28611,
-    "trailingPE": 22.586758,
+    "trailingPE": 22.497145,
     "earningsGrowth": 0.761,
     "revenueGrowth": -0.004,
-    "pegRatio": 1.04
+    "pegRatio": 1.01
   },
   "XOM": {
-    "forwardPE": 13.358321,
-    "forwardEps": 12.37431,
-    "trailingPE": 17.006172,
+    "forwardPE": 13.448802,
+    "forwardEps": 12.33344,
+    "trailingPE": 17.064814,
     "earningsGrowth": 1.114,
     "revenueGrowth": 0.326,
-    "pegRatio": 1.38
+    "pegRatio": 1.3
   },
   "MA": {
-    "forwardPE": 28.331017,
-    "forwardEps": 23.15201,
-    "trailingPE": 34.323387,
+    "forwardPE": 28.191427,
+    "forwardEps": 23.15243,
+    "trailingPE": 34.154892,
     "earningsGrowth": 0.217,
     "revenueGrowth": 0.14,
-    "pegRatio": 1.75
+    "pegRatio": 1.71
   },
   "HD": {
-    "forwardPE": 21.91342,
-    "forwardEps": 15.96921,
-    "trailingPE": 24.488453,
+    "forwardPE": 21.50708,
+    "forwardEps": 15.97009,
+    "trailingPE": 24.03569,
     "earningsGrowth": 0.046,
     "revenueGrowth": 0.057,
-    "pegRatio": 1.87
+    "pegRatio": 1.85
   },
   "PG": {
-    "forwardPE": 22.582546,
+    "forwardPE": 22.3528,
     "forwardEps": 7.39952,
-    "trailingPE": 25.165665,
+    "trailingPE": 24.909637,
     "earningsGrowth": 0.008,
     "revenueGrowth": 0.04,
-    "pegRatio": 4.3
+    "pegRatio": 4.29
   },
   "JNJ": {
-    "forwardPE": 23.439774,
+    "forwardPE": 23.775463,
     "forwardEps": 11.61786,
-    "trailingPE": 41.323215,
+    "trailingPE": 41.915024,
     "earningsGrowth": -0.959,
     "revenueGrowth": 0.059,
-    "pegRatio": 3.11
+    "pegRatio": 3.06
   },
   "ABBV": {
-    "forwardPE": 17.812681,
-    "forwardEps": 16.18173,
-    "trailingPE": 49.52577,
+    "forwardPE": 17.996552,
+    "forwardEps": 16.18699,
+    "trailingPE": 50.05326,
     "earningsGrowth": 22.821,
     "revenueGrowth": 0.103,
-    "pegRatio": 0.59
+    "pegRatio": 0.58
   },
   "WMT": {
-    "forwardPE": 39.585304,
+    "forwardPE": 38.90344,
     "forwardEps": 3.22645,
-    "trailingPE": 46.275364,
+    "trailingPE": 45.47826,
     "earningsGrowth": -0.091,
     "revenueGrowth": 0.059,
-    "pegRatio": 4.39
+    "pegRatio": 4.34
   },
   "COST": {
-    "forwardPE": 42.576256,
-    "forwardEps": 25.0278,
-    "trailingPE": 51.328995,
+    "forwardPE": 42.051052,
+    "forwardEps": 25.05431,
+    "trailingPE": 50.74952,
     "earningsGrowth": 0.15,
     "revenueGrowth": 0.111,
-    "pegRatio": 5.24
+    "pegRatio": 5.34
   },
   "MRK": {
-    "forwardPE": 16.322567,
+    "forwardPE": 16.29924,
     "forwardEps": 9.00226,
-    "trailingPE": 148.42424,
+    "trailingPE": 148.21211,
     "earningsGrowth": -0.12,
     "revenueGrowth": 0.047,
-    "pegRatio": 3.52
+    "pegRatio": 3.56
   },
   "ORCL": {
-    "forwardPE": 10.417552,
-    "forwardEps": 11.05442,
-    "trailingPE": 18.050158,
+    "forwardPE": 10.49391,
+    "forwardEps": 11.06356,
+    "trailingPE": 18.19749,
     "earningsGrowth": 0.545,
     "revenueGrowth": 0.296,
-    "pegRatio": 0.67
+    "pegRatio": 0.63
   },
   "CRM": {
-    "forwardPE": 13.887406,
+    "forwardPE": 13.340426,
     "forwardEps": 16.01523,
-    "trailingPE": 20.348581,
+    "trailingPE": 19.547117,
     "earningsGrowth": 1.189,
     "revenueGrowth": 0.108,
-    "pegRatio": 0.81
+    "pegRatio": 0.79
   },
   "BAC": {
-    "forwardPE": 9.606288,
+    "forwardPE": 9.54065,
     "forwardEps": 5.17994,
-    "trailingPE": 11.875895,
+    "trailingPE": 11.794749,
     "earningsGrowth": -0.125,
     "revenueGrowth": 0.034,
-    "pegRatio": 0.94
+    "pegRatio": 0.91
   },
   "AMD": {
-    "forwardPE": 24.100134,
-    "forwardEps": 16.77999,
-    "trailingPE": 86.410255,
+    "forwardPE": 25.453012,
+    "forwardEps": 17.64192,
+    "trailingPE": 95.94872,
     "earningsGrowth": 0.938,
     "revenueGrowth": 0.447,
-    "pegRatio": 0.48
+    "pegRatio": 0.4
   },
   "KO": {
-    "forwardPE": 27.13597,
+    "forwardPE": 27.11896,
     "forwardEps": 3.52779,
-    "trailingPE": 28.238937,
+    "trailingPE": 28.221237,
     "earningsGrowth": 0.083,
     "revenueGrowth": 0.074,
-    "pegRatio": 4.04
+    "pegRatio": 4.03
   },
   "CVX": {
-    "forwardPE": 13.017199,
-    "forwardEps": 16.35759,
-    "trailingPE": 15.633627,
+    "forwardPE": 12.869038,
+    "forwardEps": 16.52105,
+    "trailingPE": 15.610132,
     "earningsGrowth": 1.78,
     "revenueGrowth": 0.348,
-    "pegRatio": 0.84
+    "pegRatio": 0.81
   },
   "MCD": {
-    "forwardPE": 20.251638,
-    "forwardEps": 13.72926,
-    "trailingPE": 21.996836,
+    "forwardPE": 20.17094,
+    "forwardEps": 13.70883,
+    "trailingPE": 21.876581,
     "earningsGrowth": 0.104,
     "revenueGrowth": 0.011,
-    "pegRatio": 2.97
+    "pegRatio": 2.95
   },
   "NFLX": {
-    "forwardPE": 17.383741,
+    "forwardPE": 16.813652,
     "forwardEps": 3.77134,
-    "trailingPE": 18.947975,
+    "trailingPE": 18.32659,
     "earningsGrowth": 0.475,
     "revenueGrowth": 0.118,
     "pegRatio": 1.05
   },
   "PFE": {
-    "forwardPE": 10.248987,
-    "forwardEps": 2.91541,
-    "trailingPE": 42.685715,
+    "forwardPE": 10.006673,
+    "forwardEps": 2.93704,
+    "trailingPE": 41.985714,
     "earningsGrowth": -0.097,
     "revenueGrowth": -0.004,
-    "pegRatio": 14.11
+    "pegRatio": 13.69
   },
   "ABT": {
-    "forwardPE": 19.134338,
+    "forwardPE": 18.516178,
     "forwardEps": 5.93697,
-    "trailingPE": 42.388058,
-    "earningsGrowth": -0.437,
+    "trailingPE": 41.018658,
+    "earningsGrowth": -0.436,
     "revenueGrowth": 0.145,
-    "pegRatio": 1.65
+    "pegRatio": 1.63
   },
   "TXN": {
-    "forwardPE": 24.053532,
+    "forwardPE": 23.985214,
     "forwardEps": 11.56379,
-    "trailingPE": 36.076523,
+    "trailingPE": 35.974056,
     "earningsGrowth": 0.77,
     "revenueGrowth": 0.277,
-    "pegRatio": 0.94
+    "pegRatio": 0.84
   },
   "CSCO": {
-    "forwardPE": 17.025879,
+    "forwardPE": 16.693258,
     "forwardEps": 5.62203,
-    "trailingPE": 28.744745,
+    "trailingPE": 28.183184,
     "earningsGrowth": 0.521,
     "revenueGrowth": 0.176,
-    "pegRatio": 0.96
+    "pegRatio": 0.88
   },
   "PM": {
-    "forwardPE": 22.284376,
+    "forwardPE": 21.884031,
     "forwardEps": 9.04221,
-    "trailingPE": 29.41606,
+    "trailingPE": 28.887592,
     "earningsGrowth": -0.048,
     "revenueGrowth": 0.055,
-    "pegRatio": 2.79
+    "pegRatio": 2.66
   },
   "LIN": {
-    "forwardPE": 26.670902,
-    "forwardEps": 19.54302,
-    "trailingPE": 34.61022,
+    "forwardPE": 26.365843,
+    "forwardEps": 19.54233,
+    "trailingPE": 34.213146,
     "earningsGrowth": -0.105,
     "revenueGrowth": 0.092,
-    "pegRatio": 2.06
+    "pegRatio": 2.05
   },
   "ACN": {
-    "forwardPE": 16.689547,
+    "forwardPE": 16.396238,
     "forwardEps": 15.88779,
-    "trailingPE": 19.554571,
+    "trailingPE": 19.210915,
     "earningsGrowth": 0.464,
     "revenueGrowth": 0.062,
-    "pegRatio": 2.51
+    "pegRatio": 2.52
   },
   "NKE": {
-    "forwardPE": 25.406694,
-    "forwardEps": 1.55707,
-    "trailingPE": 19.019232,
+    "forwardPE": 24.932806,
+    "forwardEps": 1.54776,
+    "trailingPE": 18.552885,
     "earningsGrowth": -0.021,
     "revenueGrowth": -0.043,
-    "pegRatio": 3.51
+    "pegRatio": 3.43
   },
   "DIS": {
-    "forwardPE": 15.63807,
+    "forwardPE": 15.575368,
     "forwardEps": 7.49581,
-    "trailingPE": 24.169073,
+    "trailingPE": 24.072165,
     "earningsGrowth": -0.483,
     "revenueGrowth": 0.068,
-    "pegRatio": 3.87
+    "pegRatio": 3.81
   },
   "AXP": {
-    "forwardPE": 16.086437,
-    "forwardEps": 20.20149,
-    "trailingPE": 18.308168,
+    "forwardPE": 15.878245,
+    "forwardEps": 20.21571,
+    "trailingPE": 18.083942,
     "earningsGrowth": 0.309,
     "revenueGrowth": 0.113,
-    "pegRatio": 1.38
+    "pegRatio": 1.34
   },
   "HON": {
-    "forwardPE": 21.898638,
+    "forwardPE": 22.331984,
     "forwardEps": 9.85358,
-    "trailingPE": 10.698067,
+    "trailingPE": 10.909767,
     "earningsGrowth": -0.636,
     "revenueGrowth": 0.013,
-    "pegRatio": 3.18
+    "pegRatio": 3.0
   },
   "INTC": {
-    "forwardPE": 29.048435,
-    "forwardEps": 1.79872,
+    "forwardPE": 31.27379,
+    "forwardEps": 1.79959,
     "trailingPE": null,
     "earningsGrowth": -0.327,
     "revenueGrowth": 0.209,
     "pegRatio": 1.36
   },
   "IBM": {
-    "forwardPE": 18.672302,
+    "forwardPE": 18.512865,
     "forwardEps": 13.23404,
-    "trailingPE": 21.08447,
+    "trailingPE": 20.904436,
     "earningsGrowth": 0.25,
     "revenueGrowth": 0.047,
-    "pegRatio": 2.4
+    "pegRatio": 2.33
   },
   "AMGN": {
-    "forwardPE": 18.642893,
-    "forwardEps": 24.6893,
-    "trailingPE": 26.682898,
+    "forwardPE": 18.425976,
+    "forwardEps": 24.98755,
+    "trailingPE": 26.691015,
     "earningsGrowth": 0.194,
     "revenueGrowth": 0.085,
-    "pegRatio": 2.85
+    "pegRatio": 2.77
   },
   "GE": {
-    "forwardPE": 33.79546,
+    "forwardPE": 34.709255,
     "forwardEps": 9.31279,
-    "trailingPE": 35.969143,
+    "trailingPE": 36.94171,
     "earningsGrowth": 0.089,
     "revenueGrowth": 0.159,
-    "pegRatio": 3.86
+    "pegRatio": 3.69
   },
   "LOW": {
-    "forwardPE": 17.498926,
+    "forwardPE": 17.291779,
     "forwardEps": 12.98594,
-    "trailingPE": 19.208792,
+    "trailingPE": 18.981403,
     "earningsGrowth": 0.0,
     "revenueGrowth": 0.083,
-    "pegRatio": 1.46
+    "pegRatio": 1.45
   },
   "SBUX": {
-    "forwardPE": 28.476013,
+    "forwardPE": 28.274836,
     "forwardEps": 3.72805,
-    "trailingPE": 48.0362,
+    "trailingPE": 47.696835,
     "earningsGrowth": 4.054,
     "revenueGrowth": -0.045,
-    "pegRatio": 1.18
+    "pegRatio": 1.15
   },
   "BA": {
-    "forwardPE": 79.75588,
+    "forwardPE": 80.172,
     "forwardEps": 2.16285,
-    "trailingPE": 17.801859,
+    "trailingPE": 17.894737,
     "earningsGrowth": null,
     "revenueGrowth": 0.039,
-    "pegRatio": 3.81
+    "pegRatio": 3.71
   },
   "RTX": {
-    "forwardPE": 23.811474,
+    "forwardPE": 23.51985,
     "forwardEps": 8.0583,
-    "trailingPE": 31.2,
+    "trailingPE": 30.817886,
     "earningsGrowth": 0.34,
     "revenueGrowth": 0.111,
-    "pegRatio": 2.15
+    "pegRatio": 2.05
   },
   "CAT": {
-    "forwardPE": 17.165754,
+    "forwardPE": 17.320469,
     "forwardEps": 32.25259,
-    "trailingPE": 21.728415,
+    "trailingPE": 21.924255,
     "earningsGrowth": 0.461,
     "revenueGrowth": 0.173,
-    "pegRatio": 1.04
+    "pegRatio": 0.97
   },
   "NOW": {
-    "forwardPE": 21.314787,
+    "forwardPE": 21.233576,
     "forwardEps": 4.8023,
-    "trailingPE": 73.64029,
+    "trailingPE": 73.35971,
     "earningsGrowth": -0.442,
     "revenueGrowth": 0.205,
-    "pegRatio": 0.84
+    "pegRatio": 0.8
   },
   "INTU": {
-    "forwardPE": 13.169624,
+    "forwardPE": 12.6745205,
     "forwardEps": 26.94382,
-    "trailingPE": 21.557716,
+    "trailingPE": 20.747267,
     "earningsGrowth": -0.014,
     "revenueGrowth": 0.137,
     "pegRatio": 1.13
   },
   "ISRG": {
-    "forwardPE": 37.575478,
+    "forwardPE": 36.314728,
     "forwardEps": 12.46877,
-    "trailingPE": 56.652958,
+    "trailingPE": 54.752113,
     "earningsGrowth": -0.236,
     "revenueGrowth": 0.217,
-    "pegRatio": 2.23
+    "pegRatio": 2.11
   },
   "GS": {
-    "forwardPE": 11.703389,
+    "forwardPE": 11.661233,
     "forwardEps": 74.24773,
-    "trailingPE": 12.493889,
+    "trailingPE": 12.448885,
     "earningsGrowth": 0.388,
     "revenueGrowth": 0.233,
-    "pegRatio": 1.16
+    "pegRatio": 1.09
   },
   "SPGI": {
-    "forwardPE": 23.406239,
+    "forwardPE": 23.177828,
     "forwardEps": 20.18308,
-    "trailingPE": 28.22043,
+    "trailingPE": 27.945042,
     "earningsGrowth": 0.101,
     "revenueGrowth": 0.068,
-    "pegRatio": 1.93
+    "pegRatio": 1.89
   },
   "MS": {
-    "forwardPE": 13.345896,
+    "forwardPE": 13.272744,
     "forwardEps": 13.67012,
-    "trailingPE": 14.467883,
+    "trailingPE": 14.388581,
     "earningsGrowth": 0.082,
     "revenueGrowth": 0.108,
-    "pegRatio": 1.69
+    "pegRatio": 1.59
   },
   "BLK": {
-    "forwardPE": 18.060064,
+    "forwardPE": 18.186565,
     "forwardEps": 64.82092,
-    "trailingPE": 26.654602,
+    "trailingPE": 26.841303,
     "earningsGrowth": 0.254,
     "revenueGrowth": 0.191,
-    "pegRatio": 1.02
+    "pegRatio": 0.97
   },
   "SYK": {
-    "forwardPE": 20.546177,
+    "forwardPE": 19.981445,
     "forwardEps": 16.30863,
-    "trailingPE": 35.68477,
+    "trailingPE": 34.703938,
     "earningsGrowth": -0.117,
     "revenueGrowth": 0.076,
-    "pegRatio": 1.64
+    "pegRatio": 1.61
   },
   "PEP": {
-    "forwardPE": 16.519636,
+    "forwardPE": 16.36105,
     "forwardEps": 8.63881,
-    "trailingPE": 17.950945,
+    "trailingPE": 17.778616,
     "earningsGrowth": 0.174,
     "revenueGrowth": 0.056,
     "pegRatio": 1.53
   },
   "TMO": {
-    "forwardPE": 24.365128,
+    "forwardPE": 25.006525,
     "forwardEps": 27.78315,
-    "trailingPE": 35.703587,
+    "trailingPE": 36.643463,
     "earningsGrowth": 0.087,
     "revenueGrowth": 0.091,
-    "pegRatio": 2.05
+    "pegRatio": 1.96
   },
   "PLD": {
-    "forwardPE": 35.683556,
+    "forwardPE": 35.24219,
     "forwardEps": 3.6025,
-    "trailingPE": 28.31498,
+    "trailingPE": 27.964758,
     "earningsGrowth": 0.052,
     "revenueGrowth": 0.102,
-    "pegRatio": 3.01
+    "pegRatio": 2.94
   },
   "VRTX": {
-    "forwardPE": 27.192451,
-    "forwardEps": 19.95039,
-    "trailingPE": 34.90991,
+    "forwardPE": 27.467173,
+    "forwardEps": 19.91796,
+    "trailingPE": 35.20528,
     "earningsGrowth": -0.39,
     "revenueGrowth": 0.118,
-    "pegRatio": 2.14
+    "pegRatio": 2.15
   },
   "REGN": {
-    "forwardPE": 12.766857,
-    "forwardEps": 70.72218,
-    "trailingPE": 19.958002,
+    "forwardPE": 12.787383,
+    "forwardEps": 70.72205,
+    "trailingPE": 19.990051,
     "earningsGrowth": 0.355,
     "revenueGrowth": 0.363,
-    "pegRatio": 1.49
+    "pegRatio": 1.1
   },
   "MMC": {
     "forwardPE": null,
@@ -512,364 +512,364 @@
     "pegRatio": null
   },
   "CB": {
-    "forwardPE": 12.609857,
+    "forwardPE": 12.385571,
     "forwardEps": 29.47139,
-    "trailingPE": 13.025937,
+    "trailingPE": 12.794251,
     "earningsGrowth": 0.044,
     "revenueGrowth": 0.003,
-    "pegRatio": 2.82
+    "pegRatio": 2.8
   },
   "ETN": {
-    "forwardPE": 20.037142,
-    "forwardEps": 16.32069,
-    "trailingPE": 32.66933,
+    "forwardPE": 20.909742,
+    "forwardEps": 16.34262,
+    "trailingPE": 34.137863,
     "earningsGrowth": 0.07,
     "revenueGrowth": 0.28,
-    "pegRatio": 2.14
+    "pegRatio": 1.99
   },
   "DE": {
-    "forwardPE": 28.951962,
+    "forwardPE": 29.315985,
     "forwardEps": 22.91071,
-    "trailingPE": 36.87104,
+    "trailingPE": 37.334633,
     "earningsGrowth": 0.074,
     "revenueGrowth": 0.049,
-    "pegRatio": 1.57
+    "pegRatio": 1.54
   },
   "BKNG": {
-    "forwardPE": 13.7305355,
-    "forwardEps": 12.28794,
-    "trailingPE": 18.299349,
+    "forwardPE": 13.133586,
+    "forwardEps": 12.23314,
+    "trailingPE": 17.425703,
     "earningsGrowth": 0.068,
     "revenueGrowth": -0.013,
-    "pegRatio": 0.94
+    "pegRatio": 0.93
   },
   "MDT": {
-    "forwardPE": 16.365726,
+    "forwardPE": 15.891178,
     "forwardEps": 6.40607,
-    "trailingPE": 25.759212,
+    "trailingPE": 25.012285,
     "earningsGrowth": 0.407,
     "revenueGrowth": 0.137,
-    "pegRatio": 1.89
+    "pegRatio": 1.88
   },
   "NEE": {
-    "forwardPE": 20.170185,
+    "forwardPE": 19.873058,
     "forwardEps": 4.37527,
-    "trailingPE": 15.9009,
+    "trailingPE": 15.666666,
     "earningsGrowth": 0.932,
     "revenueGrowth": 0.016,
     "pegRatio": 1.8
   },
   "MO": {
-    "forwardPE": 13.100283,
+    "forwardPE": 12.8537445,
     "forwardEps": 5.92201,
-    "trailingPE": 15.995877,
+    "trailingPE": 15.694846,
     "earningsGrowth": 0.067,
     "revenueGrowth": 0.036,
-    "pegRatio": 2.99
+    "pegRatio": 2.97
   },
   "T": {
-    "forwardPE": 8.405887,
+    "forwardPE": 8.332691,
     "forwardEps": 2.5958,
-    "trailingPE": 11.668449,
+    "trailingPE": 11.566844,
     "earningsGrowth": -0.904,
     "revenueGrowth": 0.053,
     "pegRatio": 1.28
   },
   "VZ": {
-    "forwardPE": 8.691768,
+    "forwardPE": 8.61073,
     "forwardEps": 5.30617,
-    "trailingPE": 11.7653055,
+    "trailingPE": 11.655612,
     "earningsGrowth": 0.068,
     "revenueGrowth": 0.015,
-    "pegRatio": 0.98
+    "pegRatio": 0.97
   },
   "CL": {
-    "forwardPE": 24.069616,
+    "forwardPE": 23.550127,
     "forwardEps": 4.10019,
-    "trailingPE": 38.40078,
+    "trailingPE": 37.571983,
     "earningsGrowth": 0.033,
     "revenueGrowth": 0.046,
     "pegRatio": 1.81
   },
   "BMY": {
-    "forwardPE": 9.489309,
-    "forwardEps": 6.65275,
-    "trailingPE": 13.997783,
+    "forwardPE": 9.28122,
+    "forwardEps": 6.69524,
+    "trailingPE": 13.77827,
     "earningsGrowth": -0.028,
     "revenueGrowth": 0.069,
-    "pegRatio": 17.79
+    "pegRatio": 17.34
   },
   "GILD": {
-    "forwardPE": 16.604029,
-    "forwardEps": 10.09213,
+    "forwardPE": 16.489574,
+    "forwardEps": 10.12094,
     "trailingPE": null,
     "earningsGrowth": -0.202,
     "revenueGrowth": 0.068,
-    "pegRatio": 2.39
+    "pegRatio": 2.29
   },
   "CI": {
-    "forwardPE": 9.002529,
-    "forwardEps": 33.48837,
-    "trailingPE": 13.292769,
+    "forwardPE": 8.792073,
+    "forwardEps": 33.39258,
+    "trailingPE": 12.944885,
     "earningsGrowth": 0.102,
     "revenueGrowth": 0.067,
-    "pegRatio": 0.84
+    "pegRatio": 0.83
   },
   "ELV": {
-    "forwardPE": 14.264064,
+    "forwardPE": 14.053404,
     "forwardEps": 30.2859,
-    "trailingPE": 18.34395,
+    "trailingPE": 18.073036,
     "earningsGrowth": 0.179,
     "revenueGrowth": 0.014,
-    "pegRatio": 1.33
+    "pegRatio": 1.32
   },
   "HCA": {
-    "forwardPE": 16.220964,
-    "forwardEps": 31.28544,
-    "trailingPE": 16.83184,
+    "forwardPE": 15.826694,
+    "forwardEps": 31.27564,
+    "trailingPE": 16.417578,
     "earningsGrowth": 0.045,
     "revenueGrowth": 0.036,
-    "pegRatio": 1.56
+    "pegRatio": 1.55
   },
   "MCO": {
-    "forwardPE": 27.643587,
+    "forwardPE": 27.124872,
     "forwardEps": 18.6423,
-    "trailingPE": 31.442347,
+    "trailingPE": 30.85235,
     "earningsGrowth": 0.178,
     "revenueGrowth": 0.008,
-    "pegRatio": 1.91
+    "pegRatio": 1.86
   },
   "ICE": {
-    "forwardPE": 19.473934,
+    "forwardPE": 19.280315,
     "forwardEps": 8.93502,
-    "trailingPE": 23.70572,
+    "trailingPE": 23.470028,
     "earningsGrowth": 0.176,
     "revenueGrowth": 0.147,
-    "pegRatio": 1.96
+    "pegRatio": 1.95
   },
   "TJX": {
-    "forwardPE": 24.055626,
+    "forwardPE": 23.48457,
     "forwardEps": 5.76123,
-    "trailingPE": 25.664814,
+    "trailingPE": 25.055555,
     "earningsGrowth": 0.236,
     "revenueGrowth": 0.054,
-    "pegRatio": 2.57
+    "pegRatio": 2.46
   },
   "USB": {
-    "forwardPE": 10.195307,
+    "forwardPE": 10.144116,
     "forwardEps": 5.86054,
-    "trailingPE": 11.624514,
+    "trailingPE": 11.566149,
     "earningsGrowth": 0.102,
     "revenueGrowth": 0.084,
-    "pegRatio": 1.48
-  },
-  "PNC": {
-    "forwardPE": 10.626343,
-    "forwardEps": 21.33848,
-    "trailingPE": 12.074015,
-    "earningsGrowth": 0.143,
-    "revenueGrowth": 0.109,
     "pegRatio": 1.45
   },
+  "PNC": {
+    "forwardPE": 10.567934,
+    "forwardEps": 21.32678,
+    "trailingPE": 12.001065,
+    "earningsGrowth": 0.143,
+    "revenueGrowth": 0.109,
+    "pegRatio": 1.4
+  },
   "AON": {
-    "forwardPE": 17.044838,
+    "forwardPE": 16.570215,
     "forwardEps": 20.20553,
-    "trailingPE": 18.850574,
+    "trailingPE": 18.32567,
     "earningsGrowth": 0.057,
     "revenueGrowth": 0.026,
     "pegRatio": 2.83
   },
   "ZTS": {
-    "forwardPE": 12.816091,
+    "forwardPE": 12.393103,
     "forwardEps": 6.40679,
-    "trailingPE": 13.964286,
-    "earningsGrowth": 0.012,
-    "revenueGrowth": -0.002,
-    "pegRatio": 16.6
+    "trailingPE": 13.503402,
+    "earningsGrowth": -0.118,
+    "revenueGrowth": -0.004,
+    "pegRatio": 15.28
   },
   "COF": {
-    "forwardPE": 8.542037,
+    "forwardPE": 8.459483,
     "forwardEps": 23.86316,
-    "trailingPE": 12.490196,
+    "trailingPE": 12.369485,
     "earningsGrowth": 0.162,
     "revenueGrowth": 0.062,
     "pegRatio": 0.18
   },
   "APD": {
-    "forwardPE": 19.815235,
-    "forwardEps": 15.61879,
-    "trailingPE": 129.49371,
-    "earningsGrowth": null,
-    "revenueGrowth": 0.046,
-    "pegRatio": 2.3
+    "forwardPE": 19.585318,
+    "forwardEps": 15.56472,
+    "trailingPE": 127.54811,
+    "earningsGrowth": 130.118,
+    "revenueGrowth": 0.123,
+    "pegRatio": 2.23
   },
   "ECL": {
-    "forwardPE": 32.515804,
+    "forwardPE": 31.968258,
     "forwardEps": 9.40558,
-    "trailingPE": 41.609524,
+    "trailingPE": 40.908844,
     "earningsGrowth": -0.049,
     "revenueGrowth": 0.127,
-    "pegRatio": 2.5
+    "pegRatio": 2.43
   },
   "CME": {
-    "forwardPE": 23.221327,
+    "forwardPE": 23.119295,
     "forwardEps": 13.23094,
-    "trailingPE": 25.183607,
+    "trailingPE": 25.072952,
     "earningsGrowth": 0.161,
     "revenueGrowth": 0.13,
-    "pegRatio": 4.25
+    "pegRatio": 4.24
   },
   "LRCX": {
-    "forwardPE": 15.135257,
+    "forwardPE": 16.380728,
     "forwardEps": 12.23633,
-    "trailingPE": 27.600595,
+    "trailingPE": 29.871834,
     "earningsGrowth": 0.766,
     "revenueGrowth": 0.544,
-    "pegRatio": 0.97
+    "pegRatio": 0.81
   },
   "KLAC": {
-    "forwardPE": 18.284678,
+    "forwardPE": 19.508821,
     "forwardEps": 7.09884,
-    "trailingPE": 32.53133,
+    "trailingPE": 34.709274,
     "earningsGrowth": 0.388,
     "revenueGrowth": 0.289,
-    "pegRatio": 1.35
+    "pegRatio": 1.17
   },
   "AMAT": {
-    "forwardPE": 17.20426,
+    "forwardPE": 17.929884,
     "forwardEps": 18.55645,
-    "trailingPE": 27.545298,
+    "trailingPE": 28.707075,
     "earningsGrowth": 0.428,
     "revenueGrowth": 0.248,
-    "pegRatio": 0.78
+    "pegRatio": 0.68
   },
   "PANW": {
-    "forwardPE": 64.49385,
+    "forwardPE": 64.32374,
     "forwardEps": 4.87907,
-    "trailingPE": 786.67505,
+    "trailingPE": 784.6,
     "earningsGrowth": null,
     "revenueGrowth": 0.345,
-    "pegRatio": 1.78
+    "pegRatio": 1.61
   },
   "MU": {
-    "forwardPE": 3.1593592,
+    "forwardPE": 3.321132,
     "forwardEps": 207.76048,
-    "trailingPE": 8.830754,
+    "trailingPE": 9.2829275,
     "earningsGrowth": 10.595,
     "revenueGrowth": 3.793,
     "pegRatio": 0.16
   },
   "SNPS": {
-    "forwardPE": 23.699263,
-    "forwardEps": 18.57906,
-    "trailingPE": 77.79329,
+    "forwardPE": 24.15918,
+    "forwardEps": 18.6455,
+    "trailingPE": 79.58657,
     "earningsGrowth": 0.893,
     "revenueGrowth": 0.424,
-    "pegRatio": 2.41
+    "pegRatio": 2.29
   },
   "CDNS": {
-    "forwardPE": 31.632448,
+    "forwardPE": 32.494793,
     "forwardEps": 9.84527,
-    "trailingPE": 61.91451,
+    "trailingPE": 63.602386,
     "earningsGrowth": 0.0,
     "revenueGrowth": 0.22,
-    "pegRatio": 2.44
+    "pegRatio": 2.27
   },
   "ADI": {
-    "forwardPE": 21.87836,
+    "forwardPE": 22.032898,
     "forwardEps": 16.50078,
-    "trailingPE": 42.875298,
+    "trailingPE": 43.178146,
     "earningsGrowth": 1.635,
     "revenueGrowth": 0.396,
-    "pegRatio": 0.6
+    "pegRatio": 0.53
   },
   "MRVL": {
-    "forwardPE": 18.18796,
+    "forwardPE": 19.2298,
     "forwardEps": 7.34277,
-    "trailingPE": 43.930923,
+    "trailingPE": 46.44737,
     "earningsGrowth": 0.5,
     "revenueGrowth": 0.365,
-    "pegRatio": 0.39
+    "pegRatio": 0.33
   },
   "QCOM": {
-    "forwardPE": 12.19888,
-    "forwardEps": 12.84954,
-    "trailingPE": 12.34252,
-    "earningsGrowth": -0.23,
-    "revenueGrowth": -0.04,
-    "pegRatio": 0.78
+    "forwardPE": 13.244223,
+    "forwardEps": 12.48922,
+    "trailingPE": 13.02441,
+    "earningsGrowth": null,
+    "revenueGrowth": -0.084,
+    "pegRatio": 0.71
   },
   "WFC": {
-    "forwardPE": 10.594849,
+    "forwardPE": 10.487401,
     "forwardEps": 8.00389,
-    "trailingPE": 11.960508,
+    "trailingPE": 11.8392105,
     "earningsGrowth": 0.127,
     "revenueGrowth": 0.004,
-    "pegRatio": 1.36
+    "pegRatio": 1.32
   },
   "SCHW": {
-    "forwardPE": 11.864439,
+    "forwardPE": 11.724751,
     "forwardEps": 7.80315,
-    "trailingPE": 15.825642,
+    "trailingPE": 15.639317,
     "earningsGrowth": 0.286,
     "revenueGrowth": 0.169,
     "pegRatio": 0.77
   },
   "AIG": {
-    "forwardPE": 9.193018,
-    "forwardEps": 8.80342,
-    "trailingPE": 13.202284,
+    "forwardPE": 8.857088,
+    "forwardEps": 8.77828,
+    "trailingPE": 12.683523,
     "earningsGrowth": 0.72,
     "revenueGrowth": 0.164,
     "pegRatio": 0.68
   },
   "ALL": {
-    "forwardPE": 9.487078,
-    "forwardEps": 28.11403,
-    "trailingPE": 6.049444,
-    "earningsGrowth": 0.612,
-    "revenueGrowth": 0.118,
-    "pegRatio": 1.98
+    "forwardPE": 9.025295,
+    "forwardEps": 28.23287,
+    "trailingPE": 5.779315,
+    "earningsGrowth": -0.424,
+    "revenueGrowth": 0.005,
+    "pegRatio": 1.96
   },
   "PRU": {
-    "forwardPE": 8.947791,
-    "forwardEps": 13.68606,
-    "trailingPE": 11.153006,
+    "forwardPE": 8.6866255,
+    "forwardEps": 13.72685,
+    "trailingPE": 10.859745,
     "earningsGrowth": -0.012,
-    "revenueGrowth": -0.262,
-    "pegRatio": 0.93
+    "revenueGrowth": -0.192,
+    "pegRatio": 0.9
   },
   "AFL": {
-    "forwardPE": 16.576717,
-    "forwardEps": 7.6155,
-    "trailingPE": 18.429197,
-    "earningsGrowth": 0.468,
-    "revenueGrowth": -0.01,
+    "forwardPE": 16.139587,
+    "forwardEps": 7.68669,
+    "trailingPE": 18.110949,
+    "earningsGrowth": -0.802,
+    "revenueGrowth": -0.31,
     "pegRatio": 1.18
   },
   "MET": {
-    "forwardPE": 8.935322,
-    "forwardEps": 11.16356,
-    "trailingPE": 20.609503,
-    "earningsGrowth": 0.058,
-    "revenueGrowth": 0.105,
-    "pegRatio": 0.54
+    "forwardPE": 8.804182,
+    "forwardEps": 11.16174,
+    "trailingPE": 12.845751,
+    "earningsGrowth": 2.008,
+    "revenueGrowth": 0.182,
+    "pegRatio": 0.53
   },
   "TRV": {
-    "forwardPE": 12.950203,
+    "forwardPE": 12.703021,
     "forwardEps": 31.11071,
-    "trailingPE": 10.594006,
+    "trailingPE": 10.391797,
     "earningsGrowth": 0.097,
     "revenueGrowth": -0.005,
     "pegRatio": 2.36
   },
   "PGR": {
-    "forwardPE": 14.359372,
+    "forwardPE": 14.026222,
     "forwardEps": 16.23887,
-    "trailingPE": 11.747103,
+    "trailingPE": 11.474559,
     "earningsGrowth": -0.018,
     "revenueGrowth": 0.03,
-    "pegRatio": 71.68
+    "pegRatio": 71.18
   },
   "BK": {
     "forwardPE": null,
@@ -880,388 +880,388 @@
     "pegRatio": null
   },
   "STT": {
-    "forwardPE": 10.63827,
+    "forwardPE": 10.659517,
     "forwardEps": 15.53166,
-    "trailingPE": 13.499183,
+    "trailingPE": 13.526144,
     "earningsGrowth": 0.327,
     "revenueGrowth": 0.133,
-    "pegRatio": 0.64
+    "pegRatio": 0.61
   },
   "FITB": {
-    "forwardPE": 10.763645,
+    "forwardPE": 10.681081,
     "forwardEps": 4.96579,
-    "trailingPE": 17.936241,
+    "trailingPE": 17.798658,
     "earningsGrowth": -0.011,
-    "revenueGrowth": 0.5,
-    "pegRatio": 1.74
+    "revenueGrowth": 0.505,
+    "pegRatio": 1.7
   },
   "KEY": {
-    "forwardPE": 9.636471,
+    "forwardPE": 9.585898,
     "forwardEps": 2.17507,
-    "trailingPE": 11.516482,
+    "trailingPE": 11.456044,
     "earningsGrowth": 0.244,
     "revenueGrowth": 0.115,
-    "pegRatio": 1.4
+    "pegRatio": 1.36
   },
   "RF": {
-    "forwardPE": 9.97129,
+    "forwardPE": 9.9361925,
     "forwardEps": 2.84918,
-    "trailingPE": 11.141176,
+    "trailingPE": 11.101961,
     "earningsGrowth": 0.164,
     "revenueGrowth": 0.052,
-    "pegRatio": 1.54
+    "pegRatio": 1.51
   },
   "MMM": {
-    "forwardPE": 18.95629,
-    "forwardEps": 9.90542,
-    "trailingPE": 28.025375,
+    "forwardPE": 18.658577,
+    "forwardEps": 9.92305,
+    "trailingPE": 27.634329,
     "earningsGrowth": 0.697,
     "revenueGrowth": 0.01,
-    "pegRatio": 1.71
-  },
-  "FDX": {
-    "forwardPE": 15.144439,
-    "forwardEps": 20.91857,
-    "trailingPE": 17.078167,
-    "earningsGrowth": -0.689,
-    "revenueGrowth": 0.119,
-    "pegRatio": 2.02
-  },
-  "UPS": {
-    "forwardPE": 13.721907,
-    "forwardEps": 8.09217,
-    "trailingPE": 21.39499,
-    "earningsGrowth": -0.116,
-    "revenueGrowth": 0.067,
     "pegRatio": 1.65
   },
+  "FDX": {
+    "forwardPE": 14.723675,
+    "forwardEps": 20.9282,
+    "trailingPE": 16.611322,
+    "earningsGrowth": -0.689,
+    "revenueGrowth": 0.119,
+    "pegRatio": 1.94
+  },
+  "UPS": {
+    "forwardPE": 13.377406,
+    "forwardEps": 8.09574,
+    "trailingPE": 20.867052,
+    "earningsGrowth": -0.116,
+    "revenueGrowth": 0.067,
+    "pegRatio": 1.61
+  },
   "EMR": {
-    "forwardPE": 20.30777,
-    "forwardEps": 8.00728,
-    "trailingPE": 33.947807,
+    "forwardPE": 20.226347,
+    "forwardEps": 8.02666,
+    "trailingPE": 33.893528,
     "earningsGrowth": 0.185,
     "revenueGrowth": 0.071,
-    "pegRatio": 1.98
+    "pegRatio": 1.9
   },
   "GD": {
-    "forwardPE": 18.915054,
-    "forwardEps": 18.83949,
-    "trailingPE": 20.974104,
+    "forwardPE": 18.750378,
+    "forwardEps": 18.88282,
+    "trailingPE": 20.839317,
     "earningsGrowth": 0.157,
     "revenueGrowth": 0.129,
-    "pegRatio": 2.07
+    "pegRatio": 2.02
   },
   "LMT": {
-    "forwardPE": 17.297287,
-    "forwardEps": 33.30927,
-    "trailingPE": 20.460226,
+    "forwardPE": 17.037458,
+    "forwardEps": 33.28431,
+    "trailingPE": 20.137785,
     "earningsGrowth": 0.147,
     "revenueGrowth": 0.113,
-    "pegRatio": 1.09
+    "pegRatio": 1.06
   },
   "NOC": {
-    "forwardPE": 17.542969,
+    "forwardPE": 17.534954,
     "forwardEps": 29.94077,
-    "trailingPE": 16.57986,
+    "trailingPE": 16.572285,
     "earningsGrowth": 0.029,
     "revenueGrowth": 0.067,
     "pegRatio": 3.93
   },
   "SLB": {
-    "forwardPE": 16.134485,
-    "forwardEps": 3.07664,
-    "trailingPE": 24.097088,
+    "forwardPE": 16.208633,
+    "forwardEps": 3.07984,
+    "trailingPE": 24.23301,
     "earningsGrowth": -0.02,
     "revenueGrowth": 0.058,
-    "pegRatio": 1.44
+    "pegRatio": 1.38
   },
   "BSX": {
-    "forwardPE": 14.25738,
+    "forwardPE": 13.653741,
     "forwardEps": 3.13101,
-    "trailingPE": 18.835443,
+    "trailingPE": 18.037975,
     "earningsGrowth": -0.215,
     "revenueGrowth": 0.014,
-    "pegRatio": 0.77
+    "pegRatio": 0.75
   },
   "EW": {
-    "forwardPE": 29.808647,
-    "forwardEps": 3.38224,
-    "trailingPE": 58.61628,
-    "earningsGrowth": -0.254,
-    "revenueGrowth": 0.136,
-    "pegRatio": 2.08
+    "forwardPE": 30.125439,
+    "forwardEps": 3.39049,
+    "trailingPE": 59.38372,
+    "earningsGrowth": 0.067,
+    "revenueGrowth": 0.105,
+    "pegRatio": 2.11
   },
   "NSC": {
-    "forwardPE": 22.688715,
+    "forwardPE": 22.047161,
     "forwardEps": 14.51162,
-    "trailingPE": 27.59849,
+    "trailingPE": 26.818106,
     "earningsGrowth": 0.067,
     "revenueGrowth": 0.136,
-    "pegRatio": 4.05
+    "pegRatio": 3.87
   },
   "UNP": {
-    "forwardPE": 20.69951,
+    "forwardPE": 20.158316,
     "forwardEps": 14.39406,
-    "trailingPE": 23.241032,
+    "trailingPE": 22.633387,
     "earningsGrowth": 0.159,
     "revenueGrowth": 0.153,
-    "pegRatio": 3.0
+    "pegRatio": 2.88
   },
   "CSX": {
-    "forwardPE": 21.725658,
+    "forwardPE": 20.994774,
     "forwardEps": 2.33963,
-    "trailingPE": 26.473959,
+    "trailingPE": 25.583334,
     "earningsGrowth": 0.538,
     "revenueGrowth": 0.12,
-    "pegRatio": 1.85
+    "pegRatio": 1.81
   },
   "GWW": {
-    "forwardPE": 28.423622,
-    "forwardEps": 51.06281,
-    "trailingPE": 31.891674,
+    "forwardPE": 27.673302,
+    "forwardEps": 52.06101,
+    "trailingPE": 31.656778,
     "earningsGrowth": 1.029,
     "revenueGrowth": 0.113,
-    "pegRatio": 2.03
+    "pegRatio": 1.98
   },
   "ITW": {
-    "forwardPE": 23.111319,
+    "forwardPE": 22.750168,
     "forwardEps": 12.34936,
-    "trailingPE": 25.460304,
+    "trailingPE": 25.062445,
     "earningsGrowth": 0.068,
     "revenueGrowth": 0.044,
-    "pegRatio": 2.84
+    "pegRatio": 2.76
   },
   "PH": {
-    "forwardPE": 22.43877,
-    "forwardEps": 39.76555,
-    "trailingPE": 30.652351,
-    "earningsGrowth": 0.193,
-    "revenueGrowth": 0.098,
-    "pegRatio": 3.05
+    "forwardPE": 22.60169,
+    "forwardEps": 40.60714,
+    "trailingPE": 31.52834,
+    "earningsGrowth": 0.1,
+    "revenueGrowth": 0.179,
+    "pegRatio": 2.99
   },
   "AME": {
-    "forwardPE": 23.211346,
-    "forwardEps": 9.60694,
-    "trailingPE": 31.45134,
+    "forwardPE": 23.775091,
+    "forwardEps": 9.61805,
+    "trailingPE": 32.25247,
     "earningsGrowth": 0.156,
     "revenueGrowth": 0.173,
-    "pegRatio": 2.69
+    "pegRatio": 2.53
   },
   "TGT": {
-    "forwardPE": 16.547497,
-    "forwardEps": 9.54525,
-    "trailingPE": 16.401869,
+    "forwardPE": 16.58603,
+    "forwardEps": 9.55081,
+    "trailingPE": 16.449636,
     "earningsGrowth": 1.005,
     "revenueGrowth": 0.053,
-    "pegRatio": 2.23
+    "pegRatio": 2.16
   },
   "DG": {
-    "forwardPE": 16.596012,
+    "forwardPE": 16.084904,
     "forwardEps": 8.31525,
-    "trailingPE": 17.92208,
+    "trailingPE": 17.37013,
     "earningsGrowth": 0.333,
     "revenueGrowth": 0.052,
-    "pegRatio": 1.77
+    "pegRatio": 1.72
   },
   "KR": {
-    "forwardPE": 12.684962,
+    "forwardPE": 12.368888,
     "forwardEps": 5.47341,
-    "trailingPE": 38.572224,
+    "trailingPE": 37.61111,
     "earningsGrowth": 0.153,
     "revenueGrowth": 0.02,
     "pegRatio": 0.67
   },
   "CVS": {
-    "forwardPE": 9.528787,
-    "forwardEps": 8.53519,
-    "trailingPE": 9.445993,
+    "forwardPE": 9.7415495,
+    "forwardEps": 8.60746,
+    "trailingPE": 9.738676,
     "earningsGrowth": null,
-    "revenueGrowth": 0.06,
+    "revenueGrowth": 0.054,
     "pegRatio": 0.19
   },
   "MCK": {
-    "forwardPE": 21.172829,
-    "forwardEps": 50.63093,
-    "trailingPE": 27.650244,
-    "earningsGrowth": -0.176,
-    "revenueGrowth": 0.077,
-    "pegRatio": 2.01
+    "forwardPE": 20.620619,
+    "forwardEps": 51.44559,
+    "trailingPE": 27.362392,
+    "earningsGrowth": 0.17,
+    "revenueGrowth": 0.076,
+    "pegRatio": 2.02
   },
   "IQV": {
-    "forwardPE": 18.648254,
+    "forwardPE": 19.137552,
     "forwardEps": 14.20401,
-    "trailingPE": 32.223843,
+    "trailingPE": 33.06934,
     "earningsGrowth": 0.088,
     "revenueGrowth": 0.08,
-    "pegRatio": 0.97
+    "pegRatio": 0.98
   },
   "DGX": {
-    "forwardPE": 21.267572,
+    "forwardPE": 21.341875,
     "forwardEps": 11.97786,
-    "trailingPE": 25.37251,
+    "trailingPE": 25.461157,
     "earningsGrowth": 0.287,
     "revenueGrowth": 0.1,
     "pegRatio": 1.66
   },
   "A": {
-    "forwardPE": 25.528385,
-    "forwardEps": 6.72898,
-    "trailingPE": 33.881657,
+    "forwardPE": 26.008041,
+    "forwardEps": 6.71946,
+    "trailingPE": 34.469425,
     "earningsGrowth": 0.085,
     "revenueGrowth": 0.081,
-    "pegRatio": 1.5
+    "pegRatio": 1.45
   },
   "STE": {
-    "forwardPE": 20.60697,
+    "forwardPE": 20.459383,
     "forwardEps": 12.33175,
-    "trailingPE": 30.14472,
-    "earningsGrowth": 0.14,
-    "revenueGrowth": 0.073,
-    "pegRatio": 1.92
+    "trailingPE": 29.928825,
+    "earningsGrowth": 0.129,
+    "revenueGrowth": 0.088,
+    "pegRatio": 1.96
   },
   "ADSK": {
-    "forwardPE": 18.955744,
+    "forwardPE": 18.431778,
     "forwardEps": 14.19939,
-    "trailingPE": 34.910507,
+    "trailingPE": 33.945526,
     "earningsGrowth": 0.596,
     "revenueGrowth": 0.161,
     "pegRatio": 0.91
   },
   "IT": {
-    "forwardPE": 12.006127,
+    "forwardPE": 11.523022,
     "forwardEps": 16.49741,
-    "trailingPE": 14.1883955,
+    "trailingPE": 13.617479,
     "earningsGrowth": 6.128,
     "revenueGrowth": -0.013,
-    "pegRatio": 0.82
+    "pegRatio": 0.79
   },
   "GDDY": {
-    "forwardPE": 10.691589,
+    "forwardPE": 10.180685,
     "forwardEps": 11.235,
-    "trailingPE": 16.522696,
+    "trailingPE": 15.73315,
     "earningsGrowth": 0.377,
     "revenueGrowth": 0.06,
-    "pegRatio": 0.66
+    "pegRatio": 0.67
   },
   "VRSN": {
-    "forwardPE": 28.465303,
+    "forwardPE": 28.156078,
     "forwardEps": 10.96282,
-    "trailingPE": 33.590958,
+    "trailingPE": 33.22605,
     "earningsGrowth": 0.035,
     "revenueGrowth": 0.057,
-    "pegRatio": 2.26
+    "pegRatio": 2.22
   },
   "CDW": {
-    "forwardPE": 13.128481,
-    "forwardEps": 12.06461,
-    "trailingPE": 18.481915,
+    "forwardPE": 12.603507,
+    "forwardEps": 12.45685,
+    "trailingPE": 18.319721,
     "earningsGrowth": 0.113,
     "revenueGrowth": 0.177,
     "pegRatio": 1.33
   },
   "WDC": {
-    "forwardPE": 6.6237116,
+    "forwardPE": 6.528426,
     "forwardEps": 40.40484,
-    "trailingPE": 9.413648,
+    "trailingPE": 9.278227,
     "earningsGrowth": 0.509,
     "revenueGrowth": 0.555,
-    "pegRatio": 0.46
-  },
-  "STX": {
-    "forwardPE": 7.1398654,
-    "forwardEps": 65.34157,
-    "trailingPE": 24.46408,
-    "earningsGrowth": 2.123,
-    "revenueGrowth": 0.61,
-    "pegRatio": 0.32
-  },
-  "HPQ": {
-    "forwardPE": 9.334919,
-    "forwardEps": 3.15375,
-    "trailingPE": 11.236642,
-    "earningsGrowth": -0.113,
-    "revenueGrowth": 0.125,
-    "pegRatio": 3.2
-  },
-  "DELL": {
-    "forwardPE": 10.45899,
-    "forwardEps": 30.30025,
-    "trailingPE": 18.425,
-    "earningsGrowth": 2.729,
-    "revenueGrowth": 0.577,
     "pegRatio": 0.38
   },
+  "STX": {
+    "forwardPE": 7.05508,
+    "forwardEps": 65.34157,
+    "trailingPE": 24.17357,
+    "earningsGrowth": 2.123,
+    "revenueGrowth": 0.61,
+    "pegRatio": 0.27
+  },
+  "HPQ": {
+    "forwardPE": 9.024178,
+    "forwardEps": 3.15375,
+    "trailingPE": 10.862596,
+    "earningsGrowth": -0.113,
+    "revenueGrowth": 0.125,
+    "pegRatio": 3.14
+  },
+  "DELL": {
+    "forwardPE": 10.842485,
+    "forwardEps": 30.30025,
+    "trailingPE": 19.10058,
+    "earningsGrowth": 2.729,
+    "revenueGrowth": 0.577,
+    "pegRatio": 0.32
+  },
   "ZBRA": {
-    "forwardPE": 14.427906,
-    "forwardEps": 22.29291,
-    "trailingPE": 26.001617,
+    "forwardPE": 14.477995,
+    "forwardEps": 22.24203,
+    "trailingPE": 26.032335,
     "earningsGrowth": 0.741,
     "revenueGrowth": 0.223,
-    "pegRatio": 0.54
+    "pegRatio": 0.52
   },
   "COP": {
-    "forwardPE": 12.403797,
-    "forwardEps": 10.92085,
-    "trailingPE": 14.273973,
+    "forwardPE": 12.140732,
+    "forwardEps": 11.2242,
+    "trailingPE": 14.359326,
     "earningsGrowth": 1.07,
     "revenueGrowth": 0.355,
-    "pegRatio": 1.01
+    "pegRatio": 1.0
   },
   "EOG": {
-    "forwardPE": 8.938547,
-    "forwardEps": 16.20957,
-    "trailingPE": 11.275486,
-    "earningsGrowth": 1.094,
-    "revenueGrowth": 0.587,
-    "pegRatio": 1.11
+    "forwardPE": 9.078635,
+    "forwardEps": 16.20618,
+    "trailingPE": 9.498386,
+    "earningsGrowth": 0.974,
+    "revenueGrowth": 0.487,
+    "pegRatio": 1.1
   },
   "DVN": {
-    "forwardPE": 7.960096,
-    "forwardEps": 5.38687,
-    "trailingPE": 10.72,
-    "earningsGrowth": 0.44,
-    "revenueGrowth": 0.642,
+    "forwardPE": 7.8955927,
+    "forwardEps": 5.34602,
+    "trailingPE": 9.90845,
+    "earningsGrowth": -0.193,
+    "revenueGrowth": 0.687,
     "pegRatio": 2.92
   },
   "OXY": {
-    "forwardPE": 11.237724,
+    "forwardPE": 11.241713,
     "forwardEps": 5.01525,
-    "trailingPE": 16.011364,
+    "trailingPE": 16.017046,
     "earningsGrowth": 9.649,
     "revenueGrowth": 0.534,
-    "pegRatio": 0.86
+    "pegRatio": 0.85
   },
   "HAL": {
-    "forwardPE": 10.870009,
-    "forwardEps": 2.93652,
-    "trailingPE": 13.411764,
+    "forwardPE": 10.842508,
+    "forwardEps": 2.93659,
+    "trailingPE": 13.378151,
     "earningsGrowth": 24.0,
     "revenueGrowth": 0.018,
-    "pegRatio": 0.67
+    "pegRatio": 0.65
   },
   "MPC": {
-    "forwardPE": 6.1022215,
-    "forwardEps": 61.83322,
-    "trailingPE": 7.4761243,
+    "forwardPE": 5.9983616,
+    "forwardEps": 62.1403,
+    "trailingPE": 7.385377,
     "earningsGrowth": 4.896,
     "revenueGrowth": 0.609,
-    "pegRatio": 0.91
+    "pegRatio": 0.87
   },
   "PSX": {
-    "forwardPE": 7.8616443,
+    "forwardPE": 7.819638,
     "forwardEps": 31.42345,
-    "trailingPE": 7.9230275,
+    "trailingPE": 7.8806925,
     "earningsGrowth": 42.99,
     "revenueGrowth": 0.464,
-    "pegRatio": 0.83
+    "pegRatio": 0.79
   },
   "VLO": {
-    "forwardPE": 6.565713,
+    "forwardPE": 6.4763584,
     "forwardEps": 53.49457,
-    "trailingPE": 7.9879465,
+    "trailingPE": 7.8792357,
     "earningsGrowth": 5.768,
     "revenueGrowth": 0.465,
-    "pegRatio": 1.37
+    "pegRatio": 1.27
   },
   "HES": {
     "forwardPE": null,
@@ -1280,164 +1280,164 @@
     "pegRatio": null
   },
   "EQT": {
-    "forwardPE": 14.423132,
-    "forwardEps": 3.50964,
-    "trailingPE": 11.995261,
+    "forwardPE": 14.319755,
+    "forwardEps": 3.44978,
+    "trailingPE": 11.706162,
     "earningsGrowth": -0.17,
     "revenueGrowth": -0.081,
-    "pegRatio": 1.31
+    "pegRatio": 1.26
   },
   "D": {
-    "forwardPE": 18.24742,
-    "forwardEps": 3.81643,
-    "trailingPE": 22.983498,
+    "forwardPE": 17.961828,
+    "forwardEps": 3.81921,
+    "trailingPE": 22.640265,
     "earningsGrowth": 0.12,
     "revenueGrowth": 0.241,
     "pegRatio": 2.71
   },
   "DUK": {
-    "forwardPE": 18.1436,
+    "forwardPE": 17.822796,
     "forwardEps": 7.16947,
-    "trailingPE": 19.073313,
+    "trailingPE": 18.73607,
     "earningsGrowth": 0.106,
     "revenueGrowth": 0.011,
-    "pegRatio": 2.41
+    "pegRatio": 2.42
   },
   "SO": {
-    "forwardPE": 18.97872,
-    "forwardEps": 4.91814,
-    "trailingPE": 21.310501,
-    "earningsGrowth": 0.304,
-    "revenueGrowth": 0.001,
-    "pegRatio": 2.2
+    "forwardPE": 18.72874,
+    "forwardEps": 4.93039,
+    "trailingPE": 21.08219,
+    "earningsGrowth": 0.143,
+    "revenueGrowth": 0.13,
+    "pegRatio": 2.21
   },
   "SRE": {
-    "forwardPE": 14.410763,
-    "forwardEps": 5.53961,
-    "trailingPE": 17.09422,
-    "earningsGrowth": 0.713,
-    "revenueGrowth": -0.001,
-    "pegRatio": 0.73
+    "forwardPE": 14.149696,
+    "forwardEps": 5.5245,
+    "trailingPE": 16.738758,
+    "earningsGrowth": 10.363,
+    "revenueGrowth": 0.013,
+    "pegRatio": 0.7
   },
   "ES": {
-    "forwardPE": 14.595578,
+    "forwardPE": 14.173458,
     "forwardEps": 4.92752,
-    "trailingPE": 18.976254,
+    "trailingPE": 18.42744,
     "earningsGrowth": -0.854,
     "revenueGrowth": 0.023,
-    "pegRatio": 2.31
+    "pegRatio": 2.36
   },
   "PPL": {
-    "forwardPE": 17.007607,
-    "forwardEps": 2.1167,
-    "trailingPE": 21.301775,
+    "forwardPE": 16.910164,
+    "forwardEps": 2.11707,
+    "trailingPE": 20.574713,
     "earningsGrowth": 0.212,
     "revenueGrowth": 0.042,
-    "pegRatio": 1.31
+    "pegRatio": 1.32
   },
   "CMS": {
-    "forwardPE": 17.05475,
+    "forwardPE": 16.692806,
     "forwardEps": 4.1443,
-    "trailingPE": 25.242857,
+    "trailingPE": 24.707144,
     "earningsGrowth": -0.579,
     "revenueGrowth": 0.08,
-    "pegRatio": 2.56
+    "pegRatio": 2.55
   },
   "ATO": {
-    "forwardPE": 17.901365,
-    "forwardEps": 9.77579,
-    "trailingPE": 20.858164,
+    "forwardPE": 17.751972,
+    "forwardEps": 9.75779,
+    "trailingPE": 20.646006,
     "earningsGrowth": 0.233,
     "revenueGrowth": 0.048,
-    "pegRatio": 2.11
+    "pegRatio": 2.09
   },
   "WEC": {
-    "forwardPE": 19.631592,
+    "forwardPE": 19.22509,
     "forwardEps": 6.02702,
-    "trailingPE": 21.512728,
+    "trailingPE": 21.067274,
     "earningsGrowth": 0.422,
     "revenueGrowth": 0.089,
     "pegRatio": 2.14
   },
   "XEL": {
-    "forwardPE": 17.591784,
+    "forwardPE": 17.438562,
     "forwardEps": 4.56861,
-    "trailingPE": 18.734266,
+    "trailingPE": 18.571095,
     "earningsGrowth": 0.727,
     "revenueGrowth": 0.066,
-    "pegRatio": 1.76
+    "pegRatio": 1.75
   },
   "PCG": {
-    "forwardPE": 7.342616,
+    "forwardPE": 7.1983175,
     "forwardEps": 1.80181,
-    "trailingPE": 9.799999,
+    "trailingPE": 9.607408,
     "earningsGrowth": -0.089,
     "revenueGrowth": -0.01,
-    "pegRatio": 0.56
+    "pegRatio": 0.55
   },
   "SPG": {
-    "forwardPE": 33.447357,
+    "forwardPE": 33.723442,
     "forwardEps": 6.77333,
-    "trailingPE": 16.3574,
-    "earningsGrowth": -0.125,
-    "revenueGrowth": 0.195,
+    "trailingPE": 16.492418,
+    "earningsGrowth": -0.171,
+    "revenueGrowth": 0.133,
     "pegRatio": 4.58
   },
   "AMT": {
-    "forwardPE": 27.683552,
+    "forwardPE": 26.941479,
     "forwardEps": 7.00741,
-    "trailingPE": 27.322536,
+    "trailingPE": 26.59014,
     "earningsGrowth": -0.099,
     "revenueGrowth": 0.025,
     "pegRatio": 1.9
   },
   "CCI": {
-    "forwardPE": 31.050598,
+    "forwardPE": 30.248302,
     "forwardEps": 2.92909,
-    "trailingPE": 36.526104,
+    "trailingPE": 35.58233,
     "earningsGrowth": -0.105,
     "revenueGrowth": -0.072,
     "pegRatio": 0.72
   },
   "EQIX": {
-    "forwardPE": 48.1928,
+    "forwardPE": 48.93501,
     "forwardEps": 20.695,
-    "trailingPE": 59.9009,
+    "trailingPE": 60.823425,
     "earningsGrowth": 0.294,
     "revenueGrowth": 0.104,
-    "pegRatio": 3.13
+    "pegRatio": 2.96
   },
   "PSA": {
-    "forwardPE": 34.27871,
-    "forwardEps": 9.93328,
-    "trailingPE": 35.804417,
+    "forwardPE": 35.742313,
+    "forwardEps": 9.44147,
+    "trailingPE": 35.484753,
     "earningsGrowth": -0.354,
     "revenueGrowth": 0.108,
-    "pegRatio": 4.59
+    "pegRatio": 4.56
   },
   "WELL": {
-    "forwardPE": 76.69687,
+    "forwardPE": 76.56562,
     "forwardEps": 3.2,
-    "trailingPE": 103.995766,
+    "trailingPE": 103.8178,
     "earningsGrowth": 0.303,
     "revenueGrowth": 0.384,
     "pegRatio": 3.66
   },
   "DLR": {
-    "forwardPE": 57.55967,
+    "forwardPE": 57.40479,
     "forwardEps": 3.03459,
-    "trailingPE": 73.700424,
+    "trailingPE": 73.50211,
     "earningsGrowth": 2.205,
     "revenueGrowth": 0.207,
-    "pegRatio": 14.89
+    "pegRatio": 14.06
   },
   "O": {
-    "forwardPE": 38.31245,
+    "forwardPE": 38.016254,
     "forwardEps": 1.55302,
-    "trailingPE": 40.75342,
+    "trailingPE": 40.438354,
     "earningsGrowth": 0.238,
     "revenueGrowth": 0.102,
-    "pegRatio": 2.99
+    "pegRatio": 3.0
   },
   "EQR": {
     "forwardPE": 41.35888,
@@ -1456,135 +1456,135 @@
     "pegRatio": 7.17
   },
   "EXR": {
-    "forwardPE": 33.333126,
+    "forwardPE": 33.139523,
     "forwardEps": 4.80363,
-    "trailingPE": 32.544712,
+    "trailingPE": 32.35569,
     "earningsGrowth": 0.503,
     "revenueGrowth": 0.011,
-    "pegRatio": 6.4
+    "pegRatio": 6.36
   },
   "IRM": {
-    "forwardPE": 38.648933,
-    "forwardEps": 2.7297,
-    "trailingPE": 75.35715,
-    "earningsGrowth": null,
-    "revenueGrowth": 0.185,
+    "forwardPE": 39.21929,
+    "forwardEps": 2.71601,
+    "trailingPE": 69.62091,
+    "earningsGrowth": 0.464,
+    "revenueGrowth": 0.135,
     "pegRatio": 2.7
   },
   "UBER": {
-    "forwardPE": 15.604794,
-    "forwardEps": 4.40762,
-    "trailingPE": 40.45882,
+    "forwardPE": 15.596647,
+    "forwardEps": 4.39774,
+    "trailingPE": 40.347057,
     "earningsGrowth": -0.92,
     "revenueGrowth": 0.096,
-    "pegRatio": 6.08
+    "pegRatio": 5.98
   },
   "DASH": {
-    "forwardPE": 22.441666,
+    "forwardPE": 22.410482,
     "forwardEps": 8.01723,
-    "trailingPE": 74.6556,
+    "trailingPE": 74.551865,
     "earningsGrowth": 0.916,
     "revenueGrowth": 0.34,
-    "pegRatio": 1.13
+    "pegRatio": 1.03
   },
   "RCL": {
-    "forwardPE": 15.756186,
+    "forwardPE": 15.972465,
     "forwardEps": 20.48275,
-    "trailingPE": 19.09645,
+    "trailingPE": 19.35858,
     "earningsGrowth": 0.124,
     "revenueGrowth": 0.088,
-    "pegRatio": 1.21
+    "pegRatio": 1.17
   },
   "HLT": {
-    "forwardPE": 35.986946,
-    "forwardEps": 10.46296,
+    "forwardPE": 35.992073,
+    "forwardEps": 10.46147,
     "trailingPE": 50.813766,
     "earningsGrowth": 0.331,
     "revenueGrowth": 0.058,
-    "pegRatio": 2.05
+    "pegRatio": 2.01
   },
   "CCL": {
-    "forwardPE": 11.492557,
+    "forwardPE": 11.488673,
     "forwardEps": 2.57471,
-    "trailingPE": 13.035242,
+    "trailingPE": 13.030837,
     "earningsGrowth": 0.05,
     "revenueGrowth": 0.035,
-    "pegRatio": 1.08
+    "pegRatio": 1.02
   },
   "DAL": {
-    "forwardPE": 11.695699,
+    "forwardPE": 11.947807,
     "forwardEps": 7.29841,
-    "trailingPE": 17.037924,
+    "trailingPE": 17.405188,
     "earningsGrowth": -0.47,
     "revenueGrowth": 0.211,
     "pegRatio": 0.21
   },
   "UAL": {
-    "forwardPE": 9.392988,
+    "forwardPE": 9.584265,
     "forwardEps": 11.76303,
-    "trailingPE": 10.118132,
+    "trailingPE": 10.324176,
     "earningsGrowth": 0.083,
     "revenueGrowth": 0.174,
     "pegRatio": 6.5
   },
   "NET": {
-    "forwardPE": 144.50262,
-    "forwardEps": 1.69208,
+    "forwardPE": 148.32497,
+    "forwardEps": 1.8119,
     "trailingPE": null,
     "earningsGrowth": null,
-    "revenueGrowth": 0.359,
+    "revenueGrowth": 0.392,
     "pegRatio": 2.38
   },
   "SNOW": {
-    "forwardPE": 89.03997,
+    "forwardPE": 91.13432,
     "forwardEps": 3.02718,
     "trailingPE": null,
     "earningsGrowth": null,
     "revenueGrowth": 0.351,
-    "pegRatio": 5.21
+    "pegRatio": 4.83
   },
   "MDB": {
-    "forwardPE": 38.762363,
-    "forwardEps": 7.85788,
-    "trailingPE": 423.04166,
+    "forwardPE": 39.60535,
+    "forwardEps": 7.89868,
+    "trailingPE": 434.48608,
     "earningsGrowth": null,
     "revenueGrowth": 0.305,
     "pegRatio": 1.67
   },
   "VEEV": {
-    "forwardPE": 30.228855,
+    "forwardPE": 29.607903,
     "forwardEps": 10.25841,
-    "trailingPE": 50.836067,
+    "trailingPE": 49.791805,
     "earningsGrowth": 0.395,
     "revenueGrowth": 0.176,
     "pegRatio": 1.2
   },
   "HUBS": {
-    "forwardPE": 12.184835,
-    "forwardEps": 16.82091,
-    "trailingPE": 49.507248,
-    "earningsGrowth": null,
-    "revenueGrowth": 0.198,
-    "pegRatio": 0.26
+    "forwardPE": 12.009174,
+    "forwardEps": 16.70473,
+    "trailingPE": 48.456524,
+    "earningsGrowth": 4.387,
+    "revenueGrowth": 0.171,
+    "pegRatio": 0.25
   },
   "TWLO": {
-    "forwardPE": 29.354113,
-    "forwardEps": 6.84606,
-    "trailingPE": 25.246231,
+    "forwardPE": 29.460361,
+    "forwardEps": 6.85735,
+    "trailingPE": 25.379398,
     "earningsGrowth": 3.451,
     "revenueGrowth": 0.199,
-    "pegRatio": 0.32
+    "pegRatio": 0.3
   },
   "PINS": {
-    "forwardPE": 8.68859,
-    "forwardEps": 2.2777,
-    "trailingPE": 82.458336,
+    "forwardPE": 8.330038,
+    "forwardEps": 2.2761,
+    "trailingPE": 79.0,
     "earningsGrowth": -0.708,
     "revenueGrowth": 0.119,
-    "pegRatio": 0.29
+    "pegRatio": 0.27
   },
   "F": {
-    "forwardPE": 6.638024,
+    "forwardPE": 6.5903444,
     "forwardEps": 1.88761,
     "trailingPE": null,
     "earningsGrowth": -0.167,
@@ -1592,151 +1592,151 @@
     "pegRatio": 8.48
   },
   "GM": {
-    "forwardPE": 6.0345798,
+    "forwardPE": 5.8204346,
     "forwardEps": 14.80302,
-    "trailingPE": 19.547045,
+    "trailingPE": 18.853392,
     "earningsGrowth": 1.763,
     "revenueGrowth": 0.029,
-    "pegRatio": 0.3
+    "pegRatio": 0.29
   },
   "ADBE": {
-    "forwardPE": 8.984652,
-    "forwardEps": 27.429,
-    "trailingPE": 13.759911,
+    "forwardPE": 8.731961,
+    "forwardEps": 27.40507,
+    "trailingPE": 13.361251,
     "earningsGrowth": 0.105,
     "revenueGrowth": 0.129,
-    "pegRatio": 0.6
-  },
-  "APP": {
-    "forwardPE": 17.79306,
-    "forwardEps": 20.01342,
-    "trailingPE": 23.979797,
-    "earningsGrowth": 0.57,
-    "revenueGrowth": 0.528,
     "pegRatio": 0.59
   },
+  "APP": {
+    "forwardPE": 18.9477,
+    "forwardEps": 20.64736,
+    "trailingPE": 26.34478,
+    "earningsGrowth": 0.755,
+    "revenueGrowth": 0.555,
+    "pegRatio": 0.77
+  },
   "PLTR": {
-    "forwardPE": 62.26024,
-    "forwardEps": 2.48939,
-    "trailingPE": 109.147896,
+    "forwardPE": 63.83741,
+    "forwardEps": 2.51232,
+    "trailingPE": 112.94367,
     "earningsGrowth": 1.444,
     "revenueGrowth": 0.959,
-    "pegRatio": 1.56
+    "pegRatio": 1.3
   },
   "CRWD": {
-    "forwardPE": 134.86494,
+    "forwardPE": 134.67867,
     "forwardEps": 1.6105,
-    "trailingPE": 4344.0,
+    "trailingPE": 3615.0,
     "earningsGrowth": null,
     "revenueGrowth": 0.258,
-    "pegRatio": 6.22
+    "pegRatio": 5.61
   },
   "ANET": {
-    "forwardPE": 28.349491,
-    "forwardEps": 5.61421,
-    "trailingPE": 42.670242,
+    "forwardPE": 29.63431,
+    "forwardEps": 5.76359,
+    "trailingPE": 45.790886,
     "earningsGrowth": 0.821,
     "revenueGrowth": 0.585,
-    "pegRatio": 1.32
+    "pegRatio": 1.18
   },
   "DDOG": {
-    "forwardPE": 58.51972,
-    "forwardEps": 2.98361,
-    "trailingPE": 242.5,
-    "earningsGrowth": 2.341,
+    "forwardPE": 57.427868,
+    "forwardEps": 3.11765,
+    "trailingPE": 248.66664,
+    "earningsGrowth": 2.316,
     "revenueGrowth": 0.352,
-    "pegRatio": 0.98
+    "pegRatio": 0.91
   },
   "WDAY": {
-    "forwardPE": 15.115201,
+    "forwardPE": 14.56623,
     "forwardEps": 13.24296,
-    "trailingPE": 40.767822,
+    "trailingPE": 39.28717,
     "earningsGrowth": 2.06,
     "revenueGrowth": 0.128,
-    "pegRatio": 0.61
+    "pegRatio": 0.6
   },
   "FTNT": {
-    "forwardPE": 31.422007,
+    "forwardPE": 30.480703,
     "forwardEps": 3.89886,
-    "trailingPE": 40.03595,
+    "trailingPE": 38.8366,
     "earningsGrowth": 0.387,
     "revenueGrowth": 0.205,
-    "pegRatio": 1.51
+    "pegRatio": 1.43
   },
   "ZS": {
-    "forwardPE": 36.259388,
+    "forwardPE": 35.15318,
     "forwardEps": 5.62282,
     "trailingPE": null,
     "earningsGrowth": null,
     "revenueGrowth": 0.249,
-    "pegRatio": 2.3
+    "pegRatio": 2.09
   },
   "COIN": {
-    "forwardPE": 55.3972,
+    "forwardPE": 54.56312,
     "forwardEps": 2.4698,
     "trailingPE": null,
     "earningsGrowth": 0.674,
     "revenueGrowth": -0.342,
-    "pegRatio": 0.69
+    "pegRatio": 0.63
   },
   "PYPL": {
-    "forwardPE": 9.995965,
-    "forwardEps": 5.89838,
-    "trailingPE": 11.251908,
+    "forwardPE": 10.038143,
+    "forwardEps": 5.90149,
+    "trailingPE": 11.305345,
     "earningsGrowth": -0.038,
     "revenueGrowth": 0.02,
-    "pegRatio": 0.96
+    "pegRatio": 0.94
   },
   "ABNB": {
-    "forwardPE": 27.399755,
-    "forwardEps": 6.20918,
-    "trailingPE": 38.75399,
-    "earningsGrowth": 0.334,
-    "revenueGrowth": 0.165,
-    "pegRatio": 1.51
+    "forwardPE": 30.47867,
+    "forwardEps": 6.23354,
+    "trailingPE": 35.645405,
+    "earningsGrowth": 0.427,
+    "revenueGrowth": 0.189,
+    "pegRatio": 1.46
   },
   "TEAM": {
-    "forwardPE": 27.192102,
-    "forwardEps": 6.74056,
-    "trailingPE": null,
+    "forwardPE": 22.89644,
+    "forwardEps": 6.71196,
+    "trailingPE": 465.69693,
     "earningsGrowth": null,
-    "revenueGrowth": 0.276,
-    "pegRatio": 1.98
+    "revenueGrowth": 0.237,
+    "pegRatio": 1.91
   },
   "TTD": {
-    "forwardPE": 12.621809,
+    "forwardPE": 12.7400465,
     "forwardEps": 1.01491,
-    "trailingPE": 15.433736,
+    "trailingPE": 15.578314,
     "earningsGrowth": -0.236,
     "revenueGrowth": 0.03,
-    "pegRatio": 0.95
+    "pegRatio": 0.92
   },
   "OKTA": {
-    "forwardPE": 39.093246,
+    "forwardPE": 38.52909,
     "forwardEps": 4.37825,
-    "trailingPE": 103.10844,
+    "trailingPE": 101.62048,
     "earningsGrowth": 0.757,
     "revenueGrowth": 0.106,
-    "pegRatio": 1.37
+    "pegRatio": 1.22
   },
   "TMUS": {
-    "forwardPE": 11.264976,
+    "forwardPE": 11.364585,
     "forwardEps": 14.25569,
-    "trailingPE": 15.486017,
+    "trailingPE": 15.622951,
     "earningsGrowth": 0.336,
     "revenueGrowth": 0.074,
     "pegRatio": 0.48
   },
   "NDAQ": {
-    "forwardPE": 22.501373,
+    "forwardPE": 22.562456,
     "forwardEps": 4.74771,
-    "trailingPE": 29.188524,
+    "trailingPE": 29.26776,
     "earningsGrowth": 0.315,
     "revenueGrowth": 0.126,
-    "pegRatio": 1.7
+    "pegRatio": 1.65
   },
   "FISV": {
-    "forwardPE": 7.8482094,
+    "forwardPE": 7.8684783,
     "forwardEps": null,
     "trailingPE": null,
     "earningsGrowth": null,
@@ -1744,20 +1744,20 @@
     "pegRatio": null
   },
   "SMCI": {
-    "forwardPE": 4.4839783,
+    "forwardPE": 4.762157,
     "forwardEps": 6.03928,
-    "trailingPE": 5.7130804,
+    "trailingPE": 6.067511,
     "earningsGrowth": 5.813,
     "revenueGrowth": 2.975,
     "pegRatio": 0.91
   },
   "NTAP": {
-    "forwardPE": 15.161266,
+    "forwardPE": 15.144259,
     "forwardEps": 11.17189,
-    "trailingPE": 23.889986,
+    "trailingPE": 23.863188,
     "earningsGrowth": 0.635,
     "revenueGrowth": 0.299,
-    "pegRatio": 2.08
+    "pegRatio": 1.88
   },
   "PSTG": {
     "forwardPE": null,
@@ -1768,76 +1768,76 @@
     "pegRatio": null
   },
   "DHR": {
-    "forwardPE": 24.285643,
+    "forwardPE": 24.705173,
     "forwardEps": 9.31991,
-    "trailingPE": 37.47351,
+    "trailingPE": 38.12086,
     "earningsGrowth": 0.378,
     "revenueGrowth": 0.083,
-    "pegRatio": 1.33
+    "pegRatio": 1.28
   },
   "BDX": {
-    "forwardPE": 15.061409,
+    "forwardPE": 14.943626,
     "forwardEps": 14.17862,
-    "trailingPE": 42.20356,
-    "earningsGrowth": -0.314,
-    "revenueGrowth": 0.054,
+    "trailingPE": 41.87352,
+    "earningsGrowth": 0.469,
+    "revenueGrowth": -0.105,
     "pegRatio": 1.11
   },
   "HUM": {
-    "forwardPE": 24.097748,
+    "forwardPE": 25.38225,
     "forwardEps": 17.08832,
-    "trailingPE": 38.92155,
+    "trailingPE": 42.316097,
     "earningsGrowth": 0.271,
     "revenueGrowth": 0.262,
-    "pegRatio": 1.15
+    "pegRatio": 1.13
   },
   "RMD": {
-    "forwardPE": 18.05823,
-    "forwardEps": 13.25213,
-    "trailingPE": 21.795082,
+    "forwardPE": 17.790298,
+    "forwardEps": 13.22631,
+    "trailingPE": 21.429874,
     "earningsGrowth": 0.232,
     "revenueGrowth": 0.059,
-    "pegRatio": 1.29
+    "pegRatio": 1.28
   },
   "DXCM": {
-    "forwardPE": 26.94245,
+    "forwardPE": 25.331518,
     "forwardEps": 3.13483,
-    "trailingPE": 33.25197,
+    "trailingPE": 31.26378,
     "earningsGrowth": 0.026,
     "revenueGrowth": 0.112,
-    "pegRatio": 1.47
+    "pegRatio": 1.33
   },
   "BIIB": {
-    "forwardPE": 15.000655,
+    "forwardPE": 15.272467,
     "forwardEps": 16.26129,
-    "trailingPE": 105.597404,
+    "trailingPE": 107.510826,
     "earningsGrowth": null,
     "revenueGrowth": 0.106,
-    "pegRatio": 3.47
+    "pegRatio": 3.32
   },
   "IDXX": {
-    "forwardPE": 39.856148,
-    "forwardEps": 16.82827,
-    "trailingPE": 45.196095,
+    "forwardPE": 40.042576,
+    "forwardEps": 16.88303,
+    "trailingPE": 45.555256,
     "earningsGrowth": 0.179,
     "revenueGrowth": 0.099,
-    "pegRatio": 3.82
+    "pegRatio": 3.12
   },
   "GEHC": {
-    "forwardPE": 15.241129,
+    "forwardPE": 14.991811,
     "forwardEps": 5.495,
-    "trailingPE": 17.706131,
+    "trailingPE": 17.41649,
     "earningsGrowth": 0.39,
     "revenueGrowth": 0.072,
-    "pegRatio": 2.3
+    "pegRatio": 2.24
   },
   "MTD": {
-    "forwardPE": 32.441727,
-    "forwardEps": 51.7568,
-    "trailingPE": 37.842686,
-    "earningsGrowth": 0.183,
-    "revenueGrowth": 0.045,
-    "pegRatio": 3.2
+    "forwardPE": 32.56267,
+    "forwardEps": 52.88725,
+    "trailingPE": 37.38116,
+    "earningsGrowth": 0.163,
+    "revenueGrowth": 0.063,
+    "pegRatio": 3.12
   },
   "HOLX": {
     "forwardPE": null,
@@ -1848,191 +1848,191 @@
     "pegRatio": null
   },
   "AMP": {
-    "forwardPE": 9.890596,
-    "forwardEps": 51.49538,
-    "trailingPE": 11.471171,
+    "forwardPE": 9.721407,
+    "forwardEps": 51.58615,
+    "trailingPE": 11.294819,
     "earningsGrowth": 0.32,
     "revenueGrowth": 0.061,
-    "pegRatio": 1.48
+    "pegRatio": 1.43
   },
   "TROW": {
-    "forwardPE": 10.717229,
+    "forwardPE": 10.687654,
     "forwardEps": 10.14348,
-    "trailingPE": 11.0030365,
+    "trailingPE": 10.972672,
     "earningsGrowth": -0.028,
     "revenueGrowth": 0.059,
-    "pegRatio": 2.31
+    "pegRatio": 2.23
   },
   "SYF": {
-    "forwardPE": 7.065847,
+    "forwardPE": 7.0343666,
     "forwardEps": 10.48282,
-    "trailingPE": 7.731733,
+    "trailingPE": 7.6972857,
     "earningsGrowth": -0.063,
     "revenueGrowth": -0.047,
-    "pegRatio": 0.93
+    "pegRatio": 0.92
   },
   "CBOE": {
-    "forwardPE": 22.834057,
-    "forwardEps": 15.46243,
-    "trailingPE": 25.696508,
+    "forwardPE": 22.82616,
+    "forwardEps": 15.47654,
+    "trailingPE": 25.14377,
     "earningsGrowth": 0.432,
     "revenueGrowth": 0.19,
-    "pegRatio": 3.05
+    "pegRatio": 3.12
   },
   "MTB": {
-    "forwardPE": 10.41013,
+    "forwardPE": 10.313976,
     "forwardEps": 21.11213,
-    "trailingPE": 11.4827585,
+    "trailingPE": 11.3766985,
     "earningsGrowth": 0.046,
     "revenueGrowth": 0.005,
-    "pegRatio": 1.33
+    "pegRatio": 1.3
   },
   "CFG": {
-    "forwardPE": 9.832071,
+    "forwardPE": 9.74119,
     "forwardEps": 6.49202,
-    "trailingPE": 12.89495,
+    "trailingPE": 12.775759,
     "earningsGrowth": 0.343,
     "revenueGrowth": 0.119,
     "pegRatio": 1.65
   },
   "HBAN": {
-    "forwardPE": 8.932556,
+    "forwardPE": 8.852445,
     "forwardEps": 1.74754,
-    "trailingPE": 12.795081,
+    "trailingPE": 12.680327,
     "earningsGrowth": -0.195,
     "revenueGrowth": 0.322,
-    "pegRatio": 1.92
+    "pegRatio": 1.87
   },
   "BR": {
-    "forwardPE": 16.792372,
+    "forwardPE": 16.48756,
     "forwardEps": 11.5481,
-    "trailingPE": 21.475084,
+    "trailingPE": 21.085272,
     "earningsGrowth": -0.407,
     "revenueGrowth": 0.05,
-    "pegRatio": 1.9
+    "pegRatio": 1.95
   },
   "FIS": {
-    "forwardPE": 4.4209447,
-    "forwardEps": 6.6479,
-    "trailingPE": 4.393124,
+    "forwardPE": 4.810582,
+    "forwardEps": 5.97225,
+    "trailingPE": 4.2944694,
     "earningsGrowth": 0.38,
     "revenueGrowth": 0.271,
-    "pegRatio": 0.16
+    "pegRatio": 0.15
   },
   "GPN": {
-    "forwardPE": 5.89932,
-    "forwardEps": 16.10016,
-    "trailingPE": 169.60715,
+    "forwardPE": 6.017442,
+    "forwardEps": 16.18628,
+    "trailingPE": 173.92857,
     "earningsGrowth": -0.952,
     "revenueGrowth": 0.686,
-    "pegRatio": 0.24
+    "pegRatio": 0.23
   },
   "CMG": {
-    "forwardPE": 26.68295,
+    "forwardPE": 25.951805,
     "forwardEps": 1.32669,
-    "trailingPE": 33.08411,
+    "trailingPE": 32.17757,
     "earningsGrowth": -0.062,
     "revenueGrowth": 0.096,
-    "pegRatio": 1.81
+    "pegRatio": 1.82
   },
   "ULTA": {
-    "forwardPE": 20.24547,
+    "forwardPE": 20.088442,
     "forwardEps": 32.09607,
-    "trailingPE": 23.680758,
+    "trailingPE": 23.497084,
     "earningsGrowth": 0.133,
     "revenueGrowth": 0.089,
-    "pegRatio": 2.08
+    "pegRatio": 2.04
   },
   "YUM": {
-    "forwardPE": 24.665634,
+    "forwardPE": 23.930521,
     "forwardEps": 6.73366,
-    "trailingPE": 13.372786,
+    "trailingPE": 12.974235,
     "earningsGrowth": 3.199,
     "revenueGrowth": 0.038,
     "pegRatio": 2.11
   },
   "DECK": {
-    "forwardPE": 10.727394,
+    "forwardPE": 10.601462,
     "forwardEps": 8.17906,
-    "trailingPE": 11.621191,
+    "trailingPE": 11.484768,
     "earningsGrowth": 0.27,
     "revenueGrowth": 0.035,
-    "pegRatio": 1.05
+    "pegRatio": 1.04
   },
   "WSM": {
-    "forwardPE": 24.60808,
-    "forwardEps": 10.50915,
-    "trailingPE": 26.524101,
+    "forwardPE": 24.180117,
+    "forwardEps": 10.50698,
+    "trailingPE": 26.057436,
     "earningsGrowth": 0.42,
     "revenueGrowth": 0.067,
-    "pegRatio": 2.7
+    "pegRatio": 2.58
   },
   "EXPE": {
-    "forwardPE": 11.1007,
-    "forwardEps": 24.5462,
-    "trailingPE": 15.971865,
-    "earningsGrowth": 1.887,
-    "revenueGrowth": 0.14,
-    "pegRatio": 0.83
+    "forwardPE": 10.51823,
+    "forwardEps": 24.64673,
+    "trailingPE": 15.19578,
+    "earningsGrowth": 0.149,
+    "revenueGrowth": 0.119,
+    "pegRatio": 0.72
   },
   "MGM": {
-    "forwardPE": 21.750755,
-    "forwardEps": 1.49604,
-    "trailingPE": 12.515386,
+    "forwardPE": 23.320545,
+    "forwardEps": 1.38676,
+    "trailingPE": 12.438462,
     "earningsGrowth": null,
     "revenueGrowth": -0.009,
-    "pegRatio": 0.42
+    "pegRatio": 0.41
   },
   "LVS": {
-    "forwardPE": 13.222521,
+    "forwardPE": 13.161126,
     "forwardEps": 3.09472,
-    "trailingPE": 16.77049,
+    "trailingPE": 16.692623,
     "earningsGrowth": -0.22,
     "revenueGrowth": -0.035,
-    "pegRatio": 1.07
+    "pegRatio": 1.08
   },
   "RL": {
-    "forwardPE": 18.265474,
+    "forwardPE": 18.015734,
     "forwardEps": 20.90173,
-    "trailingPE": 21.916187,
-    "earningsGrowth": 0.216,
-    "revenueGrowth": 0.14,
-    "pegRatio": 2.21
+    "trailingPE": 21.616533,
+    "earningsGrowth": 0.467,
+    "revenueGrowth": 0.091,
+    "pegRatio": 2.05
   },
   "BBWI": {
-    "forwardPE": 7.9414463,
-    "forwardEps": 2.78035,
-    "trailingPE": 5.8105264,
+    "forwardPE": 7.6779017,
+    "forwardEps": 2.78201,
+    "trailingPE": 5.6210527,
     "earningsGrowth": 0.933,
     "revenueGrowth": -0.023,
-    "pegRatio": 0.86
+    "pegRatio": 0.81
   },
   "STZ": {
-    "forwardPE": 11.956821,
+    "forwardPE": 11.742598,
     "forwardEps": 12.09017,
-    "trailingPE": 12.941808,
+    "trailingPE": 12.709937,
     "earningsGrowth": 0.253,
     "revenueGrowth": 0.061,
-    "pegRatio": 1.78
+    "pegRatio": 1.77
   },
   "EL": {
-    "forwardPE": 26.726948,
-    "forwardEps": 4.02777,
-    "trailingPE": 107.65,
+    "forwardPE": 27.113316,
+    "forwardEps": 4.05926,
+    "trailingPE": 110.06,
     "earningsGrowth": 3.923,
     "revenueGrowth": 0.067,
     "pegRatio": 2.12
   },
   "CHD": {
-    "forwardPE": 27.490791,
-    "forwardEps": 4.04972,
-    "trailingPE": 34.150307,
+    "forwardPE": 26.967361,
+    "forwardEps": 4.05416,
+    "trailingPE": 33.53681,
     "earningsGrowth": 0.187,
     "revenueGrowth": 0.01,
-    "pegRatio": 3.15
+    "pegRatio": 3.12
   },
   "CAG": {
-    "forwardPE": 10.358853,
+    "forwardPE": 10.178525,
     "forwardEps": 1.49727,
     "trailingPE": null,
     "earningsGrowth": 0.059,
@@ -2040,263 +2040,263 @@
     "pegRatio": 10.86
   },
   "HRL": {
-    "forwardPE": 14.4243965,
+    "forwardPE": 14.009536,
     "forwardEps": 1.56679,
-    "trailingPE": 36.451614,
+    "trailingPE": 35.403225,
     "earningsGrowth": -0.672,
     "revenueGrowth": -0.024,
-    "pegRatio": 1.57
+    "pegRatio": 1.56
   },
   "TT": {
-    "forwardPE": 22.192614,
+    "forwardPE": 22.720242,
     "forwardEps": 17.68291,
-    "trailingPE": 27.27102,
+    "trailingPE": 27.919388,
     "earningsGrowth": 0.254,
     "revenueGrowth": 0.177,
-    "pegRatio": 1.42
+    "pegRatio": 1.35
   },
   "CARR": {
-    "forwardPE": 16.672985,
+    "forwardPE": 16.41291,
     "forwardEps": 3.19139,
     "trailingPE": null,
     "earningsGrowth": null,
     "revenueGrowth": 0.123,
-    "pegRatio": 1.08
+    "pegRatio": 1.03
   },
   "OTIS": {
-    "forwardPE": 17.7084,
+    "forwardPE": 17.59033,
     "forwardEps": 4.48883,
-    "trailingPE": 19.773632,
+    "trailingPE": 19.64179,
     "earningsGrowth": 0.137,
     "revenueGrowth": 0.061,
-    "pegRatio": 1.87
+    "pegRatio": 1.86
   },
   "ROK": {
-    "forwardPE": 22.858427,
-    "forwardEps": 16.67,
-    "trailingPE": 30.38676,
-    "earningsGrowth": 0.404,
-    "revenueGrowth": 0.079,
-    "pegRatio": 1.89
+    "forwardPE": 22.34486,
+    "forwardEps": 16.82087,
+    "trailingPE": 29.972885,
+    "earningsGrowth": 1.486,
+    "revenueGrowth": 0.007,
+    "pegRatio": 1.63
   },
   "IR": {
-    "forwardPE": 20.707678,
+    "forwardPE": 20.996094,
     "forwardEps": 3.95264,
-    "trailingPE": 23.186968,
+    "trailingPE": 23.509914,
     "earningsGrowth": 1.836,
     "revenueGrowth": 0.056,
-    "pegRatio": 0.68
+    "pegRatio": 0.66
   },
   "WM": {
-    "forwardPE": 26.965195,
+    "forwardPE": 26.405258,
     "forwardEps": 8.94746,
-    "trailingPE": 31.662731,
+    "trailingPE": 31.005249,
     "earningsGrowth": 0.376,
     "revenueGrowth": 0.063,
-    "pegRatio": 2.26
+    "pegRatio": 2.28
   },
   "RSG": {
-    "forwardPE": 31.139313,
+    "forwardPE": 30.818459,
     "forwardEps": 8.00981,
-    "trailingPE": 34.545708,
+    "trailingPE": 34.18975,
     "earningsGrowth": 0.097,
     "revenueGrowth": 0.082,
-    "pegRatio": 3.14
+    "pegRatio": 3.19
   },
   "PWR": {
-    "forwardPE": 23.526138,
+    "forwardPE": 24.997622,
     "forwardEps": 21.63806,
-    "trailingPE": 46.06878,
+    "trailingPE": 48.950226,
     "earningsGrowth": 1.031,
     "revenueGrowth": 0.574,
-    "pegRatio": 1.05
+    "pegRatio": 0.92
   },
   "XYL": {
-    "forwardPE": 16.959698,
+    "forwardPE": 16.58338,
     "forwardEps": 5.89928,
-    "trailingPE": 22.184034,
+    "trailingPE": 21.691795,
     "earningsGrowth": 0.344,
     "revenueGrowth": -0.03,
-    "pegRatio": 1.35
+    "pegRatio": 1.34
   },
   "HUBB": {
-    "forwardPE": 18.166235,
+    "forwardPE": 18.628643,
     "forwardEps": 23.05321,
-    "trailingPE": 24.562466,
+    "trailingPE": 25.187685,
     "earningsGrowth": 0.036,
     "revenueGrowth": 0.246,
-    "pegRatio": 1.61
+    "pegRatio": 1.54
   },
   "SHW": {
-    "forwardPE": 26.416117,
+    "forwardPE": 26.044485,
     "forwardEps": 13.21201,
-    "trailingPE": 32.107635,
+    "trailingPE": 31.655935,
     "earningsGrowth": 0.009,
     "revenueGrowth": 0.079,
-    "pegRatio": 2.41
+    "pegRatio": 2.31
   },
   "FCX": {
-    "forwardPE": 13.526616,
-    "forwardEps": 4.28045,
-    "trailingPE": 24.32773,
+    "forwardPE": 13.987824,
+    "forwardEps": 4.24798,
+    "trailingPE": 24.966385,
     "earningsGrowth": 0.761,
     "revenueGrowth": 0.082,
-    "pegRatio": 3.62
+    "pegRatio": 3.35
   },
   "NEM": {
-    "forwardPE": 11.972927,
+    "forwardPE": 12.092947,
     "forwardEps": 9.99839,
-    "trailingPE": 13.887471,
+    "trailingPE": 14.026683,
     "earningsGrowth": 0.407,
     "revenueGrowth": 0.152,
     "pegRatio": 2.78
   },
   "NUE": {
-    "forwardPE": 11.395973,
+    "forwardPE": 11.36304,
     "forwardEps": 21.55849,
-    "trailingPE": 15.648407,
+    "trailingPE": 15.603185,
     "earningsGrowth": 1.205,
     "revenueGrowth": 0.32,
     "pegRatio": 5.21
   },
   "STLD": {
-    "forwardPE": 10.368431,
+    "forwardPE": 10.415391,
     "forwardEps": 21.40102,
-    "trailingPE": 16.38811,
+    "trailingPE": 16.462334,
     "earningsGrowth": 0.92,
     "revenueGrowth": 0.348,
     "pegRatio": 11.95
   },
   "CF": {
-    "forwardPE": 10.441398,
-    "forwardEps": 11.35576,
-    "trailingPE": 8.361777,
-    "earningsGrowth": 0.996,
-    "revenueGrowth": 0.176,
-    "pegRatio": 0.48
+    "forwardPE": 10.463014,
+    "forwardEps": 11.41067,
+    "trailingPE": 8.419605,
+    "earningsGrowth": 0.311,
+    "revenueGrowth": 0.121,
+    "pegRatio": 0.51
   },
   "MOS": {
-    "forwardPE": 14.858337,
-    "forwardEps": 1.50286,
+    "forwardPE": 15.913686,
+    "forwardEps": 1.40508,
     "trailingPE": null,
     "earningsGrowth": null,
     "revenueGrowth": -0.102,
     "pegRatio": 2.02
   },
   "PKG": {
-    "forwardPE": 17.479841,
+    "forwardPE": 17.543072,
     "forwardEps": 14.23354,
-    "trailingPE": 30.678177,
+    "trailingPE": 30.78915,
     "earningsGrowth": 0.167,
     "revenueGrowth": 0.125,
-    "pegRatio": 1.64
+    "pegRatio": 1.57
   },
   "BKR": {
-    "forwardPE": 16.186163,
+    "forwardPE": 16.771246,
     "forwardEps": 2.85429,
-    "trailingPE": 15.876288,
+    "trailingPE": 16.45017,
     "earningsGrowth": -0.328,
     "revenueGrowth": 0.145,
-    "pegRatio": 1.42
+    "pegRatio": 1.32
   },
   "OKE": {
-    "forwardPE": 14.156471,
-    "forwardEps": 6.09262,
-    "trailingPE": 13.392857,
+    "forwardPE": 13.917797,
+    "forwardEps": 6.12094,
+    "trailingPE": 13.228261,
     "earningsGrowth": 0.43,
     "revenueGrowth": 0.443,
-    "pegRatio": 1.46
+    "pegRatio": 1.42
   },
   "KMI": {
-    "forwardPE": 19.549944,
+    "forwardPE": 19.401003,
     "forwardEps": 1.54425,
-    "trailingPE": 18.635803,
+    "trailingPE": 18.493826,
     "earningsGrowth": 0.216,
     "revenueGrowth": 0.093,
-    "pegRatio": 2.74
+    "pegRatio": 2.62
   },
   "WMB": {
-    "forwardPE": 24.558708,
-    "forwardEps": 2.61618,
-    "trailingPE": 25.295277,
+    "forwardPE": 24.624182,
+    "forwardEps": 2.60232,
+    "trailingPE": 25.228348,
     "earningsGrowth": 0.059,
     "revenueGrowth": 0.123,
-    "pegRatio": 1.95
+    "pegRatio": 1.85
   },
   "LNG": {
-    "forwardPE": 13.495335,
+    "forwardPE": 13.417134,
     "forwardEps": 20.71605,
-    "trailingPE": 19.89822,
+    "trailingPE": 19.782919,
     "earningsGrowth": 0.189,
     "revenueGrowth": 0.399,
     "pegRatio": 9.46
   },
   "APA": {
-    "forwardPE": 8.0873165,
-    "forwardEps": 5.37632,
-    "trailingPE": 7.0699186,
-    "earningsGrowth": 0.263,
-    "revenueGrowth": 0.092,
-    "pegRatio": 1.09
+    "forwardPE": 8.315214,
+    "forwardEps": 5.36727,
+    "trailingPE": 7.256911,
+    "earningsGrowth": 2.509,
+    "revenueGrowth": 0.315,
+    "pegRatio": 1.07
   },
   "EIX": {
-    "forwardPE": 9.355977,
+    "forwardPE": 9.123922,
     "forwardEps": 6.50707,
-    "trailingPE": 6.469713,
+    "trailingPE": 6.3092456,
     "earningsGrowth": -0.134,
     "revenueGrowth": -0.15,
-    "pegRatio": 2.73
+    "pegRatio": 2.7
   },
   "FE": {
-    "forwardPE": 15.982137,
+    "forwardPE": 15.754791,
     "forwardEps": 2.94704,
-    "trailingPE": 22.753624,
+    "trailingPE": 22.429953,
     "earningsGrowth": 0.263,
     "revenueGrowth": 0.099,
     "pegRatio": 1.56
   },
   "NRG": {
-    "forwardPE": 7.6176047,
+    "forwardPE": 8.349576,
     "forwardEps": 10.57419,
-    "trailingPE": 21.08639,
+    "trailingPE": 23.112566,
     "earningsGrowth": null,
     "revenueGrowth": 0.11,
-    "pegRatio": 0.29
+    "pegRatio": 0.28
   },
   "AEE": {
-    "forwardPE": 19.436596,
-    "forwardEps": 5.804,
-    "trailingPE": 19.61913,
-    "earningsGrowth": 0.119,
-    "revenueGrowth": -0.062,
+    "forwardPE": 19.441042,
+    "forwardEps": 5.80473,
+    "trailingPE": 19.626087,
+    "earningsGrowth": 0.03,
+    "revenueGrowth": 0.108,
     "pegRatio": 2.79
   },
   "ETR": {
-    "forwardPE": 21.591381,
-    "forwardEps": 5.10852,
-    "trailingPE": 25.240276,
+    "forwardPE": 21.619158,
+    "forwardEps": 5.11352,
+    "trailingPE": 25.297483,
     "earningsGrowth": 0.294,
     "revenueGrowth": 0.145,
-    "pegRatio": 1.72
+    "pegRatio": 1.69
   },
   "VTR": {
-    "forwardPE": 128.11511,
+    "forwardPE": 127.697845,
     "forwardEps": 0.695,
-    "trailingPE": 171.23077,
+    "trailingPE": 170.67308,
     "earningsGrowth": -0.091,
     "revenueGrowth": 0.215,
     "pegRatio": 5.08
   },
   "KIM": {
-    "forwardPE": 28.878872,
+    "forwardPE": 28.75493,
     "forwardEps": 0.8875,
-    "trailingPE": 23.95327,
+    "trailingPE": 23.850466,
     "earningsGrowth": 1.137,
     "revenueGrowth": 0.019,
     "pegRatio": 3.37
   },
   "ARE": {
-    "forwardPE": -48.05319,
+    "forwardPE": -47.659573,
     "forwardEps": -0.94,
     "trailingPE": null,
     "earningsGrowth": null,
@@ -2304,17 +2304,17 @@
     "pegRatio": 3.24
   },
   "CBRE": {
-    "forwardPE": 15.38446,
+    "forwardPE": 15.289681,
     "forwardEps": 8.86284,
-    "trailingPE": 29.197002,
+    "trailingPE": 29.01713,
     "earningsGrowth": 0.256,
     "revenueGrowth": 0.127,
-    "pegRatio": 0.82
+    "pegRatio": 0.8
   },
   "NNN": {
-    "forwardPE": 19.77176,
+    "forwardPE": 19.60962,
     "forwardEps": 2.09693,
-    "trailingPE": 19.83732,
+    "trailingPE": 19.67464,
     "earningsGrowth": 0.118,
     "revenueGrowth": 0.085,
     "pegRatio": 4.79
@@ -2328,55 +2328,55 @@
     "pegRatio": 55.18
   },
   "MRNA": {
-    "forwardPE": -52.65993,
-    "forwardEps": -4.58527,
+    "forwardPE": -56.19483,
+    "forwardEps": -4.52337,
     "trailingPE": null,
     "earningsGrowth": null,
     "revenueGrowth": 0.021,
     "pegRatio": null
   },
   "ENPH": {
-    "forwardPE": 20.214495,
+    "forwardPE": 19.86212,
     "forwardEps": 1.43313,
-    "trailingPE": 43.238804,
+    "trailingPE": 42.485073,
     "earningsGrowth": -0.652,
     "revenueGrowth": -0.285,
     "pegRatio": 0.75
   },
   "FSLR": {
-    "forwardPE": 8.482041,
+    "forwardPE": 8.71515,
     "forwardEps": 23.07935,
-    "trailingPE": 11.32215,
+    "trailingPE": 11.633313,
     "earningsGrowth": 0.25,
     "revenueGrowth": -0.228,
     "pegRatio": 0.35
   },
   "CEG": {
-    "forwardPE": 17.839582,
+    "forwardPE": 18.606316,
     "forwardEps": 13.43361,
-    "trailingPE": 23.426197,
+    "trailingPE": 24.43304,
     "earningsGrowth": -0.468,
     "revenueGrowth": 0.23,
     "pegRatio": 3.74
   },
   "VST": {
-    "forwardPE": 11.843315,
+    "forwardPE": 13.092796,
     "forwardEps": 9.53196,
-    "trailingPE": 19.0371,
+    "trailingPE": 16.79677,
     "earningsGrowth": -0.062,
     "revenueGrowth": -0.055,
-    "pegRatio": 0.34
+    "pegRatio": 0.32
   },
   "DKNG": {
-    "forwardPE": 13.657823,
-    "forwardEps": 1.72209,
+    "forwardPE": 11.130487,
+    "forwardEps": 1.663,
     "trailingPE": null,
     "earningsGrowth": null,
-    "revenueGrowth": -0.046,
+    "revenueGrowth": 0.162,
     "pegRatio": 0.06
   },
   "RBLX": {
-    "forwardPE": -37.406586,
+    "forwardPE": -38.701878,
     "forwardEps": -1.27384,
     "trailingPE": null,
     "earningsGrowth": null,
@@ -2384,17 +2384,17 @@
     "pegRatio": 8.18
   },
   "LYFT": {
-    "forwardPE": 8.240185,
+    "forwardPE": 7.8937645,
     "forwardEps": 2.165,
-    "trailingPE": 2.5967977,
-    "earningsGrowth": 0.345,
-    "revenueGrowth": 0.161,
+    "trailingPE": 2.5356085,
+    "earningsGrowth": null,
+    "revenueGrowth": 0.081,
     "pegRatio": 0.15
   },
   "TDG": {
-    "forwardPE": 24.441013,
+    "forwardPE": 24.601736,
     "forwardEps": 48.65551,
-    "trailingPE": 36.068848,
+    "trailingPE": 36.306034,
     "earningsGrowth": 0.109,
     "revenueGrowth": 0.225,
     "pegRatio": 3.05
