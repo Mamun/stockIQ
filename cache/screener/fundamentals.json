@@ -42,11 +42,11 @@
     "earningsGrowth": 2.648
   },
   "BRK-B": {
-    "returnOnEquity": 0.121199995,
-    "profitMargins": 0.22296,
-    "revenueGrowth": 0.1,
-    "debtToEquity": 17.142,
-    "earningsGrowth": 1.078
+    "returnOnEquity": 0.10574,
+    "profitMargins": 0.19497,
+    "revenueGrowth": 0.112,
+    "debtToEquity": 17.127,
+    "earningsGrowth": -0.276
   },
   "LLY": {
     "returnOnEquity": 0.86024004,
@@ -326,7 +326,7 @@
     "profitMargins": 0.06665,
     "revenueGrowth": -0.045,
     "debtToEquity": null,
-    "earningsGrowth": 4.054
+    "earningsGrowth": 4.053
   },
   "BA": {
     "returnOnEquity": null,
@@ -644,11 +644,11 @@
     "earningsGrowth": 0.388
   },
   "AMAT": {
-    "returnOnEquity": 0.41068,
-    "profitMargins": 0.30052,
-    "revenueGrowth": 0.248,
-    "debtToEquity": 28.666,
-    "earningsGrowth": 0.428
+    "returnOnEquity": 0.4337,
+    "profitMargins": 0.29286,
+    "revenueGrowth": 0.531,
+    "debtToEquity": 25.021,
+    "earningsGrowth": 0.431
   },
   "PANW": {
     "returnOnEquity": 0.01739,
@@ -707,10 +707,10 @@
     "earningsGrowth": 0.127
   },
   "SCHW": {
-    "returnOnEquity": 0.21122,
+    "returnOnEquity": 0.21113001,
     "profitMargins": 0.39333,
     "revenueGrowth": 0.169,
-    "debtToEquity": 77.821,
+    "debtToEquity": 150.811,
     "earningsGrowth": 0.286
   },
   "AIG": {
@@ -738,14 +738,14 @@
     "returnOnEquity": 0.12165,
     "profitMargins": 0.21240999,
     "revenueGrowth": -0.31,
-    "debtToEquity": 30.393,
+    "debtToEquity": 54.233,
     "earningsGrowth": -0.802
   },
   "MET": {
     "returnOnEquity": 0.19917,
     "profitMargins": 0.0621,
     "revenueGrowth": 0.182,
-    "debtToEquity": 177.992,
+    "debtToEquity": 223.774,
     "earningsGrowth": 2.008
   },
   "TRV": {
@@ -822,8 +822,8 @@
     "returnOnEquity": 0.13119,
     "profitMargins": 0.14177,
     "revenueGrowth": 0.071,
-    "debtToEquity": 58.658,
-    "earningsGrowth": 0.185
+    "debtToEquity": 62.001,
+    "earningsGrowth": 0.238
   },
   "GD": {
     "returnOnEquity": 0.18006,
@@ -1066,16 +1066,16 @@
   "DVN": {
     "returnOnEquity": 0.12555,
     "profitMargins": 0.16284999,
-    "revenueGrowth": 0.819,
-    "debtToEquity": 26.278,
+    "revenueGrowth": 0.74,
+    "debtToEquity": 26.661,
     "earningsGrowth": -0.193
   },
   "OXY": {
-    "returnOnEquity": 0.10629,
-    "profitMargins": 0.30318,
-    "revenueGrowth": 0.534,
-    "debtToEquity": 34.511,
-    "earningsGrowth": 9.649
+    "returnOnEquity": 0.13181,
+    "profitMargins": 0.32953998,
+    "revenueGrowth": 0.19,
+    "debtToEquity": 28.803,
+    "earningsGrowth": 1.494
   },
   "HAL": {
     "returnOnEquity": 0.18778999,
@@ -1138,7 +1138,7 @@
     "profitMargins": 0.16158001,
     "revenueGrowth": 0.066,
     "debtToEquity": 162.977,
-    "earningsGrowth": 0.101
+    "earningsGrowth": 0.1
   },
   "SO": {
     "returnOnEquity": 0.11897001,
@@ -1155,18 +1155,18 @@
     "earningsGrowth": 10.363
   },
   "ES": {
-    "returnOnEquity": null,
+    "returnOnEquity": 0.087629996,
     "profitMargins": 0.10379,
     "revenueGrowth": -0.075,
-    "debtToEquity": 180.7,
+    "debtToEquity": 176.04,
     "earningsGrowth": -0.071
   },
   "PPL": {
-    "returnOnEquity": 0.086330004,
-    "profitMargins": 0.13471,
-    "revenueGrowth": 0.042,
-    "debtToEquity": 135.434,
-    "earningsGrowth": 0.212
+    "returnOnEquity": 0.08879,
+    "profitMargins": 0.13618,
+    "revenueGrowth": 0.115,
+    "debtToEquity": 137.688,
+    "earningsGrowth": 0.131
   },
   "CMS": {
     "returnOnEquity": 0.05313,
@@ -1204,10 +1204,10 @@
     "earningsGrowth": -0.089
   },
   "SPG": {
-    "returnOnEquity": 1.29347,
+    "returnOnEquity": 1.2519699,
     "profitMargins": 0.6309,
     "revenueGrowth": 0.133,
-    "debtToEquity": 567.117,
+    "debtToEquity": 540.113,
     "earningsGrowth": -0.171
   },
   "AMT": {
@@ -1491,11 +1491,11 @@
     "earningsGrowth": null
   },
   "TTD": {
-    "returnOnEquity": 0.15441,
-    "profitMargins": 0.13608,
-    "revenueGrowth": 0.03,
-    "debtToEquity": 16.863,
-    "earningsGrowth": -0.236
+    "returnOnEquity": 0.12422,
+    "profitMargins": 0.110290006,
+    "revenueGrowth": -0.005,
+    "debtToEquity": 21.509,
+    "earningsGrowth": -0.652
   },
   "OKTA": {
     "returnOnEquity": 0.043130003,
@@ -1529,7 +1529,7 @@
     "returnOnEquity": 0.32368,
     "profitMargins": 0.067719996,
     "revenueGrowth": 2.975,
-    "debtToEquity": 57.466,
+    "debtToEquity": 57.12,
     "earningsGrowth": 5.813
   },
   "NTAP": {
@@ -1564,7 +1564,7 @@
     "returnOnEquity": 0.06736,
     "profitMargins": 0.00808,
     "revenueGrowth": 0.261,
-    "debtToEquity": 67.874,
+    "debtToEquity": 70.812,
     "earningsGrowth": -0.179
   },
   "RMD": {
@@ -1816,8 +1816,8 @@
     "returnOnEquity": 0.38734,
     "profitMargins": 0.15675001,
     "revenueGrowth": 0.007,
-    "debtToEquity": 99.944,
-    "earningsGrowth": 1.528
+    "debtToEquity": 102.392,
+    "earningsGrowth": 1.52
   },
   "IR": {
     "returnOnEquity": 0.1341,
@@ -1911,10 +1911,10 @@
     "earningsGrowth": null
   },
   "PKG": {
-    "returnOnEquity": null,
+    "returnOnEquity": 0.1521,
     "profitMargins": 0.07402,
     "revenueGrowth": 0.125,
-    "debtToEquity": 94.474,
+    "debtToEquity": 91.707,
     "earningsGrowth": 0.167
   },
   "BKR": {
@@ -1974,16 +1974,16 @@
     "earningsGrowth": 0.263
   },
   "NRG": {
-    "returnOnEquity": 0.23772,
-    "profitMargins": 0.02563,
-    "revenueGrowth": 0.11,
-    "debtToEquity": 483.357,
-    "earningsGrowth": null
+    "returnOnEquity": 0.34742,
+    "profitMargins": 0.03599,
+    "revenueGrowth": 0.24,
+    "debtToEquity": 438.733,
+    "earningsGrowth": 2.754
   },
   "AEE": {
     "returnOnEquity": 0.11775,
-    "profitMargins": 0.18586999,
-    "revenueGrowth": 0.108,
+    "profitMargins": 0.18628,
+    "revenueGrowth": 0.067,
     "debtToEquity": 157.038,
     "earningsGrowth": 0.03
   },
@@ -2037,10 +2037,10 @@
     "earningsGrowth": -0.906
   },
   "MRNA": {
-    "returnOnEquity": -0.38998002,
-    "profitMargins": -1.41427,
-    "revenueGrowth": 0.021,
-    "debtToEquity": 19.036,
+    "returnOnEquity": -0.34502,
+    "profitMargins": -1.10455,
+    "revenueGrowth": 0.292,
+    "debtToEquity": 61.855,
     "earningsGrowth": null
   },
   "ENPH": {
@@ -2058,18 +2058,18 @@
     "earningsGrowth": 0.25
   },
   "CEG": {
-    "returnOnEquity": 0.15055001,
-    "profitMargins": 0.110810004,
-    "revenueGrowth": 0.23,
-    "debtToEquity": 76.419,
-    "earningsGrowth": -0.468
+    "returnOnEquity": 0.18344,
+    "profitMargins": 0.12759,
+    "revenueGrowth": 0.454,
+    "debtToEquity": 70.786,
+    "earningsGrowth": 0.745
   },
   "VST": {
-    "returnOnEquity": null,
+    "returnOnEquity": 0.46328998,
     "profitMargins": 0.13148,
     "revenueGrowth": 0.277,
-    "debtToEquity": 373.28,
-    "earningsGrowth": 0.857
+    "debtToEquity": 336.81,
+    "earningsGrowth": 0.846
   },
   "DKNG": {
     "returnOnEquity": -0.83085,
@@ -2089,14 +2089,14 @@
     "returnOnEquity": 1.5812801,
     "profitMargins": 0.40672,
     "revenueGrowth": 0.081,
-    "debtToEquity": 39.566,
+    "debtToEquity": 43.203,
     "earningsGrowth": null
   },
   "TDG": {
     "returnOnEquity": null,
-    "profitMargins": 0.21277,
-    "revenueGrowth": 0.225,
+    "profitMargins": 0.19958,
+    "revenueGrowth": 0.226,
     "debtToEquity": null,
-    "earningsGrowth": 0.109
+    "earningsGrowth": 0.336
   }
 }
